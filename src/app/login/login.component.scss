@@ -1,21 +1,21 @@
+// Import Sass modules
 @use 'sass:color';
 @use 'sass:map';
 
 @import '../../styles.scss';
 
-.forgot-password-container {
+.login-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
   min-height: 100vh;
   background-color: $color-background;
   padding: 20px;
   font-family: 'Inter', sans-serif;
 }
 
-.forgot-password-card {
-  background: $color-white;
+.login-card {
+  background: white;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   padding: 40px;
@@ -29,6 +29,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 30px;
 
   .bike-icon {
     font-size: map-get($font-sizes, '2xl');
@@ -41,22 +42,6 @@
     margin: 0;
     font-weight: map-get($font-weights, semibold);
   }
-}
-
-h2 {
-  text-align: center;
-  color: $color-dark-font;
-  font-size: map-get($font-sizes, 'xl');
-  margin-bottom: 1rem;
-  font-weight: map-get($font-weights, semibold);
-}
-
-.description {
-  text-align: center;
-  color: $color-light-font;
-  font-size: map-get($font-sizes, 'sm');
-  margin-bottom: 2rem;
-  line-height: 1.5;
 }
 
 .form-group {
@@ -95,11 +80,11 @@ h2 {
   }
 }
 
-.send-btn {
+.sign-in-btn {
   width: 100%;
   padding: 12px;
   background-color: $color-secondary;
-  color: $color-white;
+  color: white;
   border: none;
   border-radius: 4px;
   font-size: map-get($font-sizes, base);
@@ -123,40 +108,40 @@ h2 {
   }
 }
 
-.back-to-login {
+.forgot-password {
   text-align: center;
   margin-top: 20px;
 
-  .back-link {
+  a {
     color: $color-light-font;
     text-decoration: none;
     font-size: map-get($font-sizes, sm);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    transition: color 0.2s;
+    font-family: inherit;
 
     &:hover {
       color: $color-secondary;
+      text-decoration: underline;
     }
   }
 }
 
-.alert {
-  padding: 12px;
-  border-radius: 4px;
-  margin-bottom: 20px;
-  font-size: map-get($font-sizes, sm);
+.illustration {
+  display: block;
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
 
-  &.alert-danger {
-    background-color: #fee2e2;
-    color: #991b1b;
-    border: 1px solid #fecaca;
+/* Media query for larger screens */
+@media (min-width: 992px) {
+  .login-container {
+
+    padding: 0 5%;
   }
 
-  &.alert-success {
-    background-color: #dcfce7;
-    color: $color-success;
-    border: 1px solid #bbf7d0;
+  .illustration {
+    display: block;
+    margin-left: 40px;
   }
 }

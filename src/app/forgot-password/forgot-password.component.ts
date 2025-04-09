@@ -25,6 +25,7 @@ export class ForgotPasswordComponent {
     this.forgotPasswordForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
+  }
 
   onSubmit() {
     if (this.forgotPasswordForm.invalid) {
@@ -44,7 +45,7 @@ export class ForgotPasswordComponent {
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.message || 'An error occurred while processing your request.';
+        this.errorMessage = 'An error occurred while processing your request.';
       }
     });
   }

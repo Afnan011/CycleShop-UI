@@ -1,0 +1,8 @@
+<div class="dashboard-container">
+    <h1>Welcome to CycleShop</h1>
+    <p *ngIf="username">Logged in as: {{ username }}</p>
+    <p *ngIf="role">Role: {{ role }}</p>
+    
+    <button (click)="logout()">LOGOUT</button>
+
+</div>
