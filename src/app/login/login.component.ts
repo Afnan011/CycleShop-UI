@@ -43,7 +43,6 @@ export class LoginComponent {
       next: (response) => {
         this.toastr.success('Login successful', 'Success');
         if (response.role === 'admin') {
-          console.log('Admin login detected, redirecting to admin dashboard...');
           this.router.navigate(['/admin/dashboard']);
         } else {
           this.router.navigate(['/dashboard']);

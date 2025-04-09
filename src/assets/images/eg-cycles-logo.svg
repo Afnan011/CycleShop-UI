@@ -1,0 +1,9 @@
+<svg width="120" height="40" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" fill-rule="evenodd">
+    <path d="M20 30c5.523 0 10-4.477 10-10S25.523 10 20 10 10 14.477 10 20s4.477 10 10 10zm0 2c6.627 0 12-5.373 12-12S26.627 8 20 8 8 13.373 8 20s5.373 12 12 12z" fill="#0D6EFD"/>
+    <path d="M20 26c3.314 0 6-2.686 6-6s-2.686-6-6-6-6 2.686-6 6 2.686 6 6 6zm0 2c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z" fill="#0D6EFD" fill-opacity=".5"/>
+    <text font-family="Arial-BoldMT, Arial" font-size="16" font-weight="bold" fill="#212529">
+      <tspan x="40" y="25">EG CYCLES</tspan>
+    </text>
+  </g>
+</svg>

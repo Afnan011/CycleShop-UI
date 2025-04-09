@@ -12,7 +12,6 @@ export const authGuard: CanActivateFn = (route) => {
     return false;
   }
 
-  // Check if the route requires admin role
   if (route.data['requiresAdmin']) {
     if (user.role === 'admin') {
       return true;
@@ -22,6 +21,5 @@ export const authGuard: CanActivateFn = (route) => {
     }
   }
 
-  // For non-admin routes, allow access
   return true;
 };
