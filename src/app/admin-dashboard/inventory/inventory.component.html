@@ -1,0 +1,127 @@
+<div class="inventory-container">
+  <div class="inventory-header">
+    <div class="search-filters">
+      <div class="search-box">
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Search cycles..." class="form-control">
+      </div>
+      <select [(ngModel)]="selectedType" class="form-control">
+        <option value="All Types">All Types</option>
+        <option *ngFor="let type of types" [value]="type">{{ type }}</option>
+      </select>
+      <select [(ngModel)]="selectedBrand" class="form-control">
+        <option value="All Brands">All Brands</option>
+        <option *ngFor="let brand of brands" [value]="brand">{{ brand }}</option>
+      </select>
+    </div>
+    <button class="add-cycle-btn" (click)="toggleModal()">
+      <i class="fas fa-plus"></i>
+      Add New Cycle
+    </button>
+  </div>
+
+  <div class="inventory-table">
+    <table>
+      <thead>
+        <tr>
+          <th>CYCLE MODEL</th>
+          <th>BRAND</th>
+          <th>TYPE</th>
+          <th>PRICE</th>
+          <th>STOCK</th>
+          <th>ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cycle of filteredCycles()">
+          <td>{{ cycle.model }}</td>
+          <td>{{ cycle.brand }}</td>
+          <td>{{ cycle.type }}</td>
+          <td>${{ cycle.price.toFixed(2) }}</td>
+          <td>
+            <span [class.low-stock]="cycle.stock < 10">{{ cycle.stock }}</span>
+          </td>
+          <td class="actions">
+            <button class="action-btn edit" (click)="editCycle(cycle)">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete" (click)="deleteCycle(cycle)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Add New Cycle Modal -->
+  <div class="modal" *ngIf="showAddModal">
+    <div class="modal-overlay" (click)="toggleModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add New Cycle</h2>
+        <button class="close-btn" (click)="toggleModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Model Name</label>
+          <input type="text" [(ngModel)]="newCycle.model" class="form-control" placeholder="Enter model name">
+          <span class="error-message" *ngIf="newCycle.model.trim() === ''">Model name is required</span>
+        </div>
+        <div class="form-group">
+          <label>Brand</label>
+          <select [(ngModel)]="newCycle.brand" class="form-control">
+            <option value="">Select Brand</option>
+            <option *ngFor="let brand of brands" [value]="brand">{{ brand }}</option>
+          </select>
+          <span class="error-message" *ngIf="newCycle.brand === ''">Brand is required</span>
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select [(ngModel)]="newCycle.type" class="form-control">
+            <option value="">Select Type</option>
+            <option *ngFor="let type of types" [value]="type">{{ type }}</option>
+          </select>
+          <span class="error-message" *ngIf="newCycle.type === ''">Type is required</span>
+        </div>
+        <div class="form-group">
+          <label>Price</label>
+          <input type="number" [(ngModel)]="newCycle.price" class="form-control" placeholder="Enter price">
+          <span class="error-message" *ngIf="newCycle.price <= 0">Price must be greater than 0</span>
+        </div>
+        <div class="form-group">
+          <label>Stock</label>
+          <input type="number" [(ngModel)]="newCycle.stock" class="form-control" placeholder="Enter stock quantity">
+          <span class="error-message" *ngIf="newCycle.stock < 0">Stock cannot be negative</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="cancel-btn" (click)="toggleModal()">Cancel</button>
+        <button class="save-btn" (click)="addCycle()" [disabled]="!validateForm()">Save Cycle</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-control.ng-invalid.ng-touched {
+  border-color: #dc3545;
+}
+
+.save-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+</style>

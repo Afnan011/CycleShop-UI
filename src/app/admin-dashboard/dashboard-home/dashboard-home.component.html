@@ -1,0 +1,85 @@
+<div class="dashboard-stats">
+  <div class="stats-cards">
+    <div class="stat-card">
+      <div class="stat-icon">₹</div>
+      <div class="stat-content">
+        <h3>Total Sales</h3>
+        <p class="stat-value">${{totalSales | number}}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">📦</div>
+      <div class="stat-content">
+        <h3>Total Orders</h3>
+        <p class="stat-value">{{totalOrders}}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">🚲</div>
+      <div class="stat-content">
+        <h3>Inventory Items</h3>
+        <p class="stat-value">{{inventoryItems}}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-content">
+        <h3>Customers</h3>
+        <p class="stat-value">{{totalCustomers}}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-tables">
+    <div class="recent-orders">
+      <h2>Recent Orders</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Product</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of recentOrders">
+            <td>{{ order.id }}</td>
+            <td>{{ order.customer }}</td>
+            <td>{{ order.product }}</td>
+            <td>₹{{ order.amount }}</td>
+            <td>
+              <span [class]="'status ' + order.status.toLowerCase()">
+                {{ order.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="low-stock">
+      <h2>Low Stock Alert</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Category</th>
+            <th>Stock</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of lowStockItems">
+            <td>{{ item.product }}</td>
+            <td>{{ item.category }}</td>
+            <td>{{ item.stock }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+

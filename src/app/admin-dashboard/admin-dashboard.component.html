@@ -18,31 +18,31 @@
   <main class="main-content">
     <aside class="sidebar">
       <nav class="nav-menu">
-        <a class="nav-item active">
+        <a routerLink="/admin/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
           <i class="fas fa-dashboard"></i>
           <span>Dashboard</span>
         </a>
-        <a class="nav-item">
+        <a routerLink="/admin/dashboard/inventory" routerLinkActive="active" class="nav-item">
           <i class="fas fa-bicycle"></i>
           <span>Inventory</span>
         </a>
-        <a class="nav-item">
+        <a routerLink="/admin/dashboard/customers" routerLinkActive="active" class="nav-item">
           <i class="fas fa-users"></i>
           <span>Customers</span>
         </a>
-        <a class="nav-item">
+        <a routerLink="/admin/dashboard/orders" routerLinkActive="active" class="nav-item">
           <i class="fas fa-shopping-cart"></i>
           <span>Orders</span>
         </a>
-        <a class="nav-item">
+        <a routerLink="/admin/dashboard/employees" routerLinkActive="active" class="nav-item">
           <i class="fas fa-user-tie"></i>
           <span>Employees</span>
         </a>
-        <a class="nav-item">
+        <a routerLink="/admin/dashboard/reports" routerLinkActive="active" class="nav-item">
           <i class="fas fa-chart-bar"></i>
           <span>Reports</span>
         </a>
-        <a class="nav-item">
+        <a routerLink="/admin/dashboard/settings" routerLinkActive="active" class="nav-item">
           <i class="fas fa-cog"></i>
           <span>Settings</span>
         </a>
@@ -55,91 +55,7 @@
       </nav>
     </aside>
     <div class="dashboard-content">
-      <div class="stats-cards">
-        <div class="stat-card">
-          <div class="stat-icon">₹</div>
-          <div class="stat-content">
-            <h3>Total Sales</h3>
-            <p class="stat-value">${{totalSales | number}}</p>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">📦</div>
-          <div class="stat-content">
-            <h3>Total Orders</h3>
-            <p class="stat-value">{{totalOrders}}</p>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">🚲</div>
-          <div class="stat-content">
-            <h3>Inventory Items</h3>
-            <p class="stat-value">{{inventoryItems}}</p>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">👥</div>
-          <div class="stat-content">
-            <h3>Customers</h3>
-            <p class="stat-value">{{totalCustomers}}</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="data-tables">
-        <div class="recent-orders">
-          <h2>Recent Orders</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>Customer</th>
-                <th>Product</th>
-                <th>Amount</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let order of recentOrders">
-                <td>{{order.id}}</td>
-                <td>{{order.customer}}</td>
-                <td>{{order.product}}</td>
-                <td>${{order.amount}}</td>
-                <td>
-                  <span class="status" [ngClass]="order.status.toLowerCase()">{{order.status}}</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="low-stock">
-          <h2>Low Stock Items</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Category</th>
-                <th>Stock</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of lowStockItems">
-                <td>{{item.product}}</td>
-                <td>{{item.category}}</td>
-                <td>{{item.stock}}</td>
-                <td>
-                  <button class="reorder-btn">Reorder</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <router-outlet></router-outlet>
     </div>
   </main>
 </div>
