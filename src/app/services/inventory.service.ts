@@ -68,7 +68,6 @@ export class InventoryService {
   getTypeByName(name: string): Observable<string | null> {
     return this.getTypes().pipe(
       map(types => {
-        console.log('cycle types: ', types);
         const foundType = types.find((type) => type.name === name);
         return foundType ? foundType.cycleTypeId : null;
       })

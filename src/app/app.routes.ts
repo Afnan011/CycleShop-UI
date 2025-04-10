@@ -6,6 +6,7 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { authGuard } from './guards/auth.guard';
 import { InventoryComponent } from './admin-dashboard/inventory/inventory.component';
 import { DashboardHomeComponent } from './admin-dashboard/dashboard-home/dashboard-home.component';
+import { CycleDetailsComponent } from './admin-dashboard/inventory/cycle-details/cycle-details.component';
 
 export const routes: Routes = [
   {
@@ -34,6 +35,10 @@ export const routes: Routes = [
       {
         path: 'inventory',
         component: InventoryComponent
+      },
+      {
+        path: 'inventory/:id',
+        component: CycleDetailsComponent
       }
     ]
   },

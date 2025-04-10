@@ -1,16 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { InventoryService } from '../../services/inventory.service';
-import { CycleInventoryView, Brand, CycleType, CycleCreate } from '../../models/cycle.model';
+import {
+  CycleInventoryView,
+  Brand,
+  CycleType,
+  CycleCreate,
+} from '../../models/cycle.model';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './inventory.component.html',
-  styleUrls: ['./inventory.component.scss']
+  styleUrls: ['./inventory.component.scss'],
 })
 export class InventoryComponent implements OnInit {
   showAddModal = false;
@@ -28,7 +35,11 @@ export class InventoryComponent implements OnInit {
   brands: Brand[] = [];
   filteredCyclesList: CycleInventoryView[] = [];
 
-  constructor(private inventoryService: InventoryService) {}
+  constructor(
+    private inventoryService: InventoryService,
+    private toastr: ToastrService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loadData();
@@ -42,7 +53,7 @@ export class InventoryComponent implements OnInit {
       next: (data) => {
         if (data && data.length > 0) {
           this.cycles = data;
-          console.log(data);
+          console.log('Cycles:', this.cycles);
           this.updateFilters();
         } else {
           this.error = 'No inventory data found.';
@@ -51,40 +62,44 @@ export class InventoryComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading inventory:', err);
-        this.error = err.status === 0
-          ? 'Cannot connect to the server. Please check if the API is running.'
-          : 'Failed to load inventory data. Please try again.';
+
+        this.error =
+          err.status === 0
+            ? 'Cannot connect to the server. Please check if the API is running.'
+            : 'Failed to load inventory data. Please try again.';
         this.loading = false;
-      }
+      },
     });
   }
 
   updateFilters() {
     if (!this.cycles) return;
 
-    // Get unique brands and types from cycles
-    const uniqueBrands = new Set(this.cycles.map(cycle => cycle.brand).filter(brand => brand));
-    const uniqueTypes = new Set(this.cycles.map(cycle => cycle.type).filter(type => type));
+    const uniqueBrands = new Set(
+      this.cycles.map((cycle) => cycle.brand).filter((brand) => brand)
+    );
+    const uniqueTypes = new Set(
+      this.cycles.map((cycle) => cycle.type).filter((type) => type)
+    );
 
-    // Load full brand and type objects
     this.inventoryService.getBrands().subscribe({
       next: (brands) => {
-        this.brands = brands.filter(brand => uniqueBrands.has(brand.name));
+        this.brands = brands.filter((brand) => uniqueBrands.has(brand.name));
       },
       error: (err) => {
         console.error('Error loading brands:', err);
         this.error = 'Failed to load brands. Please try again.';
-      }
+      },
     });
 
     this.inventoryService.getTypes().subscribe({
       next: (types) => {
-        this.types = types.filter(type => uniqueTypes.has(type.name));
+        this.types = types.filter((type) => uniqueTypes.has(type.name));
       },
       error: (err) => {
         console.error('Error loading types:', err);
         this.error = 'Failed to load types. Please try again.';
-      }
+      },
     });
   }
 
@@ -93,15 +108,19 @@ export class InventoryComponent implements OnInit {
       return [];
     }
 
-    const filtered = this.cycles.filter(cycle => {
+    const filtered = this.cycles.filter((cycle) => {
       const searchLower = (this.searchQuery || '').toLowerCase();
       const modelMatch = cycle.model.toLowerCase().includes(searchLower);
       const brandMatch = cycle.brand.toLowerCase().includes(searchLower);
       const typeMatch = cycle.type.toLowerCase().includes(searchLower);
 
-      const matchesSearch = !this.searchQuery || modelMatch || brandMatch || typeMatch;
-      const matchesType = this.selectedType === 'All Types' || cycle.type === this.selectedType;
-      const matchesBrand = this.selectedBrand === 'All Brands' || cycle.brand === this.selectedBrand;
+      const matchesSearch =
+        !this.searchQuery || modelMatch || brandMatch || typeMatch;
+      const matchesType =
+        this.selectedType === 'All Types' || cycle.type === this.selectedType;
+      const matchesBrand =
+        this.selectedBrand === 'All Brands' ||
+        cycle.brand === this.selectedBrand;
 
       return matchesSearch && matchesType && matchesBrand;
     });
@@ -126,32 +145,31 @@ export class InventoryComponent implements OnInit {
   }
 
   editCycle(cycle: CycleInventoryView) {
-    // Implement edit functionality
     console.log('Edit cycle:', cycle);
   }
   deleteCycle(cycle: CycleInventoryView) {
     if (confirm('Are you sure you want to delete this cycle?')) {
       this.inventoryService.deleteCycle(cycle.id).subscribe({
         next: () => {
-          this.loadData(); // Refresh the data
+          this.loadData();
         },
         error: (err) => {
           console.error('Error deleting cycle:', err);
           this.error = 'Failed to delete cycle. Please try again.';
-        }
+        },
       });
     }
-  }  
+  }
   newCycle = {
     model: '123',
-    brandName: '', 
-    typeName: '',  
+    brandName: '',
+    typeName: '',
     price: 130,
     costPrice: 110,
     stock: 10,
     reorderThreshold: 5,
     warehouseLocation: 'A1',
-    description: 'test description'
+    description: 'test description',
   };
 
   toggleModal() {
@@ -162,19 +180,22 @@ export class InventoryComponent implements OnInit {
   }
 
   addCycle() {
+    let brandId: string = '';
+    let typeId: string = '';
 
-    let brandId:string = '';
-    let typeId:string = '';
-
-    const brandObservable = this.inventoryService.getBrandByName(this.newCycle.brandName);
-    const typeObservable = this.inventoryService.getTypeByName(this.newCycle.typeName);
+    const brandObservable = this.inventoryService.getBrandByName(
+      this.newCycle.brandName
+    );
+    const typeObservable = this.inventoryService.getTypeByName(
+      this.newCycle.typeName
+    );
 
     forkJoin([brandObservable, typeObservable]).subscribe({
       next: ([brandIdResponse, typeIdResponse]) => {
-        brandId = brandIdResponse ?? ''; 
-        typeId = typeIdResponse ?? ''; 
+        brandId = brandIdResponse ?? '';
+        typeId = typeIdResponse ?? '';
 
-        if (!this.validateForm()) return;    
+        if (!this.validateForm()) return;
 
         const cycleData: CycleCreate = {
           modelName: this.newCycle.model,
@@ -183,48 +204,49 @@ export class InventoryComponent implements OnInit {
           price: this.newCycle.price,
           costPrice: this.newCycle.costPrice,
           description: this.newCycle.description,
-          isActive: true
+          isActive: true,
         };
 
-        this.saveCycleData(cycleData)
-
+        this.saveCycleData(cycleData);
       },
       error: (err) => {
+        this.toastr.error('Failed to Add new Cycle', 'Error');
         console.error('Error fetching brand/type IDs:', err);
         this.error = 'Failed to fetch brand/type IDs. Please try again.';
-      }
+      },
     });
-  } 
+  }
 
   saveCycleData(cycleData: CycleCreate) {
     this.inventoryService.addCycle(cycleData).subscribe({
       next: (cycle) => {
-        console.log('Cycle added:', cycle);
         const inventoryData = {
           cycleId: cycle.cycleId,
           stockQuantity: this.newCycle.stock,
           reorderThreshold: this.newCycle.reorderThreshold,
-          warehouseLocation: this.newCycle.warehouseLocation
+          warehouseLocation: this.newCycle.warehouseLocation,
         };
 
         this.inventoryService.addInventory(inventoryData).subscribe({
           next: () => {
-            this.loadData(); 
+            this.loadData();
             this.toggleModal();
           },
           error: (err) => {
+            this.toastr.error('Failed to Add new Cycle', 'Error');
             console.error('Error adding inventory:', err);
             this.error = 'Failed to add inventory. Please try again.';
-          }
+          },
         });
       },
       error: (err) => {
+        this.toastr.error('Failed to Add new Cycle', 'Error');
         console.error('Error adding cycle:', err);
         this.error = 'Failed to add cycle. Please try again.';
-      }
+      },
     });
   }
-  
+
   validateForm(): boolean {
     return (
       this.newCycle.model.trim() !== '' &&
@@ -237,8 +259,8 @@ export class InventoryComponent implements OnInit {
       this.newCycle.reorderThreshold > 0 &&
       this.newCycle.description.trim() !== ''
     );
-  }  
-  
+  }
+
   resetForm() {
     this.newCycle = {
       model: '',
@@ -249,7 +271,11 @@ export class InventoryComponent implements OnInit {
       stock: 0,
       reorderThreshold: 5,
       warehouseLocation: '',
-      description: ''
+      description: '',
     };
+  }
+
+  viewCycle(cycle: CycleInventoryView) {
+    this.router.navigate(['/admin/dashboard/inventory', cycle.id]);
   }
 }
