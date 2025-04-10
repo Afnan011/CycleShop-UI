@@ -15,7 +15,7 @@
     </div>
     <button class="add-cycle-btn" (click)="toggleModal()">
       <i class="fas fa-plus"></i>
-      Add New Cycle
+      <span>Add New Cycle</span>
     </button>
   </div>
 
@@ -37,8 +37,8 @@
           <td>{{ cycle.brand }}</td>
           <td>{{ cycle.type }}</td>
           <td>${{ cycle.price.toFixed(2) }}</td>
-          <td>
-            <span [class.low-stock]="cycle.stock < 10">{{ cycle.stock }}</span>
+          <td >
+            <span class="stocks" [class.low-stock]="cycle.stock < 10">{{ cycle.stock }}</span>
           </td>
           <td class="actions">
             <button class="action-btn edit" (click)="editCycle(cycle)">
@@ -53,6 +53,7 @@
     </table>
   </div>
 
+
   <!-- Add New Cycle Modal -->
   <div class="modal" *ngIf="showAddModal">
     <div class="modal-overlay" (click)="toggleModal()"></div>
@@ -64,36 +65,38 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="form-group">
-          <label>Model Name</label>
-          <input type="text" [(ngModel)]="newCycle.model" class="form-control" placeholder="Enter model name">
-          <span class="error-message" *ngIf="newCycle.model.trim() === ''">Model name is required</span>
-        </div>
-        <div class="form-group">
-          <label>Brand</label>
-          <select [(ngModel)]="newCycle.brand" class="form-control">
-            <option value="">Select Brand</option>
-            <option *ngFor="let brand of brands" [value]="brand">{{ brand }}</option>
-          </select>
-          <span class="error-message" *ngIf="newCycle.brand === ''">Brand is required</span>
-        </div>
-        <div class="form-group">
-          <label>Type</label>
-          <select [(ngModel)]="newCycle.type" class="form-control">
-            <option value="">Select Type</option>
-            <option *ngFor="let type of types" [value]="type">{{ type }}</option>
-          </select>
-          <span class="error-message" *ngIf="newCycle.type === ''">Type is required</span>
-        </div>
-        <div class="form-group">
-          <label>Price</label>
-          <input type="number" [(ngModel)]="newCycle.price" class="form-control" placeholder="Enter price">
-          <span class="error-message" *ngIf="newCycle.price <= 0">Price must be greater than 0</span>
-        </div>
-        <div class="form-group">
-          <label>Stock</label>
-          <input type="number" [(ngModel)]="newCycle.stock" class="form-control" placeholder="Enter stock quantity">
-          <span class="error-message" *ngIf="newCycle.stock < 0">Stock cannot be negative</span>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Model Name</label>
+            <input type="text" [(ngModel)]="newCycle.model" class="form-control" placeholder="Enter model name">
+            <span class="error-message" *ngIf="newCycle.model.trim() === ''">Model name is required</span>
+          </div>
+          <div class="form-group">
+            <label>Brand</label>
+            <select [(ngModel)]="newCycle.brand" class="form-control">
+              <option value="">Select Brand</option>
+              <option *ngFor="let brand of brands" [value]="brand">{{ brand }}</option>
+            </select>
+            <span class="error-message" *ngIf="newCycle.brand === ''">Brand is required</span>
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <select [(ngModel)]="newCycle.type" class="form-control">
+              <option value="">Select Type</option>
+              <option *ngFor="let type of types" [value]="type">{{ type }}</option>
+            </select>
+            <span class="error-message" *ngIf="newCycle.type === ''">Type is required</span>
+          </div>
+          <div class="form-group">
+            <label>Price</label>
+            <input type="number" [(ngModel)]="newCycle.price" class="form-control" placeholder="Enter price">
+            <span class="error-message" *ngIf="newCycle.price <= 0">Price must be greater than 0</span>
+          </div>
+          <div class="form-group">
+            <label>Stock</label>
+            <input type="number" [(ngModel)]="newCycle.stock" class="form-control" placeholder="Enter stock quantity">
+            <span class="error-message" *ngIf="newCycle.stock < 0">Stock cannot be negative</span>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -105,23 +108,5 @@
 </div>
 
 <style>
-.error-message {
-  color: #dc3545;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  display: block;
-}
 
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-control.ng-invalid.ng-touched {
-  border-color: #dc3545;
-}
-
-.save-btn:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
 </style>
