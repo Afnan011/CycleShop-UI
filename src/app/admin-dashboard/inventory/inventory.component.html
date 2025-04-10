@@ -6,11 +6,11 @@
       </div>
       <select [(ngModel)]="selectedType" class="form-control">
         <option value="All Types">All Types</option>
-        <option *ngFor="let type of types" [value]="type">{{ type }}</option>
+        <option *ngFor="let type of types" [value]="type.name">{{ type.name }}</option>
       </select>
       <select [(ngModel)]="selectedBrand" class="form-control">
         <option value="All Brands">All Brands</option>
-        <option *ngFor="let brand of brands" [value]="brand">{{ brand }}</option>
+        <option *ngFor="let brand of brands" [value]="brand.name">{{ brand.name }}</option>
       </select>
     </div>
     <button class="add-cycle-btn" (click)="toggleModal()">
@@ -23,12 +23,12 @@
     <table>
       <thead>
         <tr>
-          <th>CYCLE MODEL</th>
-          <th>BRAND</th>
-          <th>TYPE</th>
-          <th>PRICE</th>
-          <th>STOCK</th>
-          <th>ACTIONS</th>
+          <th>Cycle Model</th>
+          <th>Brand</th>
+          <th>Type</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -36,9 +36,9 @@
           <td>{{ cycle.model }}</td>
           <td>{{ cycle.brand }}</td>
           <td>{{ cycle.type }}</td>
-          <td>${{ cycle.price.toFixed(2) }}</td>
+          <td>₹{{ cycle.price.toFixed(2) }}</td>
           <td >
-            <span class="stocks" [class.low-stock]="cycle.stock < 10">{{ cycle.stock }}</span>
+            <span class="stocks" [class.low-stock]="cycle.stockQuantity <= cycle.reorderThreshold">{{ cycle.stockQuantity }}</span>
           </td>
           <td class="actions">
             <button class="action-btn edit" (click)="editCycle(cycle)">
@@ -51,6 +51,15 @@
         </tr>
       </tbody>
     </table>
+    <div class="pagination-controls">
+      <button class="pagination-btn" [disabled]="currentPage === 1" (click)="previousPage()">
+        <i class="fas fa-chevron-left"></i> Previous
+      </button>
+      <span class="page-info">Page {{currentPage}} of {{totalPages}}</span>
+      <button class="pagination-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
+        Next <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
   </div>
 
 
@@ -75,7 +84,7 @@
             <label>Brand</label>
             <select [(ngModel)]="newCycle.brand" class="form-control">
               <option value="">Select Brand</option>
-              <option *ngFor="let brand of brands" [value]="brand">{{ brand }}</option>
+              <option *ngFor="let brand of brands" [value]="brand.name">{{ brand.name }}</option>
             </select>
             <span class="error-message" *ngIf="newCycle.brand === ''">Brand is required</span>
           </div>
@@ -83,19 +92,34 @@
             <label>Type</label>
             <select [(ngModel)]="newCycle.type" class="form-control">
               <option value="">Select Type</option>
-              <option *ngFor="let type of types" [value]="type">{{ type }}</option>
+              <option *ngFor="let type of types" [value]="type.name">{{ type.name }}</option>
             </select>
             <span class="error-message" *ngIf="newCycle.type === ''">Type is required</span>
           </div>
           <div class="form-group">
             <label>Price</label>
-            <input type="number" [(ngModel)]="newCycle.price" class="form-control" placeholder="Enter price">
+            <input type="number" [(ngModel)]="newCycle.price" class="form-control" placeholder="Enter selling price">
             <span class="error-message" *ngIf="newCycle.price <= 0">Price must be greater than 0</span>
+          </div>
+          <div class="form-group">
+            <label>Cost Price</label>
+            <input type="number" [(ngModel)]="newCycle.costPrice" class="form-control" placeholder="Enter cost price">
+            <span class="error-message" *ngIf="newCycle.costPrice <= 0">Cost price must be greater than 0</span>
           </div>
           <div class="form-group">
             <label>Stock</label>
             <input type="number" [(ngModel)]="newCycle.stock" class="form-control" placeholder="Enter stock quantity">
             <span class="error-message" *ngIf="newCycle.stock < 0">Stock cannot be negative</span>
+          </div>
+          <div class="form-group">
+            <label>Reorder Threshold</label>
+            <input type="number" [(ngModel)]="newCycle.reorderThreshold" class="form-control" placeholder="Enter reorder threshold">
+            <span class="error-message" *ngIf="newCycle.reorderThreshold <= 0">Reorder threshold must be greater than 0</span>
+          </div>
+          <div class="form-group">
+            <label>Warehouse Location</label>
+            <input type="text" [(ngModel)]="newCycle.warehouseLocation" class="form-control" placeholder="Enter warehouse location (e.g. A1-02)">
+            <span class="error-message" *ngIf="newCycle.warehouseLocation.trim() === ''">Warehouse location is required</span>
           </div>
         </div>
       </div>
