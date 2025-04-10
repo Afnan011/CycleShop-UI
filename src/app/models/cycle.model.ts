@@ -17,21 +17,25 @@ export interface CycleInventoryView {
 }
 
 export interface Brand {
-    id: string;
+    brandId: string;
     name: string;
+    description?: string;
 }
 
-export interface Type {
-    id: string;
+export interface CycleType {
+    cycleTypeId: string;
     name: string;
 }
 
 export interface CycleCreate {
     modelName: string;
-    brandId: string;
-    typeId: string;
+    brandId: string;  // We want this to be required as it maps to non-nullable Guid in C#
+    typeId: string;   // We want this to be required as it maps to non-nullable Guid in C#
     price: number;
     costPrice: number;
+    description: string;
+    isActive?: boolean;
+    imageUrl?: string;
 }
 
 export interface InventoryCreate {

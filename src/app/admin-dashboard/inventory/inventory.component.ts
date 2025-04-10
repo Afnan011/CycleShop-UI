@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InventoryService } from '../../services/inventory.service';
-import { CycleInventoryView, Brand, Type } from '../../models/cycle.model';
+import { CycleInventoryView, Brand, CycleType, CycleCreate } from '../../models/cycle.model';
+import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 
 @Component({
   selector: 'app-inventory',
@@ -23,7 +24,7 @@ export class InventoryComponent implements OnInit {
   error = '';
 
   cycles: CycleInventoryView[] = [];
-  types: Type[] = [];
+  types: CycleType[] = [];
   brands: Brand[] = [];
   filteredCyclesList: CycleInventoryView[] = [];
 
@@ -128,7 +129,6 @@ export class InventoryComponent implements OnInit {
     // Implement edit functionality
     console.log('Edit cycle:', cycle);
   }
-
   deleteCycle(cycle: CycleInventoryView) {
     if (confirm('Are you sure you want to delete this cycle?')) {
       this.inventoryService.deleteCycle(cycle.id).subscribe({
@@ -141,17 +141,17 @@ export class InventoryComponent implements OnInit {
         }
       });
     }
-  }
-
+  }  
   newCycle = {
-    model: '',
-    brand: '',
-    type: '',
-    price: 0,
-    costPrice: 0,
-    stock: 0,
+    model: '123',
+    brandName: '', 
+    typeName: '',  
+    price: 130,
+    costPrice: 110,
+    stock: 10,
     reorderThreshold: 5,
-    warehouseLocation: ''
+    warehouseLocation: 'A1',
+    description: 'test description'
   };
 
   toggleModal() {
@@ -162,28 +162,46 @@ export class InventoryComponent implements OnInit {
   }
 
   addCycle() {
-    if (!this.validateForm()) return;
 
-    const selectedBrand = this.brands.find(b => b.name === this.newCycle.brand);
-    const selectedType = this.types.find(t => t.name === this.newCycle.type);
+    let brandId:string = '';
+    let typeId:string = '';
 
-    if (!selectedBrand || !selectedType) {
-      this.error = 'Please select valid brand and type';
-      return;
-    }
+    const brandObservable = this.inventoryService.getBrandByName(this.newCycle.brandName);
+    const typeObservable = this.inventoryService.getTypeByName(this.newCycle.typeName);
 
-    const cycleData = {
-      modelName: this.newCycle.model,
-      brandId: selectedBrand.id,
-      typeId: selectedType.id,
-      price: this.newCycle.price,
-      costPrice: this.newCycle.costPrice
-    };
+    forkJoin([brandObservable, typeObservable]).subscribe({
+      next: ([brandIdResponse, typeIdResponse]) => {
+        brandId = brandIdResponse ?? ''; 
+        typeId = typeIdResponse ?? ''; 
 
+        if (!this.validateForm()) return;    
+
+        const cycleData: CycleCreate = {
+          modelName: this.newCycle.model,
+          brandId: brandId,
+          typeId: typeId,
+          price: this.newCycle.price,
+          costPrice: this.newCycle.costPrice,
+          description: this.newCycle.description,
+          isActive: true
+        };
+
+        this.saveCycleData(cycleData)
+
+      },
+      error: (err) => {
+        console.error('Error fetching brand/type IDs:', err);
+        this.error = 'Failed to fetch brand/type IDs. Please try again.';
+      }
+    });
+  } 
+
+  saveCycleData(cycleData: CycleCreate) {
     this.inventoryService.addCycle(cycleData).subscribe({
       next: (cycle) => {
+        console.log('Cycle added:', cycle);
         const inventoryData = {
-          cycleId: cycle.id,
+          cycleId: cycle.cycleId,
           stockQuantity: this.newCycle.stock,
           reorderThreshold: this.newCycle.reorderThreshold,
           warehouseLocation: this.newCycle.warehouseLocation
@@ -191,7 +209,7 @@ export class InventoryComponent implements OnInit {
 
         this.inventoryService.addInventory(inventoryData).subscribe({
           next: () => {
-            this.loadData(); // Refresh the data
+            this.loadData(); 
             this.toggleModal();
           },
           error: (err) => {
@@ -206,30 +224,32 @@ export class InventoryComponent implements OnInit {
       }
     });
   }
-
+  
   validateForm(): boolean {
     return (
       this.newCycle.model.trim() !== '' &&
-      this.newCycle.brand !== '' &&
-      this.newCycle.type !== '' &&
+      this.newCycle.brandName !== '' &&
+      this.newCycle.typeName !== '' &&
       this.newCycle.price > 0 &&
       this.newCycle.costPrice > 0 &&
       this.newCycle.stock >= 0 &&
       this.newCycle.warehouseLocation.trim() !== '' &&
-      this.newCycle.reorderThreshold > 0
+      this.newCycle.reorderThreshold > 0 &&
+      this.newCycle.description.trim() !== ''
     );
-  }
-
+  }  
+  
   resetForm() {
     this.newCycle = {
       model: '',
-      brand: '',
-      type: '',
+      brandName: '',
+      typeName: '',
       price: 0,
       costPrice: 0,
       stock: 0,
       reorderThreshold: 5,
-      warehouseLocation: ''
+      warehouseLocation: '',
+      description: ''
     };
   }
 }

@@ -81,20 +81,20 @@
             <span class="error-message" *ngIf="newCycle.model.trim() === ''">Model name is required</span>
           </div>
           <div class="form-group">
-            <label>Brand</label>
-            <select [(ngModel)]="newCycle.brand" class="form-control">
+            <label>Brand</label>            
+            <select [(ngModel)]="newCycle.brandName" class="form-control">
               <option value="">Select Brand</option>
               <option *ngFor="let brand of brands" [value]="brand.name">{{ brand.name }}</option>
             </select>
-            <span class="error-message" *ngIf="newCycle.brand === ''">Brand is required</span>
+            <span class="error-message" *ngIf="!newCycle.brandName">Brand is required</span>
           </div>
           <div class="form-group">
             <label>Type</label>
-            <select [(ngModel)]="newCycle.type" class="form-control">
+            <select [(ngModel)]="newCycle.typeName" class="form-control">
               <option value="">Select Type</option>
               <option *ngFor="let type of types" [value]="type.name">{{ type.name }}</option>
             </select>
-            <span class="error-message" *ngIf="newCycle.type === ''">Type is required</span>
+            <span class="error-message" *ngIf="newCycle.typeName === ''">Type is required</span>
           </div>
           <div class="form-group">
             <label>Price</label>
@@ -121,6 +121,11 @@
             <input type="text" [(ngModel)]="newCycle.warehouseLocation" class="form-control" placeholder="Enter warehouse location (e.g. A1-02)">
             <span class="error-message" *ngIf="newCycle.warehouseLocation.trim() === ''">Warehouse location is required</span>
           </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea [(ngModel)]="newCycle.description" class="form-control" placeholder="Enter cycle description"></textarea>
+            <span class="error-message" *ngIf="newCycle.description.trim() === ''">Description is required</span>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -130,7 +135,3 @@
     </div>
   </div>
 </div>
-
-<style>
-
-</style>
