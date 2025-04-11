@@ -20,9 +20,9 @@
   </div>
 
   <div class="inventory-table">
-    <table>
-      <thead>
+    <table>      <thead>
         <tr>
+          <th>Image</th>
           <th>Cycle Model</th>
           <th>Brand</th>
           <th>Type</th>
@@ -33,23 +33,28 @@
       </thead>
       <tbody>
         <tr *ngFor="let cycle of filteredCycles()">
+          <td class="cycle-image">
+            <img [src]="cycle.imageUrl || 'assets/images/default_cycle2.jpg'" [alt]="cycle.model">
+          </td>
           <td>{{ cycle.model }}</td>
           <td>{{ cycle.brand }}</td>
           <td>{{ cycle.type }}</td>
           <td>₹{{ cycle.price.toFixed(2) }}</td>
-          <td >
+          <td>
             <span class="stocks" [class.low-stock]="cycle.stockQuantity <= cycle.reorderThreshold">{{ cycle.stockQuantity }}</span>
           </td>
-          <td class="actions">
-            <button class="action-btn view" (click)="viewCycle(cycle)">
-              <i class="fas fa-eye"></i>
-            </button>
-            <button class="action-btn edit" (click)="editCycle(cycle)">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="action-btn delete" (click)="deleteCycle(cycle)">
-              <i class="fas fa-trash"></i>
-            </button>
+          <td>
+            <div class="actions">
+              <button class="action-btn view" (click)="viewCycle(cycle)">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="action-btn edit" (click)="editCycle(cycle)">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="action-btn delete" (click)="deleteCycle(cycle)">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>
