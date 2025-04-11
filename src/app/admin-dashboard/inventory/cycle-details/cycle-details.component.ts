@@ -9,10 +9,11 @@ import { CycleInventoryView } from '../../../models/cycle.model';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './cycle-details.component.html',
-  styleUrls: ['./cycle-details.component.scss'],
+  styleUrls: ['./cycle-details.component.scss']
 })
 export class CycleDetailsComponent implements OnInit {
   cycle: CycleInventoryView | null = null;
+  showFullScreenImage = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -23,8 +24,6 @@ export class CycleDetailsComponent implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(params => {
       if (params['id']) {
-        // Get the cycle from the service - since we already have the data in the service,
-        // we can just filter the existing data instead of making a new API call
         this.inventoryService.getCyclesWithInventory().subscribe({
           next: (cycles) => {
             const found = cycles.find(c => c.id === params['id']);
@@ -45,5 +44,15 @@ export class CycleDetailsComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/admin/dashboard/inventory']);
+  }
+
+  openFullScreenImage() {
+    this.showFullScreenImage = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeFullScreenImage() {
+    this.showFullScreenImage = false;
+    document.body.style.overflow = 'auto';
   }
 }

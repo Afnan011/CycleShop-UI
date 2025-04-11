@@ -8,6 +8,9 @@
   <div class="cycle-content">
     <div class="cycle-image">
       <img [src]="cycle.imageUrl || 'assets/images/default_cycle2.jpg'" [alt]="cycle.model">
+      <button class="full-screen-btn" (click)="openFullScreenImage()" *ngIf="cycle.imageUrl">
+        <i class="fas fa-expand"></i>
+      </button>
     </div>
 
     <div class="cycle-info">
@@ -45,9 +48,16 @@
       <div class="additional-info">
         <p><strong>SKU:</strong> {{cycle.sku}}</p>
         <p><strong>Last Stock Update:</strong> {{cycle.lastStockUpdate | date:'medium'}}</p>
-        <p><strong>Status:</strong> <span [class.inactive]="!cycle.isActive">{{cycle.isActive ? 'Active' :
-            'Inactive'}}</span></p>
+        <p><strong>Status:</strong> <span [class.inactive]="!cycle.isActive">{{cycle.isActive ? 'Active' : 'Inactive'}}</span></p>
       </div>
     </div>
+  </div>
+
+  <!-- Full-screen image modal -->
+  <div class="fullscreen-modal" *ngIf="showFullScreenImage" (click)="closeFullScreenImage()">
+    <button class="close-btn" (click)="closeFullScreenImage()">
+      <i class="fas fa-times"></i>
+    </button>
+    <img [src]="cycle.imageUrl" [alt]="cycle.model" class="fullscreen-image">
   </div>
 </div>

@@ -5,6 +5,7 @@ import { provideToastr } from 'ngx-toastr';
 import { provideAnimations } from '@angular/platform-browser/animations';
 
 import { routes } from './app.routes';
+import { provideImageKit } from './config/imagekit.config';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,6 +19,7 @@ export const appConfig: ApplicationConfig = {
       closeButton: true,
       preventDuplicates: true,
       progressBar: true
-    })
+    }),
+    provideImageKit()
   ]
 };

@@ -60,4 +60,8 @@ export class AuthService {
   forgotPassword(email: string): Observable<any> {
     return this.http.post(`${this.API_URL}/forgot-password`, { email });
   }
+
+  getImageKitAuth(): Observable<{ signature: string, expire: number, token: string }> {
+    return this.http.get<{ signature: string, expire: number, token: string }>(`${this.API_URL}/get-ik-token`);
+  }
 }

@@ -5,12 +5,13 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { InventoryService } from '../../services/inventory.service';
 import { CycleInventoryView, Brand, CycleType, CycleCreate, InventoryCreate, CycleEdit } from '../../models/cycle.model';
+import { ImageUploadComponent } from '../../shared/components/image-upload/image-upload.component';
 import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImageUploadComponent],
   templateUrl: './inventory.component.html',
   styleUrls: ['./inventory.component.scss']
 })
@@ -48,6 +49,9 @@ export class InventoryComponent implements OnInit {
 
   sortField: string = 'model';  // Set default sort field to model
   sortDirection: 'asc' | 'desc' = 'asc';  // Set default direction to ascending
+
+  imagePreview: string | null = null;
+  editImagePreview: string | null = null;
 
   constructor(
     private inventoryService: InventoryService,
@@ -231,6 +235,7 @@ export class InventoryComponent implements OnInit {
     };
     this.currentCycleId = '';
     this.currentInventoryId = '';
+    this.removeEditImage();
   }
 
   validateEditForm(): boolean {
@@ -254,7 +259,6 @@ export class InventoryComponent implements OnInit {
     }
 
     try {
-      // Get brand and type IDs
       const brandId = await this.inventoryService.getBrandByName(this.editingCycle.brandName).toPromise();
       const typeId = await this.inventoryService.getTypeByName(this.editingCycle.typeName).toPromise();
 
@@ -263,7 +267,8 @@ export class InventoryComponent implements OnInit {
         return;
       }
 
-      // Update cycle information
+      console.log('save edits:', this.editingCycle);
+
       await this.inventoryService.updateCycle(this.currentCycleId, {
         modelName: this.editingCycle.modelName,
         brandId,
@@ -272,10 +277,9 @@ export class InventoryComponent implements OnInit {
         price: this.editingCycle.price,
         costPrice: this.editingCycle.costPrice,
         isActive: this.editingCycle.isActive,
-        imageUrl: this.editingCycle.imageUrl
+        imageUrl: this.editingCycle.imageUrl || undefined 
       }).toPromise();
 
-      // Update inventory information
       await this.inventoryService.updateInventory(this.currentInventoryId, {
         stockQuantity: this.editingCycle.stockQuantity,
         reorderThreshold: this.editingCycle.reorderThreshold,
@@ -283,7 +287,7 @@ export class InventoryComponent implements OnInit {
       }).toPromise();
 
       this.toastr.success('Cycle updated successfully');
-      this.loadCycles(); // Refresh the list
+      this.loadCycles();
       this.toggleEditModal();
     } catch (error) {
       console.error('Error updating cycle:', error);
@@ -323,7 +327,30 @@ export class InventoryComponent implements OnInit {
     }
   }
 
-  addCycle() {
+  onImageUploadSuccess(url: string) {
+    this.imagePreview = url;
+  }
+
+  onEditImageUploadSuccess(url: string) {
+    this.editImagePreview = url;
+    this.editingCycle.imageUrl = url;
+  }
+
+  onImageUploadError(error: any) {
+    console.error('Error uploading image:', error);
+    this.toastr.error('Failed to upload image');
+  }
+
+  removeImage() {
+    this.imagePreview = null;
+  }
+
+  removeEditImage() {
+    this.editImagePreview = null;
+    this.editingCycle.imageUrl = undefined;
+  }
+
+  async addCycle() {
     let brandId: string = '';
     let typeId: string = '';
 
@@ -335,7 +362,7 @@ export class InventoryComponent implements OnInit {
     );
 
     forkJoin([brandObservable, typeObservable]).subscribe({
-      next: ([brandIdResponse, typeIdResponse]) => {
+      next: async ([brandIdResponse, typeIdResponse]) => {
         brandId = brandIdResponse ?? '';
         typeId = typeIdResponse ?? '';
 
@@ -349,6 +376,7 @@ export class InventoryComponent implements OnInit {
           costPrice: this.newCycle.costPrice,
           description: this.newCycle.description,
           isActive: true,
+          imageUrl: this.imagePreview || undefined
         };
 
         this.saveCycleData(cycleData);
@@ -417,6 +445,7 @@ export class InventoryComponent implements OnInit {
       warehouseLocation: '',
       description: '',
     };
+    this.removeImage();
   }
 
   viewCycle(cycle: CycleInventoryView) {

@@ -240,8 +240,15 @@
             <span
               class="error-message"
               *ngIf="newCycle.description.trim() === ''"
-              >Description is required</span
-            >
+              >Description is required</span>
+          </div>          <div class="form-group">
+            <label>Image</label>
+            <app-image-upload
+              [previewUrl]="imagePreview"
+              (uploadSuccess)="onImageUploadSuccess($event)"
+              (uploadError)="onImageUploadError($event)"
+              (removeImage)="removeImage()"
+            ></app-image-upload>
           </div>
         </div>
       </div>
@@ -391,6 +398,14 @@
               <option [ngValue]="true">Active</option>
               <option [ngValue]="false">Inactive</option>
             </select>
+          </div>          <div class="form-group">
+            <label>Image</label>
+            <app-image-upload
+              [previewUrl]="editingCycle.imageUrl || editImagePreview"
+              (uploadSuccess)="onEditImageUploadSuccess($event)"
+              (uploadError)="onImageUploadError($event)"
+              (removeImage)="removeEditImage()"
+            ></app-image-upload>
           </div>
         </div>
       </div>
