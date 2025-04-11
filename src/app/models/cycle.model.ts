@@ -1,3 +1,17 @@
+export interface CycleEdit {
+    modelName: string;
+    brandName: string;
+    typeName: string;
+    price: number;
+    costPrice: number;
+    description: string;
+    stockQuantity: number;
+    reorderThreshold: number;
+    warehouseLocation: string;
+    isActive: boolean;
+    imageUrl?: string;
+}
+
 export interface CycleInventoryView {
     id: string;
     model: string;

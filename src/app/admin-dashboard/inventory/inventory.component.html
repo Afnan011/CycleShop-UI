@@ -33,7 +33,7 @@
       </thead>
       <tbody>
         <tr *ngFor="let cycle of filteredCycles()">
-          <td class="cycle-image">
+          <td class="cycle-image" (click)="viewCycle(cycle)">
             <img [src]="cycle.imageUrl || 'assets/images/default_cycle2.jpg'" [alt]="cycle.model">
           </td>
           <td>{{ cycle.model }}</td>
@@ -139,6 +139,86 @@
       <div class="modal-footer">
         <button class="cancel-btn" (click)="toggleModal()">Cancel</button>
         <button class="save-btn" (click)="addCycle()" [disabled]="!validateForm()">Save Cycle</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Edit Cycle Modal -->
+  <div class="modal" *ngIf="showEditModal">
+    <div class="modal-overlay" (click)="toggleEditModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Cycle</h2>
+        <button class="close-btn" (click)="toggleEditModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Model Name</label>
+            <input type="text" [(ngModel)]="editingCycle.modelName" class="form-control" placeholder="Enter model name">
+            <span class="error-message" *ngIf="editingCycle.modelName?.trim() === ''">Model name is required</span>
+          </div>
+          <div class="form-group">
+            <label>Brand</label>
+            <select [(ngModel)]="editingCycle.brandName" class="form-control">
+              <option value="">Select Brand</option>
+              <option *ngFor="let brand of brands" [value]="brand.name">{{ brand.name }}</option>
+            </select>
+            <span class="error-message" *ngIf="!editingCycle.brandName">Brand is required</span>
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <select [(ngModel)]="editingCycle.typeName" class="form-control">
+              <option value="">Select Type</option>
+              <option *ngFor="let type of types" [value]="type.name">{{ type.name }}</option>
+            </select>
+            <span class="error-message" *ngIf="editingCycle.typeName === ''">Type is required</span>
+          </div>
+          <div class="form-group">
+            <label>Price</label>
+            <input type="number" [(ngModel)]="editingCycle.price" class="form-control" placeholder="Enter selling price">
+            <span class="error-message" *ngIf="editingCycle.price <= 0">Price must be greater than 0</span>
+          </div>
+          <div class="form-group">
+            <label>Cost Price</label>
+            <input type="number" [(ngModel)]="editingCycle.costPrice" class="form-control" placeholder="Enter cost price">
+            <span class="error-message" *ngIf="editingCycle.costPrice <= 0">Cost price must be greater than 0</span>
+          </div>
+          <div class="form-group">
+            <label>Stock</label>
+            <input type="number" [(ngModel)]="editingCycle.stockQuantity" class="form-control" placeholder="Enter stock quantity">
+            <span class="error-message" *ngIf="editingCycle.stockQuantity < 0">Stock cannot be negative</span>
+          </div>
+          <div class="form-group">
+            <label>Reorder Threshold</label>
+            <input type="number" [(ngModel)]="editingCycle.reorderThreshold" class="form-control" placeholder="Enter reorder threshold">
+            <span class="error-message" *ngIf="editingCycle.reorderThreshold <= 0">Reorder threshold must be greater than 0</span>
+          </div>
+          <div class="form-group">
+            <label>Warehouse Location</label>
+            <input type="text" [(ngModel)]="editingCycle.warehouseLocation" class="form-control" placeholder="Enter warehouse location (e.g. A1-02)">
+            <span class="error-message" *ngIf="editingCycle.warehouseLocation?.trim() === ''">Warehouse location is required</span>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea [(ngModel)]="editingCycle.description" class="form-control" placeholder="Enter cycle description"></textarea>
+            <span class="error-message" *ngIf="editingCycle.description?.trim() === ''">Description is required</span>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select [(ngModel)]="editingCycle.isActive" class="form-control">
+              <option [ngValue]="true">Active</option>
+              <option [ngValue]="false">Inactive</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="cancel-btn" (click)="toggleEditModal()">Cancel</button>
+        <button class="save-btn" (click)="saveEdit()" [disabled]="!validateEditForm()">Save Changes</button>
       </div>
     </div>
   </div>

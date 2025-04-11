@@ -2,22 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { InventoryService } from '../../services/inventory.service';
-import {
-  CycleInventoryView,
-  Brand,
-  CycleType,
-  CycleCreate,
-} from '../../models/cycle.model';
-import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { ToastrService } from 'ngx-toastr';
+import { InventoryService } from '../../services/inventory.service';
+import { CycleInventoryView, Brand, CycleType, CycleCreate, InventoryCreate, CycleEdit } from '../../models/cycle.model';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './inventory.component.html',
-  styleUrls: ['./inventory.component.scss'],
+  styleUrls: ['./inventory.component.scss']
 })
 export class InventoryComponent implements OnInit {
   showAddModal = false;
@@ -35,10 +30,26 @@ export class InventoryComponent implements OnInit {
   brands: Brand[] = [];
   filteredCyclesList: CycleInventoryView[] = [];
 
+  showEditModal = false;
+  editingCycle: CycleEdit = {
+    modelName: '',
+    brandName: '',
+    typeName: '',
+    price: 0,
+    costPrice: 0,
+    description: '',
+    stockQuantity: 0,
+    reorderThreshold: 5,
+    warehouseLocation: '',
+    isActive: true
+  };
+  currentCycleId = '';
+  currentInventoryId = '';
+
   constructor(
     private inventoryService: InventoryService,
-    private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit() {
@@ -145,8 +156,106 @@ export class InventoryComponent implements OnInit {
   }
 
   editCycle(cycle: CycleInventoryView) {
-    console.log('Edit cycle:', cycle);
+    this.currentCycleId = cycle.id;
+    this.currentInventoryId = cycle.inventoryId;
+    this.editingCycle = {
+      modelName: cycle.model,
+      brandName: cycle.brand,
+      typeName: cycle.type,
+      price: cycle.price,
+      costPrice: cycle.costPrice,
+      description: cycle.description,
+      stockQuantity: cycle.stockQuantity,
+      reorderThreshold: cycle.reorderThreshold,
+      warehouseLocation: cycle.warehouseLocation,
+      isActive: cycle.isActive,
+      imageUrl: cycle.imageUrl || undefined
+    };
+    this.showEditModal = true;
   }
+
+  toggleEditModal() {
+    this.showEditModal = !this.showEditModal;
+    if (!this.showEditModal) {
+      this.resetEditForm();
+    }
+  }
+
+  resetEditForm() {
+    this.editingCycle = {
+      modelName: '',
+      brandName: '',
+      typeName: '',
+      price: 0,
+      costPrice: 0,
+      description: '',
+      stockQuantity: 0,
+      reorderThreshold: 5,
+      warehouseLocation: '',
+      isActive: true
+    };
+    this.currentCycleId = '';
+    this.currentInventoryId = '';
+  }
+
+  validateEditForm(): boolean {
+    return (
+      this.editingCycle.modelName?.trim() !== '' &&
+      this.editingCycle.brandName !== '' &&
+      this.editingCycle.typeName !== '' &&
+      this.editingCycle.price > 0 &&
+      this.editingCycle.costPrice > 0 &&
+      this.editingCycle.stockQuantity >= 0 &&
+      this.editingCycle.reorderThreshold > 0 &&
+      this.editingCycle.warehouseLocation?.trim() !== '' &&
+      this.editingCycle.description?.trim() !== ''
+    );
+  }
+
+  async saveEdit() {
+    if (!this.validateEditForm()) {
+      this.toastr.error('Please fill in all required fields correctly');
+      return;
+    }
+
+    try {
+      // Get brand and type IDs
+      const brandId = await this.inventoryService.getBrandByName(this.editingCycle.brandName).toPromise();
+      const typeId = await this.inventoryService.getTypeByName(this.editingCycle.typeName).toPromise();
+
+      if (!brandId || !typeId) {
+        this.toastr.error('Invalid brand or type selected');
+        return;
+      }
+
+      // Update cycle information
+      await this.inventoryService.updateCycle(this.currentCycleId, {
+        modelName: this.editingCycle.modelName,
+        brandId,
+        typeId,
+        description: this.editingCycle.description,
+        price: this.editingCycle.price,
+        costPrice: this.editingCycle.costPrice,
+        isActive: this.editingCycle.isActive,
+        imageUrl: this.editingCycle.imageUrl
+      }).toPromise();
+
+      // Update inventory information
+      await this.inventoryService.updateInventory(this.currentInventoryId, {
+        stockQuantity: this.editingCycle.stockQuantity,
+        reorderThreshold: this.editingCycle.reorderThreshold,
+        warehouseLocation: this.editingCycle.warehouseLocation
+      }).toPromise();
+
+      this.toastr.success('Cycle updated successfully');
+      this.loadCycles(); // Refresh the list
+      this.toggleEditModal();
+    } catch (error) {
+      console.error('Error updating cycle:', error);
+      this.toastr.error('Failed to update cycle');
+    }
+  }
+
   deleteCycle(cycle: CycleInventoryView) {
     if (confirm('Are you sure you want to delete this cycle?')) {
       this.inventoryService.deleteCycle(cycle.id).subscribe({
@@ -277,5 +386,20 @@ export class InventoryComponent implements OnInit {
 
   viewCycle(cycle: CycleInventoryView) {
     this.router.navigate(['/admin/dashboard/inventory', cycle.id]);
+  }
+
+  loadCycles() {
+    this.inventoryService.getCyclesWithInventory().subscribe({
+      next: (data) => {
+        if (data && data.length > 0) {
+          this.cycles = data;
+          this.updateFilters();
+        }
+      },
+      error: (err) => {
+        console.error('Error refreshing inventory:', err);
+        this.toastr.error('Failed to refresh inventory data');
+      }
+    });
   }
 }

@@ -85,4 +85,25 @@ export class InventoryService {
   deleteCycle(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/Cycles/${id}`, { headers: this.getAuthHeaders() });
   }
+
+  updateCycle(id: string, cycle: {
+    modelName: string;
+    brandId: string;
+    typeId: string;
+    description: string;
+    price: number;
+    costPrice: number;
+    isActive: boolean;
+    imageUrl?: string;
+  }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/Cycles/${id}`, cycle, { headers: this.getAuthHeaders() });
+  }
+
+  updateInventory(id: string, inventory: {
+    stockQuantity: number;
+    reorderThreshold: number;
+    warehouseLocation: string;
+  }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/Inventory/${id}`, inventory, { headers: this.getAuthHeaders() });
+  }
 }
