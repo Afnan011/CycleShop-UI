@@ -1,0 +1,53 @@
+<div class="cycle-details-container" *ngIf="cycle">
+  <div class="cycle-header">
+    <button class="back-button" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i> Back to Inventory
+    </button>
+  </div>
+
+  <div class="cycle-content">
+    <div class="cycle-image">
+      <img [src]="cycle.imageUrl || 'assets/images/default_cycle2.jpg'" [alt]="cycle.model">
+    </div>
+
+    <div class="cycle-info">
+      <h1 class="cycle-title">{{cycle.model}}</h1>
+      <div class="cycle-meta">
+        <span class="brand">{{cycle.brand}}</span>
+        <span class="type">{{cycle.type}}</span>
+      </div>
+
+      <div class="cycle-price">
+        <h2>₹{{cycle.price.toFixed(2)}}</h2>
+        <span class="cost-price">Cost: ₹{{cycle.costPrice.toFixed(2)}}</span>
+      </div>
+
+      <div class="stock-info">
+        <div class="stock-status" [class.low-stock]="cycle.stockQuantity <= cycle.reorderThreshold">
+          <span class="label">Stock Level:</span>
+          <span class="value">{{cycle.stockQuantity}}</span>
+        </div>
+        <div class="reorder-info">
+          <span class="label">Reorder Threshold:</span>
+          <span class="value">{{cycle.reorderThreshold}}</span>
+        </div>
+        <div class="location">
+          <span class="label">Warehouse Location:</span>
+          <span class="value">{{cycle.warehouseLocation}}</span>
+        </div>
+      </div>
+
+      <div class="cycle-description">
+        <h3>Description</h3>
+        <p>{{cycle.description}}</p>
+      </div>
+
+      <div class="additional-info">
+        <p><strong>SKU:</strong> {{cycle.sku}}</p>
+        <p><strong>Last Stock Update:</strong> {{cycle.lastStockUpdate | date:'medium'}}</p>
+        <p><strong>Status:</strong> <span [class.inactive]="!cycle.isActive">{{cycle.isActive ? 'Active' :
+            'Inactive'}}</span></p>
+      </div>
+    </div>
+  </div>
+</div>
