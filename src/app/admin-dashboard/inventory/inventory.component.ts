@@ -46,22 +46,26 @@ export class InventoryComponent implements OnInit {
   currentCycleId = '';
   currentInventoryId = '';
 
+  sortField: string = 'model';  // Set default sort field to model
+  sortDirection: 'asc' | 'desc' = 'asc';  // Set default direction to ascending
+
   constructor(
     private inventoryService: InventoryService,
-    private router: Router,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private router: Router
   ) {}
 
   ngOnInit() {
     this.loadData();
   }
+
   loadData() {
     this.loading = true;
     this.error = '';
     this.cycles = [];
 
     this.inventoryService.getCyclesWithInventory().subscribe({
-      next: (data) => {
+      next: (data: CycleInventoryView[]) => {
         if (data && data.length > 0) {
           this.cycles = data;
           console.log('Cycles:', this.cycles);
@@ -71,11 +75,10 @@ export class InventoryComponent implements OnInit {
         }
         this.loading = false;
       },
-      error: (err) => {
+      error: (err: Error) => {
         console.error('Error loading inventory:', err);
-
         this.error =
-          err.status === 0
+          err.message === '0'
             ? 'Cannot connect to the server. Please check if the API is running.'
             : 'Failed to load inventory data. Please try again.';
         this.loading = false;
@@ -114,12 +117,21 @@ export class InventoryComponent implements OnInit {
     });
   }
 
+  sortBy(field: string) {
+    if (this.sortField === field) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortField = field;
+      this.sortDirection = 'asc';
+    }
+  }
+
   filteredCycles() {
     if (!this.cycles) {
       return [];
     }
 
-    const filtered = this.cycles.filter((cycle) => {
+    let filtered = this.cycles.filter((cycle) => {
       const searchLower = (this.searchQuery || '').toLowerCase();
       const modelMatch = cycle.model.toLowerCase().includes(searchLower);
       const brandMatch = cycle.brand.toLowerCase().includes(searchLower);
@@ -135,6 +147,29 @@ export class InventoryComponent implements OnInit {
 
       return matchesSearch && matchesType && matchesBrand;
     });
+
+    // Apply sorting if a sort field is selected
+    if (this.sortField) {
+      filtered = filtered.sort((a, b) => {
+        let aValue = a[this.sortField as keyof CycleInventoryView];
+        let bValue = b[this.sortField as keyof CycleInventoryView];
+
+        // Handle numeric values
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          return this.sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+        }
+
+        // Handle string values
+        aValue = String(aValue).toLowerCase();
+        bValue = String(bValue).toLowerCase();
+
+        if (this.sortDirection === 'asc') {
+          return aValue.localeCompare(bValue);
+        } else {
+          return bValue.localeCompare(aValue);
+        }
+      });
+    }
 
     this.totalPages = Math.max(1, Math.ceil(filtered.length / this.pageSize));
     this.currentPage = Math.min(this.currentPage, this.totalPages);

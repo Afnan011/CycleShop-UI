@@ -138,13 +138,21 @@
     }
 
     th {
-      background-color: $color-table-header;
-      font-weight: map-get($font-weights, semibold);
-      color: $color-dark-font;
-      font-size: map-get($font-sizes, sm);
-      font-family: 'Inter', sans-serif;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      cursor: pointer;
+      user-select: none;
       position: relative;
+      padding-right: 20px;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      span {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
     }
 
     td {
