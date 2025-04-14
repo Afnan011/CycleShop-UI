@@ -1,0 +1,48 @@
+<div class="image-upload">
+  <div class="upload-container" [class.uploading]="isUploading">
+    <div
+      class="custom-upload-button"
+      (click)="triggerUpload()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+      [class.dragover]="isDragOver"
+    >
+      <div class="upload-icon">
+        <i class="fas fa-cloud-upload-alt"></i>
+      </div>
+      <div class="upload-text">
+        <span class="primary-text">Choose a file</span>
+        <span class="secondary-text">or drag it here</span>
+      </div>
+
+      <ik-upload
+        #ikUpload
+        style="display: none;"
+        [folder]="'/cycles'"
+        [useUniqueFileName]="true"
+        [urlEndpoint]="urlEndpoint"
+        [authenticator]="authenticator"
+        [publicKey]="publicKey"
+        (onError)="handleUploadError($event)"
+        (onSuccess)="handleUploadSuccess($event)"
+        (uploadStart)="handleUploadStart()"
+      ></ik-upload>
+    </div>
+
+    <div class="loading-overlay" *ngIf="isUploading">
+      <div class="spinner"></div>
+      <span>Uploading...</span>
+    </div>
+  </div>
+  <div class="image-preview" *ngIf="previewUrl">
+    <img [src]="previewUrl" alt="Preview" />
+    <button
+      type="button"
+      class="remove-image"
+      (click)="removeImageHandler()"
+    >
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+</div>

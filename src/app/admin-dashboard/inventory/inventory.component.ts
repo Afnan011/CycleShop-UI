@@ -47,8 +47,8 @@ export class InventoryComponent implements OnInit {
   currentCycleId = '';
   currentInventoryId = '';
 
-  sortField: string = 'model';  // Set default sort field to model
-  sortDirection: 'asc' | 'desc' = 'asc';  // Set default direction to ascending
+  sortField: string = 'model';  
+  sortDirection: 'asc' | 'desc' = 'asc';  
 
   imagePreview: string | null = null;
   editImagePreview: string | null = null;
