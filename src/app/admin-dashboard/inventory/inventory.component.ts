@@ -5,13 +5,14 @@ import { ToastrService } from 'ngx-toastr';
 import { CycleInventoryView, Brand, CycleType } from '../../models/cycle.model';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
 import { CycleFormComponent } from '../../shared/components/cycle-form/cycle-form.component';
+import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal.component';
 import { InventoryStateService } from '../../services/inventory-state.service';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, ModalComponent, CycleFormComponent, FormsModule],
+  imports: [CommonModule, ModalComponent, CycleFormComponent, ConfirmModalComponent, FormsModule], // ConfirmModalComponent is used in the template with *ngIf
   templateUrl: './inventory.component.html',
   styleUrls: ['./inventory.component.scss']
 })
@@ -19,6 +20,8 @@ export class InventoryComponent implements OnInit {
   // View state
   showAddModal = false;
   showEditModal = false;
+  showDeleteModal = false;
+  selectedCycleToDelete: CycleInventoryView | null = null;
   selectedType = 'All Types';
   selectedBrand = 'All Brands';
   searchQuery = '';
@@ -62,7 +65,7 @@ export class InventoryComponent implements OnInit {
       this.cycles = cycles;
       this.updatePagination();
     });
-    
+
     this.inventoryState.brands$.subscribe(brands => this.brands = brands);
     this.inventoryState.types$.subscribe(types => this.types = types);
     this.inventoryState.loading$.subscribe(loading => this.loading = loading);
@@ -114,8 +117,8 @@ export class InventoryComponent implements OnInit {
         aValue = String(aValue).toLowerCase();
         bValue = String(bValue).toLowerCase();
 
-        return this.sortDirection === 'asc' 
-          ? aValue.localeCompare(bValue) 
+        return this.sortDirection === 'asc'
+          ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
       });
     }
@@ -194,9 +197,16 @@ export class InventoryComponent implements OnInit {
   }
 
   deleteCycle(cycle: CycleInventoryView) {
-    if (confirm('Are you sure you want to delete this cycle?')) {
-      this.inventoryState.deleteCycle(cycle.id);
+    this.selectedCycleToDelete = cycle;
+    this.showDeleteModal = true;
+  }
+
+  confirmDelete() {
+    if (this.selectedCycleToDelete) {
+      this.inventoryState.deleteCycle(this.selectedCycleToDelete.id);
       this.toastr.success('Cycle deleted successfully');
+      this.showDeleteModal = false;
+      this.selectedCycleToDelete = null;
     }
   }
 

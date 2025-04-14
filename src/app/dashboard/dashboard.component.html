@@ -2,7 +2,14 @@
     <h1>Welcome to CycleShop</h1>
     <p *ngIf="username">Logged in as: {{ username }}</p>
     <p *ngIf="role">Role: {{ role }}</p>
-    
-    <button (click)="logout()">LOGOUT</button>
 
+    <button (click)="logout()">LOGOUT</button>
 </div>
+
+<app-confirm-modal
+    [isOpen]="showLogoutModal"
+    title="Confirm Logout"
+    message="Are you sure you want to logout?"
+    (onConfirm)="confirmLogout()"
+    (onClose)="showLogoutModal = false">
+</app-confirm-modal>

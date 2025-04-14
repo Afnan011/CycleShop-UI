@@ -7,6 +7,12 @@ import { authGuard } from './guards/auth.guard';
 import { InventoryComponent } from './admin-dashboard/inventory/inventory.component';
 import { DashboardHomeComponent } from './admin-dashboard/dashboard-home/dashboard-home.component';
 import { CycleDetailsComponent } from './admin-dashboard/inventory/cycle-details/cycle-details.component';
+import { PosComponent } from './admin-dashboard/pos/pos.component';
+import { OrdersComponent } from './admin-dashboard/orders/orders.component';
+import { CustomersComponent } from './admin-dashboard/customers/customers.component';
+import { EmployeesComponent } from './admin-dashboard/employees/employees.component';
+import { ReportsComponent } from './admin-dashboard/reports/reports.component';
+import { SettingsComponent } from './admin-dashboard/settings/settings.component';
 
 export const routes: Routes = [
   {
@@ -34,11 +40,40 @@ export const routes: Routes = [
       },
       {
         path: 'inventory',
-        component: InventoryComponent
+        children: [
+          {
+            path: '',
+            component: InventoryComponent
+          },
+          {
+            path: ':id',
+            component: CycleDetailsComponent
+          }
+        ]
       },
       {
-        path: 'inventory/:id',
-        component: CycleDetailsComponent
+        path: 'pos',
+        component: PosComponent
+      },
+      {
+        path: 'orders',
+        component: OrdersComponent
+      },
+      {
+        path: 'customers',
+        component: CustomersComponent
+      },
+      {
+        path: 'employees',
+        component: EmployeesComponent
+      },
+      {
+        path: 'reports',
+        component: ReportsComponent
+      },
+      {
+        path: 'settings',
+        component: SettingsComponent
       }
     ]
   },
