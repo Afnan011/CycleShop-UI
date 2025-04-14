@@ -1,0 +1,131 @@
+<div class="form-grid">
+  <div class="form-group">
+    <label>Model Name</label>
+    <input
+      type="text"
+      [(ngModel)]="formData.modelName"
+      class="form-control"
+      placeholder="Enter model name"
+    />
+    <span class="error-message" *ngIf="formData.modelName?.trim() === ''">
+      Model name is required
+    </span>
+  </div>
+  <div class="form-group">
+    <label>Brand</label>
+    <select [(ngModel)]="formData.brandName" class="form-control">
+      <option value="">Select Brand</option>
+      <option *ngFor="let brand of brands" [value]="brand.name">
+        {{ brand.name }}
+      </option>
+    </select>
+    <span class="error-message" *ngIf="!formData.brandName">
+      Brand is required
+    </span>
+  </div>
+  <div class="form-group">
+    <label>Type</label>
+    <select [(ngModel)]="formData.typeName" class="form-control">
+      <option value="">Select Type</option>
+      <option *ngFor="let type of types" [value]="type.name">
+        {{ type.name }}
+      </option>
+    </select>
+    <span class="error-message" *ngIf="formData.typeName === ''">
+      Type is required
+    </span>
+  </div>
+  <div class="form-group">
+    <label>Price</label>
+    <input
+      type="number"
+      [(ngModel)]="formData.price"
+      class="form-control"
+      placeholder="Enter selling price"
+    />
+    <span class="error-message" *ngIf="formData.price <= 0">
+      Price must be greater than 0
+    </span>
+  </div>
+  <div class="form-group">
+    <label>Cost Price</label>
+    <input
+      type="number"
+      [(ngModel)]="formData.costPrice"
+      class="form-control"
+      placeholder="Enter cost price"
+    />
+    <span class="error-message" *ngIf="formData.costPrice <= 0">
+      Cost price must be greater than 0
+    </span>
+  </div>
+  <div class="form-group">
+    <label>Stock</label>
+    <input
+      type="number"
+      [(ngModel)]="formData.stockQuantity"
+      class="form-control"
+      placeholder="Enter stock quantity"
+    />
+    <span class="error-message" *ngIf="formData.stockQuantity < 0">
+      Stock cannot be negative
+    </span>
+  </div>
+  <div class="form-group">
+    <label>Reorder Threshold</label>
+    <input
+      type="number"
+      [(ngModel)]="formData.reorderThreshold"
+      class="form-control"
+      placeholder="Enter reorder threshold"
+    />
+    <span class="error-message" *ngIf="formData.reorderThreshold <= 0">
+      Reorder threshold must be greater than 0
+    </span>
+  </div>
+  <div class="form-group">
+    <label>Warehouse Location</label>
+    <input
+      type="text"
+      [(ngModel)]="formData.warehouseLocation"
+      class="form-control"
+      placeholder="Enter warehouse location (e.g. A1-02)"
+    />
+    <span class="error-message" *ngIf="formData.warehouseLocation?.trim() === ''">
+      Warehouse location is required
+    </span>
+  </div>
+  <div class="form-group">
+    <label>Description</label>
+    <textarea
+      [(ngModel)]="formData.description"
+      class="form-control"
+      placeholder="Enter cycle description"
+    ></textarea>
+    <span class="error-message" *ngIf="formData.description?.trim() === ''">
+      Description is required
+    </span>
+  </div>
+  <div class="form-group" *ngIf="isEdit">
+    <label>Status</label>
+    <select [(ngModel)]="formData.isActive" class="form-control">
+      <option [ngValue]="true">Active</option>
+      <option [ngValue]="false">Inactive</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Image</label>
+    <app-image-upload
+      [previewUrl]="imageUrl"
+      (uploadSuccess)="onImageUploadSuccess($event)"
+      (uploadError)="imageError.emit($event)"
+      (removeImage)="onImageRemove()"
+    ></app-image-upload>
+  </div>
+</div>
+<div class="form-actions">
+  <button class="cancel-btn" (click)="cancel.emit()">Cancel</button>
+  <button class="save-btn" (click)="onSubmit()" [disabled]="!validateForm()">
+    {{ isEdit ? 'Save Changes' : 'Save Cycle' }}
+  </button>
+</div>

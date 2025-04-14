@@ -2,27 +2,18 @@
   <div class="inventory-header">
     <div class="search-filters">
       <div class="search-box">
-        <input
-          type="text"
-          [(ngModel)]="searchQuery"
-          placeholder="Search cycles..."
-          class="form-control"
-        />
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Search cycles..." class="form-control" />
       </div>
       <select [(ngModel)]="selectedType" class="form-control">
         <option value="All Types">All Types</option>
-        <option *ngFor="let type of types" [value]="type.name">
-          {{ type.name }}
-        </option>
+        <option *ngFor="let type of types" [value]="type.name">{{ type.name }}</option>
       </select>
       <select [(ngModel)]="selectedBrand" class="form-control">
         <option value="All Brands">All Brands</option>
-        <option *ngFor="let brand of brands" [value]="brand.name">
-          {{ brand.name }}
-        </option>
+        <option *ngFor="let brand of brands" [value]="brand.name">{{ brand.name }}</option>
       </select>
     </div>
-    <button class="add-cycle-btn" (click)="toggleModal()">
+    <button class="add-cycle-btn" (click)="showAddModal = true">
       <i class="fas fa-plus"></i>
       <span>Add New Cycle</span>
     </button>
@@ -35,33 +26,23 @@
           <th>Image</th>
           <th (click)="sortBy('model')">
             Model
-            <span *ngIf="sortField === 'model'">
-              {{ sortDirection === "asc" ? "▲" : "▼" }}
-            </span>
+            <span *ngIf="sortField === 'model'">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
           </th>
           <th (click)="sortBy('brand')">
             Brand
-            <span *ngIf="sortField === 'brand'">
-              {{ sortDirection === "asc" ? "▲" : "▼" }}
-            </span>
+            <span *ngIf="sortField === 'brand'">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
           </th>
           <th (click)="sortBy('type')">
             Type
-            <span *ngIf="sortField === 'type'">
-              {{ sortDirection === "asc" ? "▲" : "▼" }}
-            </span>
+            <span *ngIf="sortField === 'type'">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
           </th>
           <th (click)="sortBy('price')">
             Price
-            <span *ngIf="sortField === 'price'">
-              {{ sortDirection === "asc" ? "▲" : "▼" }}
-            </span>
+            <span *ngIf="sortField === 'price'">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
           </th>
           <th (click)="sortBy('stockQuantity')">
             Stock
-            <span *ngIf="sortField === 'stockQuantity'">
-              {{ sortDirection === "asc" ? "▲" : "▼" }}
-            </span>
+            <span *ngIf="sortField === 'stockQuantity'">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
           </th>
           <th>Actions</th>
         </tr>
@@ -69,21 +50,16 @@
       <tbody>
         <tr *ngFor="let cycle of filteredCycles()">
           <td class="cycle-image" (click)="viewCycle(cycle)">
-            <img
-              [src]="cycle.imageUrl || 'assets/images/default_cycle2.jpg'"
-              [alt]="cycle.model"
-            />
+            <img [src]="cycle.imageUrl || 'assets/images/default_cycle2.jpg'" [alt]="cycle.model" />
           </td>
           <td>{{ cycle.model }}</td>
           <td>{{ cycle.brand }}</td>
           <td>{{ cycle.type }}</td>
           <td>₹{{ cycle.price.toFixed(2) }}</td>
           <td>
-            <span
-              class="stocks"
-              [class.low-stock]="cycle.stockQuantity <= cycle.reorderThreshold"
-              >{{ cycle.stockQuantity }}</span
-            >
+            <span class="stocks" [class.low-stock]="cycle.stockQuantity <= cycle.reorderThreshold">
+              {{ cycle.stockQuantity }}
+            </span>
           </td>
           <td>
             <div class="actions">
@@ -102,323 +78,36 @@
       </tbody>
     </table>
     <div class="pagination-controls">
-      <button
-        class="pagination-btn"
-        [disabled]="currentPage === 1"
-        (click)="previousPage()"
-      >
+      <button class="pagination-btn" [disabled]="currentPage === 1" (click)="previousPage()">
         <i class="fas fa-chevron-left"></i> Previous
       </button>
       <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
-      <button
-        class="pagination-btn"
-        [disabled]="currentPage === totalPages"
-        (click)="nextPage()"
-      >
+      <button class="pagination-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
         Next <i class="fas fa-chevron-right"></i>
       </button>
     </div>
   </div>
 
   <!-- Add New Cycle Modal -->
-  <div class="modal" *ngIf="showAddModal">
-    <div class="modal-overlay" (click)="toggleModal()"></div>
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Add New Cycle</h2>
-        <button class="close-btn" (click)="toggleModal()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Model Name</label>
-            <input
-              type="text"
-              [(ngModel)]="newCycle.model"
-              class="form-control"
-              placeholder="Enter model name"
-            />
-            <span class="error-message" *ngIf="newCycle.model.trim() === ''"
-              >Model name is required</span
-            >
-          </div>
-          <div class="form-group">
-            <label>Brand</label>
-            <select [(ngModel)]="newCycle.brandName" class="form-control">
-              <option value="">Select Brand</option>
-              <option *ngFor="let brand of brands" [value]="brand.name">
-                {{ brand.name }}
-              </option>
-            </select>
-            <span class="error-message" *ngIf="!newCycle.brandName"
-              >Brand is required</span
-            >
-          </div>
-          <div class="form-group">
-            <label>Type</label>
-            <select [(ngModel)]="newCycle.typeName" class="form-control">
-              <option value="">Select Type</option>
-              <option *ngFor="let type of types" [value]="type.name">
-                {{ type.name }}
-              </option>
-            </select>
-            <span class="error-message" *ngIf="newCycle.typeName === ''"
-              >Type is required</span
-            >
-          </div>
-          <div class="form-group">
-            <label>Price</label>
-            <input
-              type="number"
-              [(ngModel)]="newCycle.price"
-              class="form-control"
-              placeholder="Enter selling price"
-            />
-            <span class="error-message" *ngIf="newCycle.price <= 0"
-              >Price must be greater than 0</span
-            >
-          </div>
-          <div class="form-group">
-            <label>Cost Price</label>
-            <input
-              type="number"
-              [(ngModel)]="newCycle.costPrice"
-              class="form-control"
-              placeholder="Enter cost price"
-            />
-            <span class="error-message" *ngIf="newCycle.costPrice <= 0"
-              >Cost price must be greater than 0</span
-            >
-          </div>
-          <div class="form-group">
-            <label>Stock</label>
-            <input
-              type="number"
-              [(ngModel)]="newCycle.stock"
-              class="form-control"
-              placeholder="Enter stock quantity"
-            />
-            <span class="error-message" *ngIf="newCycle.stock < 0"
-              >Stock cannot be negative</span
-            >
-          </div>
-          <div class="form-group">
-            <label>Reorder Threshold</label>
-            <input
-              type="number"
-              [(ngModel)]="newCycle.reorderThreshold"
-              class="form-control"
-              placeholder="Enter reorder threshold"
-            />
-            <span class="error-message" *ngIf="newCycle.reorderThreshold <= 0"
-              >Reorder threshold must be greater than 0</span
-            >
-          </div>
-          <div class="form-group">
-            <label>Warehouse Location</label>
-            <input
-              type="text"
-              [(ngModel)]="newCycle.warehouseLocation"
-              class="form-control"
-              placeholder="Enter warehouse location (e.g. A1-02)"
-            />
-            <span
-              class="error-message"
-              *ngIf="newCycle.warehouseLocation.trim() === ''"
-              >Warehouse location is required</span
-            >
-          </div>
-          <div class="form-group">
-            <label>Description</label>
-            <textarea
-              [(ngModel)]="newCycle.description"
-              class="form-control"
-              placeholder="Enter cycle description"
-            ></textarea>
-            <span
-              class="error-message"
-              *ngIf="newCycle.description.trim() === ''"
-              >Description is required</span>
-          </div>          <div class="form-group">
-            <label>Image</label>
-            <app-image-upload
-              [previewUrl]="imagePreview"
-              (uploadSuccess)="onImageUploadSuccess($event)"
-              (uploadError)="onImageUploadError($event)"
-              (removeImage)="removeImage()"
-            ></app-image-upload>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="cancel-btn" (click)="toggleModal()">Cancel</button>
-        <button
-          class="save-btn"
-          (click)="addCycle()"
-          [disabled]="!validateForm()"
-        >
-          Save Cycle
-        </button>
-      </div>
-    </div>
-  </div>
+  <app-modal *ngIf="showAddModal" [isOpen]="true" (close)="showAddModal = false" title="Add New Cycle">
+    <app-cycle-form
+      [formData]="newCycle"
+      [brands]="brands"
+      [types]="types"
+      (formSubmit)="onAddCycleSubmit($event)"
+      (cancel)="showAddModal = false">
+    </app-cycle-form>
+  </app-modal>
 
   <!-- Edit Cycle Modal -->
-  <div class="modal" *ngIf="showEditModal">
-    <div class="modal-overlay" (click)="toggleEditModal()"></div>
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Edit Cycle</h2>
-        <button class="close-btn" (click)="toggleEditModal()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Model Name</label>
-            <input
-              type="text"
-              [(ngModel)]="editingCycle.modelName"
-              class="form-control"
-              placeholder="Enter model name"
-            />
-            <span
-              class="error-message"
-              *ngIf="editingCycle.modelName?.trim() === ''"
-              >Model name is required</span
-            >
-          </div>
-          <div class="form-group">
-            <label>Brand</label>
-            <select [(ngModel)]="editingCycle.brandName" class="form-control">
-              <option value="">Select Brand</option>
-              <option *ngFor="let brand of brands" [value]="brand.name">
-                {{ brand.name }}
-              </option>
-            </select>
-            <span class="error-message" *ngIf="!editingCycle.brandName"
-              >Brand is required</span
-            >
-          </div>
-          <div class="form-group">
-            <label>Type</label>
-            <select [(ngModel)]="editingCycle.typeName" class="form-control">
-              <option value="">Select Type</option>
-              <option *ngFor="let type of types" [value]="type.name">
-                {{ type.name }}
-              </option>
-            </select>
-            <span class="error-message" *ngIf="editingCycle.typeName === ''"
-              >Type is required</span
-            >
-          </div>
-          <div class="form-group">
-            <label>Price</label>
-            <input
-              type="number"
-              [(ngModel)]="editingCycle.price"
-              class="form-control"
-              placeholder="Enter selling price"
-            />
-            <span class="error-message" *ngIf="editingCycle.price <= 0"
-              >Price must be greater than 0</span
-            >
-          </div>
-          <div class="form-group">
-            <label>Cost Price</label>
-            <input
-              type="number"
-              [(ngModel)]="editingCycle.costPrice"
-              class="form-control"
-              placeholder="Enter cost price"
-            />
-            <span class="error-message" *ngIf="editingCycle.costPrice <= 0"
-              >Cost price must be greater than 0</span
-            >
-          </div>
-          <div class="form-group">
-            <label>Stock</label>
-            <input
-              type="number"
-              [(ngModel)]="editingCycle.stockQuantity"
-              class="form-control"
-              placeholder="Enter stock quantity"
-            />
-            <span class="error-message" *ngIf="editingCycle.stockQuantity < 0"
-              >Stock cannot be negative</span
-            >
-          </div>
-          <div class="form-group">
-            <label>Reorder Threshold</label>
-            <input
-              type="number"
-              [(ngModel)]="editingCycle.reorderThreshold"
-              class="form-control"
-              placeholder="Enter reorder threshold"
-            />
-            <span
-              class="error-message"
-              *ngIf="editingCycle.reorderThreshold <= 0"
-              >Reorder threshold must be greater than 0</span
-            >
-          </div>
-          <div class="form-group">
-            <label>Warehouse Location</label>
-            <input
-              type="text"
-              [(ngModel)]="editingCycle.warehouseLocation"
-              class="form-control"
-              placeholder="Enter warehouse location (e.g. A1-02)"
-            />
-            <span
-              class="error-message"
-              *ngIf="editingCycle.warehouseLocation?.trim() === ''"
-              >Warehouse location is required</span
-            >
-          </div>
-          <div class="form-group">
-            <label>Description</label>
-            <textarea
-              [(ngModel)]="editingCycle.description"
-              class="form-control"
-              placeholder="Enter cycle description"
-            ></textarea>
-            <span
-              class="error-message"
-              *ngIf="editingCycle.description?.trim() === ''"
-              >Description is required</span
-            >
-          </div>
-          <div class="form-group">
-            <label>Status</label>
-            <select [(ngModel)]="editingCycle.isActive" class="form-control">
-              <option [ngValue]="true">Active</option>
-              <option [ngValue]="false">Inactive</option>
-            </select>
-          </div>          <div class="form-group">
-            <label>Image</label>
-            <app-image-upload
-              [previewUrl]="editingCycle.imageUrl || editImagePreview"
-              (uploadSuccess)="onEditImageUploadSuccess($event)"
-              (uploadError)="onImageUploadError($event)"
-              (removeImage)="removeEditImage()"
-            ></app-image-upload>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="cancel-btn" (click)="toggleEditModal()">Cancel</button>
-        <button
-          class="save-btn"
-          (click)="saveEdit()"
-          [disabled]="!validateEditForm()"
-        >
-          Save Changes
-        </button>
-      </div>
-    </div>
-  </div>
+  <app-modal *ngIf="showEditModal" [isOpen]="true" (close)="showEditModal = false" title="Edit Cycle">
+    <app-cycle-form
+      [formData]="editingCycle"
+      [brands]="brands"
+      [types]="types"
+      [isEdit]="true"
+      (formSubmit)="onEditCycleSubmit($event)"
+      (cancel)="showEditModal = false">
+    </app-cycle-form>
+  </app-modal>
 </div>
