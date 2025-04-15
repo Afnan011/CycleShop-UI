@@ -85,11 +85,7 @@ export class ImageUploadComponent implements AfterViewInit {
   }
 
   handleUploadStart() {
-    this.isUploading = true;
-    console.log('Upload started');
-    console.log('File input:', this.fileInput);
-    console.log('is uploading:', this.isUploading);
-    
+    this.isUploading = true;   
   }
 
   handleUploadSuccess(event: any) {

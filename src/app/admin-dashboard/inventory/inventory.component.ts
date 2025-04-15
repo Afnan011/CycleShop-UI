@@ -87,7 +87,6 @@ export class InventoryComponent implements OnInit {
       this.sortDirection = 'asc';
     }
   }
-
   filteredCycles() {
     if (!this.cycles) return [];
 
@@ -120,10 +119,12 @@ export class InventoryComponent implements OnInit {
         return this.sortDirection === 'asc'
           ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
-      });
-    }
+      });    }
 
-    this.updatePagination();
+    // Update pagination based on filtered results
+    this.totalPages = Math.max(1, Math.ceil(filtered.length / this.pageSize));
+    this.currentPage = Math.min(this.currentPage, this.totalPages);
+
     const startIndex = (this.currentPage - 1) * this.pageSize;
     return filtered.slice(startIndex, startIndex + this.pageSize);
   }
@@ -144,55 +145,123 @@ export class InventoryComponent implements OnInit {
       this.currentPage--;
     }
   }
-
   onAddCycleSubmit(formData: any) {
-    this.inventoryState.addCycle(
-      {
-        modelName: formData.modelName,
-        brandId: formData.brandId,
-        typeId: formData.typeId,
-        price: formData.price,
-        costPrice: formData.costPrice,
-        description: formData.description,
-        isActive: true,
-        imageUrl: formData.imageUrl
+    // First, get the brand ID from brand name
+    this.inventoryState.inventoryService.getBrandByName(formData.brandName).subscribe({
+      next: (brandId) => {
+        if (!brandId) {
+          this.toastr.error('Selected brand not found');
+          return;
+        }
+        // Then, get the type ID from type name
+        this.inventoryState.inventoryService.getTypeByName(formData.typeName).subscribe({
+          next: (typeId) => {
+            if (!typeId) {
+              this.toastr.error('Selected type not found');
+              return;
+            }
+            // Now we have both IDs, we can create the cycle
+            console.log(formData);
+            console.log('imageUrL' + ' ' + formData.imageUrl);
+            this.inventoryState.addCycle(
+              {
+                modelName: formData.modelName,
+                brandId: brandId,
+                typeId: typeId,
+                price: formData.price,
+                costPrice: formData.costPrice,
+                description: formData.description,
+                isActive: true,
+                imageUrl: formData.imageUrl
+              },
+              {
+                stockQuantity: formData.stockQuantity,
+                reorderThreshold: formData.reorderThreshold,
+                warehouseLocation: formData.warehouseLocation
+              }
+            );
+            this.showAddModal = false;
+            this.toastr.success('Cycle added successfully');
+          },
+          error: (err) => {
+            console.error('Error getting type ID:', err);
+            this.toastr.error('Error getting type ID');
+          }
+        });
       },
-      {
-        stockQuantity: formData.stockQuantity,
-        reorderThreshold: formData.reorderThreshold,
-        warehouseLocation: formData.warehouseLocation
+      error: (err) => {
+        console.error('Error getting brand ID:', err);
+        this.toastr.error('Error getting brand ID');
       }
-    );
-    this.showAddModal = false;
-    this.toastr.success('Cycle added successfully');
+    });
   }
-
   onEditCycleSubmit(formData: any) {
-    this.inventoryState.updateCycle(
-      this.editingCycle.id,
-      {
-        modelName: formData.modelName,
-        brandId: formData.brandId,
-        typeId: formData.typeId,
-        price: formData.price,
-        costPrice: formData.costPrice,
-        description: formData.description,
-        isActive: formData.isActive,
-        imageUrl: formData.imageUrl
+    // First, get the brand ID from brand name
+    this.inventoryState.inventoryService.getBrandByName(formData.brandName).subscribe({
+      next: (brandId) => {
+        if (!brandId) {
+          this.toastr.error('Selected brand not found');
+          return;
+        }
+        // Then, get the type ID from type name
+        this.inventoryState.inventoryService.getTypeByName(formData.typeName).subscribe({
+          next: (typeId) => {
+            if (!typeId) {
+              this.toastr.error('Selected type not found');
+              return;
+            }
+            // Now we have both IDs, we can update the cycle
+            this.inventoryState.updateCycle(
+              this.editingCycle.id,
+              {
+                modelName: formData.modelName,
+                brandId: brandId,
+                typeId: typeId,
+                price: formData.price,
+                costPrice: formData.costPrice,
+                description: formData.description,
+                isActive: formData.isActive,
+                imageUrl: formData.imageUrl
+              },
+              this.editingCycle.inventoryId,
+              {
+                stockQuantity: formData.stockQuantity,
+                reorderThreshold: formData.reorderThreshold,
+                warehouseLocation: formData.warehouseLocation
+              }
+            );
+            this.showEditModal = false;
+            this.toastr.success('Cycle updated successfully');
+          },
+          error: (err) => {
+            console.error('Error getting type ID:', err);
+            this.toastr.error('Error getting type ID');
+          }
+        });
       },
-      this.editingCycle.inventoryId,
-      {
-        stockQuantity: formData.stockQuantity,
-        reorderThreshold: formData.reorderThreshold,
-        warehouseLocation: formData.warehouseLocation
+      error: (err) => {
+        console.error('Error getting brand ID:', err);
+        this.toastr.error('Error getting brand ID');
       }
-    );
-    this.showEditModal = false;
-    this.toastr.success('Cycle updated successfully');
+    });
   }
-
   editCycle(cycle: CycleInventoryView) {
-    this.editingCycle = { ...cycle };
+    // Map the cycle data to match the form structure
+    this.editingCycle = {
+      id: cycle.id,
+      modelName: cycle.model,
+      brandName: cycle.brand,
+      typeName: cycle.type,
+      price: cycle.price,
+      costPrice: cycle.costPrice,
+      stockQuantity: cycle.stockQuantity,
+      reorderThreshold: cycle.reorderThreshold,
+      warehouseLocation: cycle.warehouseLocation,
+      description: cycle.description,
+      isActive: cycle.isActive,
+      imageUrl: cycle.imageUrl,
+      inventoryId: cycle.inventoryId
+    };
     this.showEditModal = true;
   }
 

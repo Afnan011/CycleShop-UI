@@ -223,7 +223,6 @@
       }
     }
   }
-
   td.cycle-image {
     width: 80px;
     padding: 0.5rem;
@@ -235,6 +234,8 @@
       object-fit: cover;
       border-radius: 6px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: block; // Ensure image is displayed as block
+      margin: 0 auto; // Center the image
     }
 
     &:hover {

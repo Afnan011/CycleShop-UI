@@ -19,7 +19,7 @@ export class InventoryStateService {
   loading$ = this.loadingSubject.asObservable();
   error$ = this.errorSubject.asObservable();
 
-  constructor(private inventoryService: InventoryService) {}
+  constructor(public inventoryService: InventoryService) {}
 
   loadInventoryData() {
     this.loadingSubject.next(true);
@@ -38,22 +38,15 @@ export class InventoryStateService {
       }
     });
   }
-
   private updateFilters(cycles: CycleInventoryView[]) {
-    const uniqueBrands = new Set(cycles.map(cycle => cycle.brand));
-    const uniqueTypes = new Set(cycles.map(cycle => cycle.type));
-
+    // Load all brands and types without filtering
     this.inventoryService.getBrands().subscribe({
-      next: (brands) => this.brandsSubject.next(
-        brands.filter(brand => uniqueBrands.has(brand.name))
-      ),
+      next: (brands) => this.brandsSubject.next(brands),
       error: (err) => console.error('Error loading brands:', err)
     });
 
     this.inventoryService.getTypes().subscribe({
-      next: (types) => this.typesSubject.next(
-        types.filter(type => uniqueTypes.has(type.name))
-      ),
+      next: (types) => this.typesSubject.next(types),
       error: (err) => console.error('Error loading types:', err)
     });
   }

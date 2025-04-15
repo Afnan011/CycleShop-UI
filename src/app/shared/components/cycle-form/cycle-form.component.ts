@@ -43,10 +43,11 @@ export class CycleFormComponent {
       this.formData.description?.trim() !== ''
     );
   }
-
   onImageUploadSuccess(url: string) {
     this.imageUrl = url;
+    this.formData.imageUrl = url; 
     this.imageUploaded.emit(url);
+    console.log('Image uploaded successfully:', url);
   }
 
   onImageRemove() {

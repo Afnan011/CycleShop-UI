@@ -252,12 +252,6 @@
       display: flex;
       align-items: baseline;
       gap: 0.25rem;
-
-      &::before {
-        content: '₹';
-        font-size: 0.7em;
-        font-weight: map-get($font-weights, medium);
-      }
     }
   }
   .add-to-cart-btn {
