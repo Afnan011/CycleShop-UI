@@ -1,11 +1,9 @@
-// Shared table styles for dashboard components
 @use 'sass:color';
 @use 'sass:map';
-
-@import '../../../styles.scss';
+@use '../../../styles' as styles;
 
 .dashboard-table {
-  background: white;
+  background: styles.$color-white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -17,20 +15,20 @@
     th, td {
       padding: 1rem;
       text-align: left;
-      border-bottom: 1px solid $color-border;
+      border-bottom: 1px solid styles.$color-border;
     }
 
     th {
       background-color: #ecedef;
-      font-weight: map-get($font-weights, medium);
-      color: $color-dark-font;
+      font-weight: map.get(styles.$font-weights, medium);
+      color: styles.$color-dark-font;
       font-size: 0.875rem;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       position: relative;
     }
-    
+
     td {
-      color: $color-dark-font;
+      color: styles.$color-dark-font;
       font-size: 0.875rem;
     }
 
@@ -50,22 +48,22 @@
         transition: all 0.2s;
 
         &.edit {
-          background-color: rgba($color-primary, 0.1);
-          color: $color-primary;
+          background-color: rgba(styles.$color-primary, 0.1);
+          color: styles.$color-primary;
 
           &:hover {
-            background-color: $color-primary;
-            color: white;
+            background-color: styles.$color-primary;
+            color: styles.$color-white;
           }
         }
 
         &.delete {
-          background-color: rgba($color-error, 0.1);
-          color: $color-error;
+          background-color: rgba(styles.$color-error, 0.1);
+          color: styles.$color-error;
 
           &:hover {
-            background-color: $color-error;
-            color: white;
+            background-color: styles.$color-error;
+            color: styles.$color-white;
           }
         }
       }
@@ -73,24 +71,24 @@
   }
 }
 
-// Status badge styles
 .status-badge {
   padding: 0.5rem 1.5rem;
   border-radius: 15px;
-  font-weight: map-get($font-weights, medium);
-  
+  font-weight: map.get(styles.$font-weights, medium);
+
   &.warning {
-    background-color: $color-warning;
-    color: $color-dark-font;
+    background-color: styles.$color-warning;
+    color: styles.$color-dark-font;
   }
-  
+
   &.success {
-    background-color: rgba($color-primary, 0.1);
-    color: $color-primary;
+    background-color: rgba(styles.$color-primary, 0.1);
+    color: styles.$color-primary;
   }
-  
+
   &.error {
-    background-color: rgba($color-error, 0.1);
-    color: $color-error;
+    background-color: rgba(styles.$color-error, 0.1);
+    color: styles.$color-error;
   }
 }
+
