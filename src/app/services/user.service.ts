@@ -10,10 +10,10 @@ export interface User {
   email: string;
   role: 'admin' | 'employee';
   isActive: boolean;
-  imageUrl?: string;
   lastLogin?: Date;
   createdAt: Date;
   updatedAt: Date;
+  imageUrl?: string;
 }
 
 export interface CreateUserRequest {
