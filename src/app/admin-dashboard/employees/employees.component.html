@@ -2,7 +2,12 @@
   <div class="inventory-header">
     <div class="search-filters">
       <div class="search-box">
-        <input type="text" [(ngModel)]="searchQuery" placeholder="Search employees..." class="form-control" />
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          placeholder="Search employees..."
+          class="form-control"
+        />
       </div>
       <select [(ngModel)]="selectedRole" class="form-control">
         <option value="All Roles">All Roles</option>
@@ -15,7 +20,7 @@
         <option [ngValue]="false">Inactive</option>
       </select>
     </div>
-  <button class="add-cycle-btn" (click)="showAddModal()">
+    <button class="add-cycle-btn" (click)="showAddModal()">
       <i class="fas fa-plus"></i>
       <span>Add Employee</span>
     </button>
@@ -24,48 +29,82 @@
     <table>
       <thead>
         <tr>
+          <th>Image</th>
           <th (click)="sortBy('username')">
             Username
-            <span *ngIf="sortField === 'username'" class="sort-indicator">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
+            <span *ngIf="sortField === 'username'" class="sort-indicator">{{
+              sortDirection === "asc" ? "▲" : "▼"
+            }}</span>
           </th>
           <th (click)="sortBy('email')">
             Email
-            <span *ngIf="sortField === 'email'" class="sort-indicator">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
+            <span *ngIf="sortField === 'email'" class="sort-indicator">{{
+              sortDirection === "asc" ? "▲" : "▼"
+            }}</span>
           </th>
           <th (click)="sortBy('role')">
             Role
-            <span *ngIf="sortField === 'role'" class="sort-indicator">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
+            <span *ngIf="sortField === 'role'" class="sort-indicator">{{
+              sortDirection === "asc" ? "▲" : "▼"
+            }}</span>
           </th>
           <th (click)="sortBy('isActive')">
             Status
-            <span *ngIf="sortField === 'isActive'" class="sort-indicator">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
+            <span *ngIf="sortField === 'isActive'" class="sort-indicator">{{
+              sortDirection === "asc" ? "▲" : "▼"
+            }}</span>
           </th>
           <th (click)="sortBy('lastLogin')">
             Last Login
-            <span *ngIf="sortField === 'lastLogin'" class="sort-indicator">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
+            <span *ngIf="sortField === 'lastLogin'" class="sort-indicator">{{
+              sortDirection === "asc" ? "▲" : "▼"
+            }}</span>
           </th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let employee of filteredEmployees()">
-          <td>{{employee.username}}</td>
-          <td>{{employee.email}}</td>
-          <td>
-            <span class="role-badge" [class]="employee.role">{{employee.role}}</span>
+          <td class="employee-image">
+            <img
+              [src]="employee.imageUrl || 'assets/images/user-avatar.png'"
+              [alt]="employee.username"
+              (error)="handleImageError($event)"
+            />
           </td>
+          <td>{{ employee.username }}</td>
+          <td>{{ employee.email }}</td>
           <td>
-            <span class="status-badge" [class]="employee.isActive ? 'active' : 'inactive'">
-              {{employee.isActive ? 'Active' : 'Inactive'}}
+            <span class="role-badge" [ngClass]="employee.role">
+              {{ employee.role | titlecase }}
             </span>
           </td>
-          <td>{{employee.lastLogin | date:'medium'}}</td>
+          <td>
+            <span
+              class="status-badge"
+              [ngClass]="employee.isActive ? 'active' : 'inactive'"
+            >
+              {{ employee.isActive ? "Active" : "Inactive" }}
+            </span>
+          </td>
+          <td>
+            {{ employee.lastLogin | date:'shortTime' }}<br>
+            {{ employee.lastLogin | date:'MMM dd, yyyy' }}
+          </td>
           <td>
             <div class="actions">
-              <button class="action-btn edit" (click)="editEmployee(employee)">
+              <button
+                class="action-btn edit"
+                (click)="editEmployee(employee)"
+                title="Edit"
+              >
                 <i class="fas fa-edit"></i>
               </button>
-              <button class="action-btn delete" (click)="deleteEmployee(employee)">
+              <button
+                class="action-btn delete"
+                (click)="deleteEmployee(employee)"
+                title="Delete"
+              >
                 <i class="fas fa-trash"></i>
               </button>
             </div>
@@ -74,11 +113,19 @@
       </tbody>
     </table>
     <div class="pagination-controls">
-      <button class="pagination-btn" [disabled]="currentPage === 1" (click)="previousPage()">
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage === 1"
+        (click)="previousPage()"
+      >
         <i class="fas fa-chevron-left"></i> Previous
       </button>
       <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
-      <button class="pagination-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage === totalPages"
+        (click)="nextPage()"
+      >
         Next <i class="fas fa-chevron-right"></i>
       </button>
     </div>
@@ -86,9 +133,18 @@
 </div>
 
 <!-- Add/Edit Employee Modal -->
-<app-modal *ngIf="showModal" [isOpen]="true" (close)="closeModal()" [title]="modalTitle">
+<app-modal
+  *ngIf="showModal"
+  [isOpen]="true"
+  (close)="closeModal()"
+  [title]="modalTitle"
+>
   <div class="modal-body">
-    <form [formGroup]="employeeForm" (ngSubmit)="submitForm()" class="form-grid">
+    <form
+      [formGroup]="employeeForm"
+      (ngSubmit)="submitForm()"
+      class="form-grid"
+    >
       <div class="form-group">
         <label for="username">Username</label>
         <input
@@ -97,8 +153,11 @@
           formControlName="username"
           placeholder="Enter username"
           class="form-control"
+        />
+        <span
+          class="error-message"
+          *ngIf="employeeForm.get('username')?.errors?.['required'] && employeeForm.get('username')?.touched"
         >
-        <span class="error-message" *ngIf="employeeForm.get('username')?.errors?.['required'] && employeeForm.get('username')?.touched">
           Username is required
         </span>
       </div>
@@ -111,11 +170,17 @@
           formControlName="email"
           placeholder="Enter email"
           class="form-control"
+        />
+        <span
+          class="error-message"
+          *ngIf="employeeForm.get('email')?.errors?.['required'] && employeeForm.get('email')?.touched"
         >
-        <span class="error-message" *ngIf="employeeForm.get('email')?.errors?.['required'] && employeeForm.get('email')?.touched">
           Email is required
         </span>
-        <span class="error-message" *ngIf="employeeForm.get('email')?.errors?.['email'] && employeeForm.get('email')?.touched">
+        <span
+          class="error-message"
+          *ngIf="employeeForm.get('email')?.errors?.['email'] && employeeForm.get('email')?.touched"
+        >
           Please enter a valid email address
         </span>
       </div>
@@ -128,8 +193,11 @@
           formControlName="password"
           placeholder="Enter password"
           class="form-control"
+        />
+        <span
+          class="error-message"
+          *ngIf="employeeForm.get('password')?.errors?.['required'] && employeeForm.get('password')?.touched"
         >
-        <span class="error-message" *ngIf="employeeForm.get('password')?.errors?.['required'] && employeeForm.get('password')?.touched">
           Password is required
         </span>
       </div>
@@ -140,6 +208,16 @@
           <option value="employee">Employee</option>
           <option value="admin">Admin</option>
         </select>
+      </div>
+
+      <div class="form-group">
+        <label>Profile Image</label>
+        <app-image-upload
+          [previewUrl]="employeeForm.get('imageUrl')?.value"
+          (uploadSuccess)="onImageUploadSuccess($event)"
+          (removeImage)="onImageRemove()"
+        >
+        </app-image-upload>
       </div>
 
       <div class="form-group" *ngIf="editMode">
@@ -156,8 +234,13 @@
       <button type="button" class="cancel-btn" (click)="closeModal()">
         <i class="fas fa-times"></i> Cancel
       </button>
-      <button type="submit" class="save-btn" [disabled]="employeeForm.invalid" (click)="submitForm()">
-        <i class="fas fa-check"></i> {{editMode ? 'Update' : 'Create'}}
+      <button
+        type="submit"
+        class="save-btn"
+        [disabled]="employeeForm.invalid"
+        (click)="submitForm()"
+      >
+        <i class="fas fa-check"></i> {{ editMode ? "Update" : "Create" }}
       </button>
     </div>
   </div>
@@ -170,5 +253,6 @@
   title="Delete Employee"
   message="Are you sure you want to delete this employee? This action cannot be undone."
   (onConfirm)="confirmDelete()"
-  (onClose)="showDeleteModal = false">
+  (onClose)="showDeleteModal = false"
+>
 </app-confirm-modal>

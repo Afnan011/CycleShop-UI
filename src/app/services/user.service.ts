@@ -10,6 +10,7 @@ export interface User {
   email: string;
   role: 'admin' | 'employee';
   isActive: boolean;
+  imageUrl?: string;
   lastLogin?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -20,6 +21,7 @@ export interface CreateUserRequest {
   email: string;
   password: string;
   role: 'admin' | 'employee';
+  imageUrl?: string;
 }
 
 export interface UpdateUserRequest {
@@ -27,6 +29,7 @@ export interface UpdateUserRequest {
   email?: string;
   role?: 'admin' | 'employee';
   isActive?: boolean;
+  imageUrl?: string;
 }
 
 @Injectable({

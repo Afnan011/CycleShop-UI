@@ -16,6 +16,7 @@ import {
 import { ModalComponent } from '../../shared/components/modal/modal.component';
 import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal.component';
 import { ToastrService } from 'ngx-toastr';
+import { ImageUploadComponent } from '../../shared/components/image-upload/image-upload.component';
 
 @Component({
   selector: 'app-employees',
@@ -26,6 +27,7 @@ import { ToastrService } from 'ngx-toastr';
     FormsModule,
     ModalComponent,
     ConfirmModalComponent,
+    ImageUploadComponent,
   ],
   templateUrl: './employees.component.html',
   styleUrls: ['./employees.component.scss'],
@@ -79,8 +81,11 @@ export class EmployeesComponent implements OnInit {
       ],
       role: [employee?.role ?? 'employee', Validators.required],
       isActive: [employee?.isActive ?? true],
+      imageUrl: [employee?.imageUrl ?? '']
     });
-  }  loadEmployees(): void {
+  }
+
+  loadEmployees(): void {
     this.userService.getUsers().subscribe({
       next: (users: User[]) => {
         this.employees = users;
@@ -129,9 +134,9 @@ export class EmployeesComponent implements OnInit {
         if (this.sortField === 'lastLogin') {
           // Safe type handling for date values
           const aDate = aValue instanceof Date ? aValue.getTime() :
-                       typeof aValue === 'string' ? new Date(aValue).getTime() : 0;
+            typeof aValue === 'string' ? new Date(aValue).getTime() : 0;
           const bDate = bValue instanceof Date ? bValue.getTime() :
-                       typeof bValue === 'string' ? new Date(bValue).getTime() : 0;
+            typeof bValue === 'string' ? new Date(bValue).getTime() : 0;
           return this.sortDirection === 'asc' ? aDate - bDate : bDate - aDate;
         }
 
@@ -222,6 +227,7 @@ export class EmployeesComponent implements OnInit {
         email: this.employeeForm.value.email,
         role: this.employeeForm.value.role,
         isActive: this.employeeForm.value.isActive,
+        imageUrl: this.employeeForm.value.imageUrl
       };
 
       this.userService
@@ -243,6 +249,7 @@ export class EmployeesComponent implements OnInit {
         email: this.employeeForm.value.email,
         password: this.employeeForm.value.password,
         role: this.employeeForm.value.role,
+        imageUrl: this.employeeForm.value.imageUrl
       };
 
       this.userService.createUser(createData).subscribe({
@@ -263,5 +270,19 @@ export class EmployeesComponent implements OnInit {
     this.showModal = false;
     this.selectedEmployee = null;
     this.employeeForm = this.createEmployeeForm();
+  }
+
+  handleImageError(event: Event): void {
+    if (event.target instanceof HTMLImageElement) {
+      event.target.src = 'assets/images/default_avatar.jpg';
+    }
+  }
+
+  onImageUploadSuccess(url: string) {
+    this.employeeForm.patchValue({ imageUrl: url });
+  }
+
+  onImageRemove() {
+    this.employeeForm.patchValue({ imageUrl: '' });
   }
 }

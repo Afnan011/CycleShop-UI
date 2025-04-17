@@ -127,7 +127,7 @@
         transition: all 0.2s;
 
         &:hover:not(:disabled) {
-          background-color: #f1f3f5; // Using a specific color value instead of undefined variable
+          background-color: #f1f3f5; 
         }
 
         &:disabled {
@@ -167,6 +167,16 @@
       td {
         color: $color-body-font;
         font-size: map.get($font-sizes, base);
+      }
+
+      .employee-image {
+           img{
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            object-fit: contain;
+            border: 1px solid $color-border;
+           }        
       }
 
       .actions {
