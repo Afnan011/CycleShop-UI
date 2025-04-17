@@ -15,7 +15,7 @@
         <option [ngValue]="false">Inactive</option>
       </select>
     </div>
-    <button class="add-cycle-btn" (click)="showAddModal()">
+  <button class="add-cycle-btn" (click)="showAddModal()">
       <i class="fas fa-plus"></i>
       <span>Add Employee</span>
     </button>
@@ -26,23 +26,23 @@
         <tr>
           <th (click)="sortBy('username')">
             Username
-            <span *ngIf="sortField === 'username'">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
+            <span *ngIf="sortField === 'username'" class="sort-indicator">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
           </th>
           <th (click)="sortBy('email')">
             Email
-            <span *ngIf="sortField === 'email'">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
+            <span *ngIf="sortField === 'email'" class="sort-indicator">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
           </th>
           <th (click)="sortBy('role')">
             Role
-            <span *ngIf="sortField === 'role'">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
+            <span *ngIf="sortField === 'role'" class="sort-indicator">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
           </th>
           <th (click)="sortBy('isActive')">
             Status
-            <span *ngIf="sortField === 'isActive'">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
+            <span *ngIf="sortField === 'isActive'" class="sort-indicator">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
           </th>
           <th (click)="sortBy('lastLogin')">
             Last Login
-            <span *ngIf="sortField === 'lastLogin'">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
+            <span *ngIf="sortField === 'lastLogin'" class="sort-indicator">{{ sortDirection === "asc" ? "▲" : "▼" }}</span>
           </th>
           <th>Actions</th>
         </tr>
@@ -87,45 +87,80 @@
 
 <!-- Add/Edit Employee Modal -->
 <app-modal *ngIf="showModal" [isOpen]="true" (close)="closeModal()" [title]="modalTitle">
-  <form class="employee-form" [formGroup]="employeeForm" (ngSubmit)="submitForm()">
-    <div class="form-group">
-      <label for="username">Username</label>
-      <input type="text" id="username" formControlName="username" placeholder="Enter username">
-    </div>
+  <div class="modal-body">
+    <form [formGroup]="employeeForm" (ngSubmit)="submitForm()" class="form-grid">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          placeholder="Enter username"
+          class="form-control"
+        >
+        <span class="error-message" *ngIf="employeeForm.get('username')?.errors?.['required'] && employeeForm.get('username')?.touched">
+          Username is required
+        </span>
+      </div>
 
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input type="email" id="email" formControlName="email" placeholder="Enter email">
-    </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          placeholder="Enter email"
+          class="form-control"
+        >
+        <span class="error-message" *ngIf="employeeForm.get('email')?.errors?.['required'] && employeeForm.get('email')?.touched">
+          Email is required
+        </span>
+        <span class="error-message" *ngIf="employeeForm.get('email')?.errors?.['email'] && employeeForm.get('email')?.touched">
+          Please enter a valid email address
+        </span>
+      </div>
 
-    <div class="form-group" *ngIf="!editMode">
-      <label for="password">Password</label>
-      <input type="password" id="password" formControlName="password" placeholder="Enter password">
-    </div>
+      <div class="form-group" *ngIf="!editMode">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          placeholder="Enter password"
+          class="form-control"
+        >
+        <span class="error-message" *ngIf="employeeForm.get('password')?.errors?.['required'] && employeeForm.get('password')?.touched">
+          Password is required
+        </span>
+      </div>
 
-    <div class="form-group">
-      <label for="role">Role</label>
-      <select id="role" formControlName="role">
-        <option value="employee">Employee</option>
-        <option value="admin">Admin</option>
-      </select>
-    </div>
+      <div class="form-group">
+        <label for="role">Role</label>
+        <select id="role" formControlName="role" class="form-control">
+          <option value="employee">Employee</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
 
-    <div class="form-group" *ngIf="editMode">
-      <label for="isActive">Status</label>
-      <select id="isActive" formControlName="isActive">
-        <option [ngValue]="true">Active</option>
-        <option [ngValue]="false">Inactive</option>
-      </select>
-    </div>
-
+      <div class="form-group" *ngIf="editMode">
+        <label for="isActive">Status</label>
+        <select id="isActive" formControlName="isActive" class="form-control">
+          <option [ngValue]="true">Active</option>
+          <option [ngValue]="false">Inactive</option>
+        </select>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
     <div class="form-actions">
-      <button type="button" class="cancel-btn" (click)="closeModal()">Cancel</button> // Changed class to cancel-btn
-      <button type="submit" class="submit-btn" [disabled]="employeeForm.invalid"> // Changed class to submit-btn
-        {{editMode ? 'Update' : 'Create'}}
+      <button type="button" class="cancel-btn" (click)="closeModal()">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button type="submit" class="save-btn" [disabled]="employeeForm.invalid" (click)="submitForm()">
+        <i class="fas fa-check"></i> {{editMode ? 'Update' : 'Create'}}
       </button>
     </div>
-  </form>
+  </div>
 </app-modal>
 
 <!-- Delete Confirmation Modal -->
