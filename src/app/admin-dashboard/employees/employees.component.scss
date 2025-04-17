@@ -1,6 +1,6 @@
-@use 'sass:color';
-@use 'sass:map';
-@use '../../../styles' as styles;
+@use "sass:color";
+@use "sass:map";
+@use "../../../styles" as *;
 
 .employees-container {
   padding: 1.5rem;
@@ -14,7 +14,7 @@
     align-items: center;
     margin-bottom: 2rem;
     gap: 1rem;
-    background-color: styles.$color-white;
+    background-color: $color-white;
     padding: 1rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -22,8 +22,13 @@
     .search-filters {
       display: flex;
       gap: 1rem;
-      align-items: center;      flex: 1;
+      align-items: center;
+      flex: 1;
 
+      select{
+        cursor: pointer;
+      }
+      
       .search-box {
         max-width: 300px;
         min-width: 200px;
@@ -31,21 +36,21 @@
         input {
           width: 100%;
           padding: 0.75rem 1rem;
-          border: 1px solid styles.$color-border;
+          border: 1px solid $color-border;
           border-radius: 4px;
-          font-size: map.get(styles.$font-sizes, base);
-          color: styles.$color-body-font;
-          background-color: styles.$color-white;
+          font-size: map.get($font-sizes, base);
+          color: $color-body-font;
+          background-color: $color-white;
           transition: all 0.2s;
 
           &:focus {
             outline: none;
-            border-color: styles.$color-primary;
-            box-shadow: 0 0 0 2px rgba(styles.$color-primary, 0.1);
+            border-color: $color-primary;
+            box-shadow: 0 0 0 2px rgba($color-primary, 0.1);
           }
 
           &::placeholder {
-            color: styles.$color-light-font;
+            color: $color-light-font;
           }
         }
       }
@@ -53,23 +58,21 @@
       .form-control {
         min-width: 120px;
         padding: 0.75rem 1rem;
-        border: 1px solid styles.$color-border;
+        border: 1px solid $color-border;
         border-radius: 4px;
-        font-size: map.get(styles.$font-sizes, base);
-        color: styles.$color-body-font;
-        background-color: styles.$color-white;
-        cursor: pointer;
-        transition: all 0.2s;
+        font-size: map.get($font-sizes, base);
+        color: $color-body-font;
+        background-color: $color-white;
 
         &:focus {
           outline: none;
-          border-color: styles.$color-primary;
-          box-shadow: 0 0 0 2px rgba(styles.$color-primary, 0.1);
+          border-color: $color-primary;
+          box-shadow: 0 0 0 2px rgba($color-primary, 0.1);
         }
 
         option {
-          color: styles.$color-body-font;
-          background-color: styles.$color-white;
+          color: $color-body-font;
+          background-color: $color-white;
           padding: 0.5rem;
         }
       }
@@ -79,11 +82,11 @@
   .add-cycle-btn {
     padding: 0 1.5rem;
     height: 40px;
-    background-color: styles.$color-primary;
-    color: styles.$color-white;
+    background-color: $color-primary;
+    color: $color-white;
     border: none;
     border-radius: 4px;
-    font-weight: map.get(styles.$font-weights, medium);
+    font-weight: map.get($font-weights, medium);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -92,7 +95,7 @@
     margin-left: auto;
 
     &:hover {
-      background-color: color.adjust(styles.$color-primary, $lightness: -5%);
+      background-color: color.adjust($color-primary, $lightness: -5%);
     }
 
     i {
@@ -101,7 +104,7 @@
   }
 
   .inventory-table {
-    background: styles.$color-white;
+    background: $color-white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     overflow: hidden;
@@ -115,11 +118,11 @@
 
       .pagination-btn {
         padding: 0.5rem 1rem;
-        border: 1px solid styles.$color-border;
-        background: styles.$color-white;
+        border: 1px solid $color-border;
+        background: $color-white;
         border-radius: 4px;
-        color: styles.$color-dark-font;
-        font-weight: map.get(styles.$font-weights, medium);
+        color: $color-dark-font;
+        font-weight: map.get($font-weights, medium);
         cursor: pointer;
         transition: all 0.2s;
 
@@ -134,8 +137,8 @@
       }
 
       .page-info {
-        color: styles.$color-dark-font;
-        font-size: map.get(styles.$font-sizes, sm);
+        color: $color-dark-font;
+        font-size: map.get($font-sizes, sm);
       }
     }
 
@@ -147,22 +150,23 @@
       td {
         padding: 1rem;
         text-align: left;
-        border-bottom: 1px solid styles.$color-border;
+        border-bottom: 1px solid $color-border;
       }
 
       th {
-        font-weight: map.get(styles.$font-weights, medium);
-        color: styles.$color-dark-font;
-        background-color: styles.$color-table-header;
+        font-weight: map.get($font-weights, medium);
+        color: $color-dark-font;
+        background-color: $color-table-header;
         cursor: pointer;
         transition: background-color 0.2s;
 
         &:hover {
-          background-color: color.adjust(styles.$color-table-header, $lightness: -2%);
+          background-color: color.adjust($color-table-header, $lightness: -2%);
         }
-      }      td {
-        color: styles.$color-body-font;
-        font-size: map.get(styles.$font-sizes, base);
+      }
+      td {
+        color: $color-body-font;
+        font-size: map.get($font-sizes, base);
       }
 
       .actions {
@@ -181,20 +185,20 @@
           transition: all 0.2s;
 
           &.edit {
-            background-color: rgba(styles.$color-primary, 0.1);
-            color: styles.$color-primary;
+            background-color: rgba($color-primary, 0.1);
+            color: $color-primary;
 
             &:hover {
-              background-color: rgba(styles.$color-primary, 0.2);
+              background-color: rgba($color-primary, 0.2);
             }
           }
 
           &.delete {
-            background-color: rgba(styles.$color-error, 0.1);
-            color: styles.$color-error;
+            background-color: rgba($color-error, 0.1);
+            color: $color-error;
 
             &:hover {
-              background-color: rgba(styles.$color-error, 0.2);
+              background-color: rgba($color-error, 0.2);
             }
           }
         }
@@ -205,16 +209,16 @@
       padding: 0.25rem 0.75rem;
       border-radius: 1rem;
       font-size: 0.875rem;
-      font-weight: map.get(styles.$font-weights, medium);
+      font-weight: map.get($font-weights, medium);
 
       &.admin {
-        background-color: rgba(styles.$color-error, 0.1);
-        color: styles.$color-error;
+        background-color: rgba($color-error, 0.1);
+        color: $color-error;
       }
 
       &.employee {
-        background-color: rgba(styles.$color-primary, 0.1);
-        color: styles.$color-primary;
+        background-color: rgba($color-primary, 0.1);
+        color: $color-primary;
       }
     }
 
@@ -222,16 +226,16 @@
       padding: 0.25rem 0.75rem;
       border-radius: 1rem;
       font-size: 0.875rem;
-      font-weight: map.get(styles.$font-weights, medium);
+      font-weight: map.get($font-weights, medium);
 
       &.active {
-        background-color: rgba(styles.$color-success, 0.1);
-        color: styles.$color-success;
+        background-color: rgba($color-success, 0.1);
+        color: $color-success;
       }
 
       &.inactive {
-        background-color: rgba(styles.$color-light-font, 0.2);
-        color: styles.$color-light-font;
+        background-color: rgba($color-light-font, 0.2);
+        color: $color-light-font;
       }
     }
   }
@@ -249,33 +253,33 @@
     gap: 0.5rem;
 
     label {
-      font-weight: map.get(styles.$font-weights, medium);
-      color: styles.$color-dark-font;
+      font-weight: map.get($font-weights, medium);
+      color: $color-dark-font;
     }
 
     .form-control {
       padding: 0.75rem 1rem;
-      border: 1px solid styles.$color-border;
+      border: 1px solid $color-border;
       border-radius: 0.25rem;
-      background-color: styles.$color-white;
-      font-size: map.get(styles.$font-sizes, base);
-      color: styles.$color-dark-font;
+      background-color: $color-white;
+      font-size: map.get($font-sizes, base);
+      color: $color-dark-font;
       transition: all 0.2s;
 
       &:focus {
         outline: none;
-        border-color: styles.$color-primary;
-        box-shadow: 0 0 0 2px rgba(styles.$color-primary, 0.1);
+        border-color: $color-primary;
+        box-shadow: 0 0 0 2px rgba($color-primary, 0.1);
       }
 
       &.ng-invalid.ng-touched {
-        border-color: styles.$color-error;
+        border-color: $color-error;
       }
     }
 
     .error-message {
-      color: styles.$color-error;
-      font-size: map.get(styles.$font-sizes, sm);
+      color: $color-error;
+      font-size: map.get($font-sizes, sm);
       margin-top: 0.25rem;
     }
   }
@@ -287,15 +291,15 @@
   gap: 1rem;
   padding: 1rem 1.5rem;
   background-color: #f8f9fa;
-  border-top: 1px solid styles.$color-border;
+  border-top: 1px solid $color-border;
 
   .cancel-btn {
     padding: 0.75rem 1.5rem;
-    border: 1px solid styles.$color-border;
+    border: 1px solid $color-border;
     border-radius: 4px;
-    background: styles.$color-white;
-    color: styles.$color-dark-font;
-    font-weight: map.get(styles.$font-weights, medium);
+    background: $color-white;
+    color: $color-dark-font;
+    font-weight: map.get($font-weights, medium);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -307,17 +311,17 @@
     }
 
     i {
-      font-size: map.get(styles.$font-sizes, sm);
+      font-size: map.get($font-sizes, sm);
     }
   }
 
   .save-btn {
     padding: 0.75rem 1.5rem;
-    background-color: styles.$color-primary;
+    background-color: $color-primary;
     border: none;
     border-radius: 4px;
     color: white;
-    font-weight: map.get(styles.$font-weights, medium);
+    font-weight: map.get($font-weights, medium);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -325,7 +329,7 @@
     transition: background-color 0.2s;
 
     &:hover {
-      background-color: color.adjust(styles.$color-primary, $lightness: -5%);
+      background-color: color.adjust($color-primary, $lightness: -5%);
     }
 
     &:disabled {
@@ -334,7 +338,7 @@
     }
 
     i {
-      font-size: map.get(styles.$font-sizes, sm);
+      font-size: map.get($font-sizes, sm);
     }
   }
 }

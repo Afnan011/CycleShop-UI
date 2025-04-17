@@ -1,6 +1,6 @@
 @use 'sass:color';
 @use 'sass:map';
-@import '../../../../styles.scss';
+@use '../../../../styles' as *;
 
 .modal {
   position: fixed;
@@ -44,9 +44,8 @@
     align-items: center;
 
     h2 {
-      margin: 0;
-      font-size: map-get($font-sizes, lg);
-      font-weight: map-get($font-weights, semibold);
+      margin: 0;      font-size: map.get($font-sizes, lg);
+      font-weight: map.get($font-weights, semibold);
       color: $color-dark-font;
     }
 
@@ -68,11 +67,9 @@
         background-color: rgba($color-error, 0.1);
         color: $color-error;
         transform: scale(1.1);
-      }
-
-      i {
-        font-size: map-get($font-sizes, base);
-      }
+      }        i {
+          font-size: map.get($font-sizes, base);
+        }
     }
   }
   .modal-body {
@@ -109,17 +106,15 @@
         label {
           display: block;
           margin-bottom: 0.5rem;
-          color: $color-dark-font;
-          font-size: map-get($font-sizes, sm);
-          font-weight: map-get($font-weights, medium);
+          color: $color-dark-font;          font-size: map.get($font-sizes, sm);
+          font-weight: map.get($font-weights, medium);
         }
 
         .form-control {
           width: 100%;
           padding: 0.75rem 1rem;
-          border: 1px solid $color-border;
-          border-radius: 4px;
-          font-size: map-get($font-sizes, base);
+          border: 1px solid $color-border;          border-radius: 4px;
+          font-size: map.get($font-sizes, base);
           background-color: $color-white;
           color: $color-dark-font;
           transition: all 0.2s;
@@ -143,7 +138,7 @@
           display: block;
           margin-top: 0.5rem;
           color: $color-error;
-          font-size: map-get($font-sizes, sm);
+          font-size: map.get($font-sizes, sm);
         }
 
         select.form-control {
@@ -172,7 +167,7 @@
       .save-btn {
         padding: 0.75rem 1.5rem;
         border-radius: 4px;
-        font-weight: map-get($font-weights, medium);
+        font-weight: map.get($font-weights, medium);
         display: flex;
         align-items: center;
         gap: 0.5rem;
@@ -180,7 +175,7 @@
         transition: all 0.2s;
 
         i {
-          font-size: map-get($font-sizes, sm);
+          font-size: map.get($font-sizes, sm);
         }
       }
 
@@ -200,7 +195,7 @@
         color: $color-white;
 
         &:hover {
-          background-color: darken($color-primary, 5%);
+            background-color: color.adjust($color-primary, $lightness: -5%);
         }
 
         &:disabled {

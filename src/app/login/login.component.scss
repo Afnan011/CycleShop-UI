@@ -1,8 +1,7 @@
-// Import Sass modules
 @use 'sass:color';
 @use 'sass:map';
 
-@import '../../styles.scss';
+@use '../../styles.scss' as *;
 
 .login-container {
   display: flex;
@@ -30,45 +29,40 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 30px;
-
   .bike-icon {
-    font-size: map-get($font-sizes, '2xl');
+    font-size: map.get($font-sizes, '2xl');
     margin-right: 0.625rem;
   }
-
   h1 {
-    font-size: map-get($font-sizes, '2xl');
+    font-size: map.get($font-sizes, '2xl');
     color: $color-dark-font;
     margin: 0;
-    font-weight: map-get($font-weights, semibold);
+    font-weight: map.get($font-weights, semibold);
   }
 }
 
 .form-group {
   margin-bottom: 1.25rem;
 
-  .error-message {
-    color: $color-error;
-    font-size: map-get($font-sizes, xs);
+  .error-message {    color: $color-error;
+    font-size: map.get($font-sizes, xs);
     margin-top: 0.25rem;
-    font-weight: map-get($font-weights, medium);
+    font-weight: map.get($font-weights, medium);
   }
 
-  label {
-    display: block;
+  label {    display: block;
     margin-bottom: 0.5rem;
-    font-size: map-get($font-sizes, sm);
+    font-size: map.get($font-sizes, sm);
     color: $color-light-font;
-    font-weight: map-get($font-weights, medium);
+    font-weight: map.get($font-weights, medium);
   }
 
   .form-control {
     width: 100%;
     padding: 0.75rem 0.9375rem;
     border: 1px solid $color-border;
-    border-radius: 0.25rem;
-    background-color: $color-background;
-    font-size: map-get($font-sizes, base);
+    border-radius: 0.25rem;    background-color: $color-background;
+    font-size: map.get($font-sizes, base);
     font-family: inherit;
     transition: border-color 0.2s, box-shadow 0.2s;
 
@@ -87,8 +81,8 @@
   color: white;
   border: none;
   border-radius: 4px;
-  font-size: map-get($font-sizes, base);
-  font-weight: map-get($font-weights, medium);
+  font-size:map.get($font-sizes, base);
+  font-weight:map.get($font-weights, medium);
   font-family: inherit;
   cursor: pointer;
   transition: all 0.2s;
@@ -115,7 +109,7 @@
   a {
     color: $color-light-font;
     text-decoration: none;
-    font-size: map-get($font-sizes, sm);
+    font-size:map.get($font-sizes, sm);
     font-family: inherit;
 
     &:hover {

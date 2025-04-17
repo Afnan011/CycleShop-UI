@@ -1,5 +1,5 @@
 @use 'sass:color';
-@import '../../../../styles.scss';
+@use '../../../../styles.scss' as *;
 
 .form-grid {
   display: grid;
@@ -79,7 +79,7 @@
     cursor: pointer;
 
     &:hover {
-      background-color: darken($color-primary, 5%);
+      background-color: color.adjust($color-primary, $blackness: 5%);
     }
 
     &:disabled {

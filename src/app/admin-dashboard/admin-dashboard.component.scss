@@ -1,7 +1,7 @@
 @use 'sass:color';
 @use 'sass:map';
 
-@import '../../styles.scss';
+@use '../../styles.scss' as *;
 
 .admin-layout {
   display: flex;
@@ -99,7 +99,7 @@
     &.active {
       background-color: rgba($color-primary, 0.1);
       color: $color-primary;
-      font-weight: map-get($font-weights, medium);
+      font-weight:map.get($font-weights, medium);
     }
   }
 }

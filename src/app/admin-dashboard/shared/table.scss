@@ -1,6 +1,6 @@
 @use 'sass:color';
 @use 'sass:map';
-@use '../../../styles' as styles;
+@use '../../../styles' as *;
 
 .dashboard-table {
   background: styles.$color-white;
@@ -15,20 +15,20 @@
     th, td {
       padding: 1rem;
       text-align: left;
-      border-bottom: 1px solid styles.$color-border;
+      border-bottom: 1px solid  $color-border;
     }
 
     th {
       background-color: #ecedef;
-      font-weight: map.get(styles.$font-weights, medium);
-      color: styles.$color-dark-font;
+      font-weight: map.get($font-weights, medium);
+      color: $color-dark-font;
       font-size: 0.875rem;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       position: relative;
     }
 
     td {
-      color: styles.$color-dark-font;
+      color: $color-dark-font;
       font-size: 0.875rem;
     }
 
@@ -48,22 +48,22 @@
         transition: all 0.2s;
 
         &.edit {
-          background-color: rgba(styles.$color-primary, 0.1);
-          color: styles.$color-primary;
+          background-color: rgba($color-primary, 0.1);
+          color: $color-primary;
 
           &:hover {
-            background-color: styles.$color-primary;
-            color: styles.$color-white;
+            background-color: $color-primary;
+            color: $color-white;
           }
         }
 
         &.delete {
-          background-color: rgba(styles.$color-error, 0.1);
-          color: styles.$color-error;
+          background-color: rgba($color-error, 0.1);
+          color: $color-error;
 
           &:hover {
-            background-color: styles.$color-error;
-            color: styles.$color-white;
+            background-color: $color-error;
+            color: $color-white;
           }
         }
       }
@@ -74,21 +74,21 @@
 .status-badge {
   padding: 0.5rem 1.5rem;
   border-radius: 15px;
-  font-weight: map.get(styles.$font-weights, medium);
+  font-weight: map.get($font-weights, medium);
 
   &.warning {
-    background-color: styles.$color-warning;
-    color: styles.$color-dark-font;
+    background-color: $color-warning;
+    color: $color-dark-font;
   }
 
   &.success {
-    background-color: rgba(styles.$color-primary, 0.1);
-    color: styles.$color-primary;
+    background-color: rgba($color-primary, 0.1);
+    color: $color-primary;
   }
 
   &.error {
-    background-color: rgba(styles.$color-error, 0.1);
-    color: styles.$color-error;
+    background-color: rgba($color-error, 0.1);
+    color: $color-error;
   }
 }
 

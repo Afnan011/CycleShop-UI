@@ -1,7 +1,7 @@
 @use 'sass:color';
 @use 'sass:map';
 
-@import '../../../styles.scss';
+@use '../../../styles.scss' as *;
 .dashboard-stats {
   padding: 2rem;
   width: 100%;
@@ -77,7 +77,7 @@
 
     th {
       background-color: $color-table-header;
-      font-weight: map-get($font-weights, medium);
+      font-weight:map.get($font-weights, medium);
     }
 
     td {

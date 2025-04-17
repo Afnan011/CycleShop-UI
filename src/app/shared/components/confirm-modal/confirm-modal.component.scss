@@ -1,4 +1,6 @@
-@import '../../../../styles.scss';
+@use 'sass:color';
+@use 'sass:map';
+@use '../../../../styles.scss' as *;
 
 .modal {
   position: fixed;
@@ -63,12 +65,11 @@
   .modal-body {
     padding: 1.5rem;
 
-    p {
-      margin: 0;
+    p {      margin: 0;
       color: $color-dark-font;
-      font-size: map-get($font-sizes, base);
+      font-size: map.get($font-sizes, base);
       line-height: 1.5;
-      font-weight: map-get($font-weights, regular);
+      font-weight: map.get($font-weights, regular);
     }
   }
 
@@ -91,7 +92,7 @@
       color: $color-dark-font;
       font-weight: 500;
       cursor: pointer;
-      font-size: map-get($font-sizes, base);
+      font-size:map.get($font-sizes, base);
 
       &:hover {
         background-color: #f8f9fa;
@@ -106,10 +107,10 @@
       border-radius: 4px;
       font-weight: 500;
       cursor: pointer;
-      font-size: map-get($font-sizes, base);
+      font-size:map.get($font-sizes, base);
 
       &:hover {
-        background-color: darken($color-error, 5%);
+        background-color: color.scale($color-error, $lightness: -5%);
       }
     }
   }
