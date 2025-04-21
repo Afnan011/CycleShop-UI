@@ -37,6 +37,7 @@ export class CustomersComponent implements OnInit {
   sortField: string = '';
   sortDirection: 'asc' | 'desc' = 'asc';
   showDetailModal = false;
+  currentFormPage: number = 0;
 
   constructor(
     private customerState: CustomerStateService,
@@ -47,7 +48,8 @@ export class CustomersComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadCustomers();    this.customerState.customers$.subscribe((customers: Customer[]) => {
+    this.loadCustomers();    
+    this.customerState.customers$.subscribe((customers: Customer[]) => {
       this.customers = customers;
       this.updatePagination();
     });
@@ -86,6 +88,7 @@ export class CustomersComponent implements OnInit {
     this.editMode = false;
     this.modalTitle = 'Add New Customer';
     this.customerForm.reset();
+    this.currentFormPage = 0;
     this.showModal = true;
   }
 
@@ -101,6 +104,7 @@ export class CustomersComponent implements OnInit {
       billingAddress: customer.billingAddress,
       shippingAddress: customer.shippingAddress
     });
+    this.currentFormPage = 0;
     this.showModal = true;
   }
 
@@ -132,6 +136,7 @@ export class CustomersComponent implements OnInit {
   closeModal() {
     this.showModal = false;
     this.customerForm.reset();
+    this.currentFormPage = 0;
   }
 
   sortBy(field: string) {
@@ -142,6 +147,7 @@ export class CustomersComponent implements OnInit {
       this.sortDirection = 'asc';
     }
   }
+
   filteredCustomers() {
     let filtered = [...this.customers];
 
@@ -185,6 +191,7 @@ export class CustomersComponent implements OnInit {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     return filtered.slice(startIndex, startIndex + this.itemsPerPage);
   }
+
   updatePagination() {
     let filtered = this.customers;
     if (this.searchQuery) {
@@ -201,13 +208,19 @@ export class CustomersComponent implements OnInit {
   }
 
   nextPage() {
-    if (this.currentPage < this.totalPages) {
+    if (this.currentFormPage < 2) {
+      if (this.isCurrentPageValid()) {
+        this.currentFormPage++;
+      }
+    } else if (this.currentPage < this.totalPages) {
       this.currentPage++;
     }
   }
 
   previousPage() {
-    if (this.currentPage > 1) {
+    if (this.currentFormPage > 0) {
+      this.currentFormPage--;
+    } else if (this.currentPage > 1) {
       this.currentPage--;
     }
   }
@@ -222,4 +235,32 @@ export class CustomersComponent implements OnInit {
     this.selectedCustomer = null;
   }
 
+  goToPage(page: number) {
+    if (page >= 0 && page <= 2 && this.isPageAccessible(page)) {
+      this.currentFormPage = page;
+    }
+  }
+
+  isCurrentPageValid(): boolean {
+    if (this.currentFormPage === 0) {
+      return !!this.customerForm.get('firstName')?.valid &&
+             !!this.customerForm.get('lastName')?.valid &&
+             !!this.customerForm.get('email')?.valid &&
+             !!this.customerForm.get('phone')?.valid;
+    } else if (this.currentFormPage === 1) {
+      return !!this.customerForm.get('billingAddress')?.valid;
+    } else {
+      return !!this.customerForm.get('shippingAddress')?.valid;
+    }
+  }
+
+  isPageAccessible(page: number): boolean {
+    if (page === 0) return true;
+    if (page === 1) return !!this.customerForm.get('firstName')?.valid &&
+                           !!this.customerForm.get('lastName')?.valid &&
+                           !!this.customerForm.get('email')?.valid &&
+                           !!this.customerForm.get('phone')?.valid;
+    if (page === 2) return !!this.customerForm.get('billingAddress')?.valid;
+    return false;
+  }
 }

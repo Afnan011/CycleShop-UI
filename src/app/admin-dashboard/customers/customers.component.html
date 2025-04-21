@@ -95,12 +95,24 @@
     [title]="modalTitle"
   >
     <div class="modal-body">
-      <form
-        [formGroup]="customerForm"
-        (ngSubmit)="submitForm()"
-        class="form-grid"
-      >
-        <div class="form-section">
+      <form [formGroup]="customerForm" (ngSubmit)="submitForm()" class="form-grid">
+        <!-- Progress indicator -->
+        <div class="form-progress">
+          <div class="progress-dots">
+            <div class="dot" [class.active]="currentFormPage === 0" (click)="goToPage(0)">
+              <span class="dot-label">Personal Info</span>
+            </div>
+            <div class="dot" [class.active]="currentFormPage === 1" (click)="goToPage(1)">
+              <span class="dot-label">Billing Address</span>
+            </div>
+            <div class="dot" [class.active]="currentFormPage === 2" (click)="goToPage(2)">
+              <span class="dot-label">Shipping Address</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Personal Information Page -->
+        <div class="form-section" *ngIf="currentFormPage === 0">
           <h3>Personal Information</h3>
           <div class="form-group">
             <label for="firstName">First Name</label>
@@ -177,7 +189,8 @@
           </div>
         </div>
 
-        <div class="form-section" formGroupName="billingAddress">
+        <!-- Billing Address Page -->
+        <div class="form-section" formGroupName="billingAddress" *ngIf="currentFormPage === 1">
           <h3>Billing Address</h3>
           <div class="form-group">
             <label for="billingStreetLine1">Street Line 1</label>
@@ -276,7 +289,8 @@
           </div>
         </div>
 
-        <div class="form-section" formGroupName="shippingAddress">
+        <!-- Shipping Address Page -->
+        <div class="form-section" formGroupName="shippingAddress" *ngIf="currentFormPage === 2">
           <h3>Shipping Address</h3>
           <div class="form-group">
             <label for="shippingStreetLine1">Street Line 1</label>
@@ -378,12 +392,33 @@
     </div>
     <div class="modal-footer">
       <div class="form-actions">
+        <button 
+          type="button" 
+          class="nav-btn" 
+          *ngIf="currentFormPage > 0" 
+          (click)="previousPage()"
+        >
+          <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        
         <button type="button" class="cancel-btn" (click)="closeModal()">
           <i class="fas fa-times"></i> Cancel
         </button>
+        
+        <button
+          type="button"
+          class="nav-btn"
+          *ngIf="currentFormPage < 2"
+          (click)="nextPage()"
+          [disabled]="!isCurrentPageValid()"
+        >
+          Next <i class="fas fa-chevron-right"></i>
+        </button>
+        
         <button
           type="submit"
           class="save-btn"
+          *ngIf="currentFormPage === 2"
           [disabled]="customerForm.invalid"
           (click)="submitForm()"
         >
