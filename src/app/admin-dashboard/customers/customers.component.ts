@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
 import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal.component';
 import { CustomerStateService } from '../../services/customer-state.service';
@@ -38,17 +39,17 @@ export class CustomersComponent implements OnInit {
   sortDirection: 'asc' | 'desc' = 'asc';
   showDetailModal = false;
   currentFormPage: number = 0;
-
   constructor(
     private customerState: CustomerStateService,
     private fb: FormBuilder,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private router: Router
   ) {
     this.customerForm = this.createCustomerForm();
   }
 
   ngOnInit(): void {
-    this.loadCustomers();    
+    this.loadCustomers();
     this.customerState.customers$.subscribe((customers: Customer[]) => {
       this.customers = customers;
       this.updatePagination();
@@ -224,10 +225,8 @@ export class CustomersComponent implements OnInit {
       this.currentPage--;
     }
   }
-
   viewCustomer(customer: Customer) {
-    this.selectedCustomer = customer;
-    this.showDetailModal = true;
+    this.router.navigate(['/admin/dashboard/customers', customer.customerId]);
   }
 
   closeDetailModal() {

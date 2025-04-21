@@ -1,0 +1,73 @@
+<div class="customer-details-container">
+  <div class="details-header">
+    <button class="back-btn" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i> Back to Customers
+    </button>
+    <h1 *ngIf="customer">Customer Details: {{customer.firstName}} {{customer.lastName}}</h1>
+  </div>
+
+  <div class="loading-indicator" *ngIf="loading">
+    <i class="fas fa-spinner fa-spin"></i> Loading customer details...
+  </div>
+
+  <div class="error-message" *ngIf="error">
+    <i class="fas fa-exclamation-circle"></i> Failed to load customer details. Please try again later.
+  </div>
+
+  <div class="customer-content" *ngIf="customer && !loading">
+    <div class="content-section personal-info">
+      <div class="section-header">
+        <h2>Personal Information</h2>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Name</label>
+          <p>{{customer.firstName}} {{customer.lastName}}</p>
+        </div>
+        <div class="info-item">
+          <label>Email</label>
+          <p>{{customer.email}}</p>
+        </div>
+        <div class="info-item">
+          <label>Phone</label>
+          <p>{{customer.phone}}</p>
+        </div>
+        <div class="info-item">
+          <label>Loyalty Points</label>
+          <p class="loyalty-points">{{customer.loyaltyPoints}}</p>
+        </div>
+        <div class="info-item">
+          <label>Customer Since</label>
+          <p>{{customer.createdAt | date: 'mediumDate'}}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="address-sections">
+      <div class="content-section">
+        <div class="section-header">
+          <h2>Billing Address</h2>
+        </div>
+        <div class="address-content" *ngIf="customer.billingAddress">
+          <p>{{customer.billingAddress.streetLine1}}</p>
+          <p *ngIf="customer.billingAddress.streetLine2">{{customer.billingAddress.streetLine2}}</p>
+          <p>{{customer.billingAddress.city}}, {{customer.billingAddress.state}} {{customer.billingAddress.postalCode}}</p>
+          <p>{{customer.billingAddress.country}}</p>
+        </div>
+      </div>
+
+      <div class="content-section">
+        <div class="section-header">
+          <h2>Shipping Address</h2>
+        </div>
+        <div class="address-content" *ngIf="customer.shippingAddress">
+          <p>{{customer.shippingAddress.streetLine1}}</p>
+          <p *ngIf="customer.shippingAddress.streetLine2">{{customer.shippingAddress.streetLine2}}</p>
+          <p>{{customer.shippingAddress.city}}, {{customer.shippingAddress.state}} {{customer.shippingAddress.postalCode}}</p>
+          <p>{{customer.shippingAddress.country}}</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

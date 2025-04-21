@@ -90,6 +90,7 @@ export class PosComponent implements OnInit {
       this.cartItems.push({ cycle, quantity: 1 });
     }
     this.closeProductDetails();
+    this.isCartExpanded = true; 
   }
 
   removeFromCart(cycleId: string) {

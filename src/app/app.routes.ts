@@ -10,6 +10,7 @@ import { CycleDetailsComponent } from './admin-dashboard/inventory/cycle-details
 import { PosComponent } from './admin-dashboard/pos/pos.component';
 import { OrdersComponent } from './admin-dashboard/orders/orders.component';
 import { CustomersComponent } from './admin-dashboard/customers/customers.component';
+import { CustomerDetailsComponent } from './admin-dashboard/customers/customer-details/customer-details.component';
 import { EmployeesComponent } from './admin-dashboard/employees/employees.component';
 import { ReportsComponent } from './admin-dashboard/reports/reports.component';
 import { SettingsComponent } from './admin-dashboard/settings/settings.component';
@@ -58,10 +59,18 @@ export const routes: Routes = [
       {
         path: 'orders',
         component: OrdersComponent
-      },
-      {
+      },      {
         path: 'customers',
-        component: CustomersComponent
+        children: [
+          {
+            path: '',
+            component: CustomersComponent
+          },
+          {
+            path: ':id',
+            component: CustomerDetailsComponent
+          }
+        ]
       },
       {
         path: 'employees',
