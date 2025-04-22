@@ -1,28 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import {
-  FormsModule,
-  ReactiveFormsModule,
-  FormGroup,
-  FormBuilder,
-  FormArray,
-  Validators,
-} from '@angular/forms';
-import {
-  Order,
-  Customer,
-  Address,
-  Cycle,
-  CreateOrderRequest,
-  OrderService,
-} from '../../services/order.service';
+import { ToastrService } from 'ngx-toastr';
+import { OrderService, Order, Customer, Address, Cycle, CreateOrderRequest, Inventory, statusType } from '../../services/order.service';
 import { CustomerService } from 'src/app/services/customer.service';
+import { OrderDetailsModalComponent } from "./order-details-modal/order-details-modal.component";
 
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, HttpClientModule, OrderDetailsModalComponent],
   templateUrl: './orders.component.html',
   styleUrls: ['./orders.component.scss'],
 })
@@ -54,7 +42,7 @@ export class OrdersComponent implements OnInit {
   showDetailsModal: boolean = false;
   selectedOrder: Order | null = null;
   isEditingStatus: boolean = false;
-  newStatus: string = '';
+  newStatus: string | statusType = '';
 
   // Form properties
   orderForm: FormGroup;
@@ -62,12 +50,13 @@ export class OrdersComponent implements OnInit {
   constructor(
     private orderService: OrderService,
     private customerService: CustomerService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private toastr: ToastrService
   ) {
     this.orderForm = this.fb.group({
       customerId: ['', Validators.required],
       shippingAddressId: [''],
-      discount: [0, [Validators.min(0)]],
+      discount: [0, [Validators.min(0), Validators.max(99999999)]],
       notes: [''],
       orderItems: this.fb.array([]),
     });
@@ -143,11 +132,26 @@ export class OrdersComponent implements OnInit {
   }
 
   addOrderItem(): void {
+    // Check if there's an empty first item
+    if (this.orderItemsFormArray.length > 0) {
+      const lastItem = this.orderItemsFormArray.at(this.orderItemsFormArray.length - 1);
+      if (!lastItem.get('cycleId')?.value) {
+        this.toastr.warning('Please select a cycle for the current item before adding a new one');
+        return;
+      }
+    }
+
     const itemGroup = this.fb.group({
       cycleId: ['', Validators.required],
       quantity: [1, [Validators.required, Validators.min(1)]],
       priceSnapshot: [0, Validators.required],
-      taxRate: [0.1], // Default 10% tax
+      taxRate: [0.1],
+      maxQuantity: [0],
+      cycleDetails: this.fb.group({
+        modelName: [''],
+        sku: [''],
+        brandName: ['']
+      })
     });
 
     this.orderItemsFormArray.push(itemGroup);
@@ -166,42 +170,73 @@ export class OrdersComponent implements OnInit {
     const selectedCycle = this.availableCycles.find(
       (c) => c.cycleId === cycleId
     );
+
     if (selectedCycle) {
+      // Patch the form with cycle details including brand name
       itemForm.patchValue({
-        priceSnapshot: selectedCycle.price,
+        cycleDetails: {
+          modelName: selectedCycle.modelName,
+          sku: selectedCycle.sku,
+          brandName: selectedCycle.brand?.name || 'Unknown Brand'
+        }
       });
-      this.updateItemTotal(index);
+
+      // Find the current inventory for this cycle
+      this.orderService.getInventoryForCycle(cycleId).subscribe({
+        next: (inventory: Inventory) => {
+          const maxStock = inventory.stockQuantity;
+          const safeQuantity = Math.min(1, maxStock);
+
+          itemForm.patchValue({
+            priceSnapshot: selectedCycle.price,
+            maxQuantity: maxStock,
+            quantity: safeQuantity
+          });
+
+          if (maxStock <= 0) {
+            this.toastr.warning('This cycle is out of stock!');
+          } else if (maxStock <= inventory.reorderThreshold) {
+            this.toastr.info('This cycle is running low on stock');
+          }
+
+          // Update form validation
+          itemForm.get('quantity')?.setValidators([
+            Validators.required,
+            Validators.min(1),
+            Validators.max(maxStock)
+          ]);
+          itemForm.get('quantity')?.updateValueAndValidity();
+
+          this.updateItemTotal(index);
+        },
+        error: (err: Error) => {
+          this.toastr.error('Error fetching inventory information');
+          console.error('Error fetching inventory:', err);
+        }
+      });
     }
   }
 
-  updateItemTotal(index: number): void {
-    const itemForm = this.orderItemsFormArray.at(index);
-    const price = itemForm.get('priceSnapshot')?.value || 0;
-    const quantity = itemForm.get('quantity')?.value || 0;
-    this.updateTotals();
-  }
-
-  // Order Totals Calculations
   calculateItemTotal(index: number): number {
     const itemForm = this.orderItemsFormArray.at(index);
-    const price = itemForm.get('priceSnapshot')?.value || 0;
-    const quantity = itemForm.get('quantity')?.value || 0;
+    const price = Number(itemForm.get('priceSnapshot')?.value) || 0;
+    const quantity = Number(itemForm.get('quantity')?.value) || 0;
     return price * quantity;
   }
 
   calculateSubtotal(): number {
     return this.orderItemsFormArray.controls.reduce((total, item) => {
-      const price = item.get('priceSnapshot')?.value || 0;
-      const quantity = item.get('quantity')?.value || 0;
+      const price = Number(item.get('priceSnapshot')?.value) || 0;
+      const quantity = Number(item.get('quantity')?.value) || 0;
       return total + price * quantity;
     }, 0);
   }
 
   calculateTax(): number {
     return this.orderItemsFormArray.controls.reduce((total, item) => {
-      const price = item.get('priceSnapshot')?.value || 0;
-      const quantity = item.get('quantity')?.value || 0;
-      const taxRate = item.get('taxRate')?.value || 0;
+      const price = Number(item.get('priceSnapshot')?.value) || 0;
+      const quantity = Number(item.get('quantity')?.value) || 0;
+      const taxRate = Number(item.get('taxRate')?.value) || 0;
       return total + price * quantity * taxRate;
     }, 0);
   }
@@ -209,20 +244,83 @@ export class OrdersComponent implements OnInit {
   calculateTotal(): number {
     const subtotal = this.calculateSubtotal();
     const tax = this.calculateTax();
-    const discount = this.orderForm.get('discount')?.value || 0;
+    const discount = Number(this.orderForm.get('discount')?.value) || 0;
+
+    // Validate discount against max allowed (50% of subtotal)
+    const maxDiscount = subtotal * 0.5;
+    if (discount > maxDiscount) {
+      this.toastr.warning('Discount cannot exceed 50% of the subtotal');
+      this.orderForm.patchValue({ discount: maxDiscount });
+      return subtotal + tax - maxDiscount;
+    }
+
     return subtotal + tax - discount;
   }
 
+  updateItemTotal(index: number): void {
+    const itemForm = this.orderItemsFormArray.at(index);
+    const price = Number(itemForm.get('priceSnapshot')?.value) || 0;
+    const quantity = Number(itemForm.get('quantity')?.value) || 0;
+    const maxQuantity = Number(itemForm.get('maxQuantity')?.value) || 0;
+
+    if (isNaN(quantity)) {
+      itemForm.patchValue({ quantity: 1 });
+      this.toastr.warning('Invalid quantity value, reset to 1');
+    } else if (quantity > maxQuantity) {
+      itemForm.patchValue({ quantity: maxQuantity });
+      this.toastr.warning(`Quantity adjusted to maximum available stock: ${maxQuantity}`);
+    }
+
+    this.updateTotals();
+  }
+
   updateTotals(): void {
-    // This function is called when items change to update totals display
-    this.calculateSubtotal();
-    this.calculateTax();
-    this.calculateTotal();
+    const subtotal = this.calculateSubtotal();
+    const tax = this.calculateTax();
+    const total = this.calculateTotal();
   }
 
   // Form Submission
   submitOrder(): void {
-    if (this.orderForm.invalid) return;
+    if (this.orderForm.invalid) {
+      this.toastr.error('Please fill in all required fields');
+      return;
+    }
+
+    // Check if there are any items in the order
+    if (this.orderItemsFormArray.length === 0) {
+      this.toastr.error('Please add at least one item to the order');
+      return;
+    }
+
+    // Check if all items have cycles selected
+    const hasEmptyItems = this.orderItemsFormArray.controls.some(item => !item.get('cycleId')?.value);
+    if (hasEmptyItems) {
+      this.toastr.error('Please select cycles for all order items');
+      return;
+    }
+
+    const subtotal = this.calculateSubtotal();
+    const maxDiscount = subtotal * 0.5;
+    const currentDiscount = this.orderForm.get('discount')?.value || 0;
+
+    if (currentDiscount > maxDiscount) {
+      this.toastr.error('Discount cannot exceed 50% of the total amount');
+      return;
+    }
+
+    // Check if any items exceed available stock
+    let hasStockIssue = false;
+    this.orderItemsFormArray.controls.forEach(item => {
+      const quantity = Number(item.get('quantity')?.value) || 0;
+      const maxQuantity = Number(item.get('maxQuantity')?.value) || 0;
+      if (quantity > maxQuantity) {
+        hasStockIssue = true;
+        this.toastr.error(`Insufficient stock for selected quantity of item`);
+      }
+    });
+
+    if (hasStockIssue) return;
 
     const orderData: Order = {
       customerId: this.orderForm.get('customerId')?.value,
@@ -238,7 +336,6 @@ export class OrdersComponent implements OnInit {
         priceSnapshot: item.get('priceSnapshot')?.value,
       })),
     };
-
 
     // Get the employee ID from the JWT token
     const storedUser = localStorage.getItem('currentUser');
@@ -301,11 +398,11 @@ export class OrdersComponent implements OnInit {
     this.viewOrderDetails(order);
   }
 
-  updateOrderStatus(): void {
+  updateOrderStatus(newStatus: any): void {
     if (!this.selectedOrder) return;
 
     const updateData = {
-      status: this.newStatus,
+      status: newStatus,
     };
 
     this.orderService
@@ -313,10 +410,12 @@ export class OrdersComponent implements OnInit {
       .subscribe({
         next: () => {
           if (this.selectedOrder) {
-            this.selectedOrder.status = this.newStatus;
+            this.selectedOrder.status = this.newStatus as statusType;
           }
           this.isEditingStatus = false;
-          this.loadOrders(); // Reload all orders to reflect changes
+          this.loadOrders();
+          this.toastr.success('Order status updated successfully');
+          this.closeModals();
         },
         error: (err) => {
           console.error('Error updating order status', err);
@@ -533,5 +632,30 @@ export class OrdersComponent implements OnInit {
       (item) =>
         item.get('cycleId')?.value !== null && item.get('cycleId')?.value !== ''
     );
+  }
+
+  onQuantityChange(index: number): void {
+    const itemForm = this.orderItemsFormArray.at(index);
+    const quantity = Number(itemForm.get('quantity')?.value);
+    const maxQuantity = Number(itemForm.get('maxQuantity')?.value) || 0;
+    const cycleId = itemForm.get('cycleId')?.value;
+
+    if (!cycleId) return;
+
+    const selectedCycle = this.availableCycles.find(c => c.cycleId === cycleId);
+    if (!selectedCycle) return;
+
+    if (isNaN(quantity)) {
+      itemForm.patchValue({ quantity: 1 });
+      this.toastr.warning('Please enter a valid quantity');
+    } else if (quantity > maxQuantity) {
+      itemForm.patchValue({ quantity: maxQuantity });
+      this.toastr.warning(`Maximum available stock is ${maxQuantity}`);
+    } else if (quantity < 1) {
+      itemForm.patchValue({ quantity: 1 });
+      this.toastr.warning('Minimum quantity is 1');
+    }
+
+    this.updateTotals();
   }
 }

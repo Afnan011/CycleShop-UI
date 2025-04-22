@@ -55,7 +55,7 @@ $font-weights: (
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  font-size: map.get($font-sizes, base); // Use map.get
+  font-size: map.get($font-sizes, base);
   line-height: 1.5;
   color: $color-body-font;
   background-color: $color-background;

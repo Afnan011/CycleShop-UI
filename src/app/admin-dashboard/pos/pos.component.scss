@@ -274,8 +274,8 @@
     }
 
     &.disabled {
-      background: #e9ecef;
-      color: #6c757d;
+      background: $color-border;
+      color: $color-light-font;
       cursor: not-allowed;
       opacity: 0.8;
     }

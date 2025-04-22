@@ -35,8 +35,9 @@ export interface CycleType {
 
 export interface Cycle {
   cycleId: string;
-  model: string;
+  modelName: string;
   brandId: string;
+  sku:string;
   brand: Brand;
   typeId: string;
   type: CycleType;
@@ -57,6 +58,8 @@ export interface OrderItem {
   totalPrice?: number;
 }
 
+export type statusType = "pending" | "processing" | "completed" | "cancelled" | "refunded";
+
 export interface Order {
   orderId?: string;
   orderNumber?: string;
@@ -66,7 +69,7 @@ export interface Order {
   shippingAddressId?: string;
   shippingAddress?: Address;
   orderDate?: Date;
-  status?: string;
+  status?: statusType;
   subtotal: number;
   tax: number;
   discount: number;
@@ -91,10 +94,15 @@ export interface UpdateOrderStatusRequest {
   status: string;
 }
 
+export interface Inventory {
+  cycleId: string;
+  stockQuantity: number;
+  reorderThreshold: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
-
 export class OrderService {
   private apiUrl = environment.apiUrl;
 
@@ -130,14 +138,25 @@ export class OrderService {
   }
 
   updateOrderStatus(orderId: string, statusRequest: UpdateOrderStatusRequest): Observable<any> {
-    return this.http.put(`${this.apiUrl}/orders/${orderId}`, statusRequest, { headers: this.getAuthHeaders() });
+    return this.http.put(`${this.apiUrl}/orders/${orderId}/status`, statusRequest, { headers: this.getAuthHeaders() });
+  }
+
+  getInventoryForCycle(cycleId: string): Observable<Inventory> {
+    return this.http.get<Inventory>(`${this.apiUrl}/Inventory/cycle/${cycleId}`);
+  }
+
+  getAllCustomers(): Observable<Customer[]> {
+    return this.http.get<Customer[]>(`${this.apiUrl}/customers`, { headers: this.getAuthHeaders() });
+  }
+
+  getCustomerAddresses(customerId: string): Observable<Address[]> {
+    return this.http.get<Address[]>(`${this.apiUrl}/customers/${customerId}/addresses`, { headers: this.getAuthHeaders() });
   }
 
   getAllCycles(): Observable<Cycle[]> {
     return this.http.get<Cycle[]>(`${this.apiUrl}/cycles`, { headers: this.getAuthHeaders() });
   }
 
-  // Helper method
   formatAddress(address: Address): string {
     if (!address) return 'No address provided';
     return `${address.street}, ${address.city}, ${address.state} ${address.postalCode}, ${address.country}`;
@@ -183,7 +202,7 @@ export class OrderService {
               <tbody>
                 ${order.orderItems.map(item => `
                   <tr>
-                    <td>${item.cycle?.brand?.name} ${item.cycle?.model}</td>
+                    <td>${item.cycle?.sku} ${item.cycle?.modelName}</td>
                     <td>${item.quantity}</td>
                     <td>$${item.priceSnapshot.toFixed(2)}</td>
                     <td>$${(item.quantity * item.priceSnapshot).toFixed(2)}</td>
