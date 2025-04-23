@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 import { OrderService, Order, Customer, Address, Cycle, CreateOrderRequest, Inventory, statusType } from '../../services/order.service';
 import { CustomerService } from 'src/app/services/customer.service';
 import { OrderDetailsModalComponent } from "./order-details-modal/order-details-modal.component";
@@ -51,7 +52,8 @@ export class OrdersComponent implements OnInit {
     private orderService: OrderService,
     private customerService: CustomerService,
     private fb: FormBuilder,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private router: Router
   ) {
     this.orderForm = this.fb.group({
       customerId: ['', Validators.required],
@@ -379,21 +381,6 @@ export class OrdersComponent implements OnInit {
 
     if (hasStockIssue) return;
 
-    const orderData: Order = {
-      customerId: this.orderForm.get('customerId')?.value,
-      shippingAddressId: this.orderForm.get('shippingAddressId')?.value,
-      discount: this.orderForm.get('discount')?.value || 0,
-      notes: this.orderForm.get('notes')?.value || '',
-      subtotal: this.calculateSubtotal(),
-      tax: this.calculateTax(),
-      totalAmount: this.calculateTotal(),
-      orderItems: this.orderItemsFormArray.controls.map((item) => ({
-        cycleId: item.get('cycleId')?.value,
-        quantity: item.get('quantity')?.value,
-        priceSnapshot: item.get('priceSnapshot')?.value,
-      })),
-    };
-
     // Get the employee ID from the JWT token
     const storedUser = localStorage.getItem('currentUser');
     let employeeId = '';
@@ -417,32 +404,41 @@ export class OrdersComponent implements OnInit {
       // Fallback if no user found in localStorage
       employeeId = '00000000-0000-0000-0000-000000000000';
     }
-    const createOrderRequest: CreateOrderRequest = {
-      customerId: orderData.customerId,
-      employeeId: employeeId,
-      discount: orderData.discount,
-      notes: orderData.notes,
-      shippingAddressId: orderData.shippingAddressId,
-      items: orderData.orderItems.map((item) => ({
-        cycleId: item.cycleId,
-        quantity: item.quantity,
+
+    // Prepare order data for payment page
+    const orderData = {
+      orderInfo: {
+        customerId: this.orderForm.get('customerId')?.value,
+        shippingAddressId: this.orderForm.get('shippingAddressId')?.value,
+        discount: this.orderForm.get('discount')?.value || 0,
+        notes: this.orderForm.get('notes')?.value || '',
+        employeeId: employeeId,
+        customer: this.customers.find(c => c.customerId === this.orderForm.get('customerId')?.value),
+      },
+      items: this.orderItemsFormArray.controls.map((item) => ({
+        cycleId: item.get('cycleId')?.value,
+        quantity: item.get('quantity')?.value,
+        priceSnapshot: item.get('priceSnapshot')?.value,
+        cycleDetails: item.get('cycleDetails')?.value
       })),
+      financialDetails: {
+        subtotal: this.calculateSubtotal(),
+        tax: this.calculateTax(),
+        totalAmount: this.calculateTotal(),
+      }
     };
 
-    console.log('Create Order Request:', createOrderRequest);
-
-    this.orderService.createOrder(createOrderRequest).subscribe({
-      next: (createdOrder) => {
-        this.closeModals();
-        this.loadOrders();
-      },
-      error: (err) => {
-        console.error('Error creating order', err);
-        // Handle error (show notification, etc)
-      },
+    // Navigate to payment page with order data
+    this.router.navigate(['/admin/dashboard/payment'], {
+      state: { 
+        order: orderData,
+        isPendingOrder: true
+      }
     });
+    
+    // Close the create order modal
+    this.closeModals();
   }
-
 
   viewOrderDetails(order: Order): void {
     this.selectedOrder = order;

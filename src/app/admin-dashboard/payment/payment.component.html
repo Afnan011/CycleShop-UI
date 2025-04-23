@@ -2,7 +2,9 @@
   <div class="payment-card">
     <div class="order-summary">
       <h2>Order Summary</h2>
-      <div class="order-details" *ngIf="order">
+      
+      <!-- Regular order from POS -->
+      <div class="order-details" *ngIf="order && !isPendingOrder">
         <div class="line-item">
           <span>Subtotal:</span>
           <span>{{ order.subtotal | currency }}</span>
@@ -18,6 +20,42 @@
         <div class="line-item total">
           <span>Total:</span>
           <span>{{ order.totalAmount | currency }}</span>
+        </div>
+      </div>
+
+      <!-- Pending order from order creation -->
+      <div class="order-details" *ngIf="pendingOrderData">
+        <div class="customer-info" *ngIf="pendingOrderData.orderInfo?.customer">
+          <h4>Customer</h4>
+          <p>{{ pendingOrderData.orderInfo.customer.firstName }} {{ pendingOrderData.orderInfo.customer.lastName }}</p>
+        </div>
+        
+        <div class="items-summary" *ngIf="pendingOrderData.items?.length">
+          <h4>Items</h4>
+          <div class="item" *ngFor="let item of pendingOrderData.items">
+            <div class="item-details">
+              <span class="item-name">{{ item.cycleDetails.modelName }}</span>
+              <span class="item-quantity">x{{ item.quantity }}</span>
+              <span class="item-price">{{ item.priceSnapshot * item.quantity | currency }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="line-item">
+          <span>Subtotal:</span>
+          <span>{{ pendingOrderData.financialDetails.subtotal | currency }}</span>
+        </div>
+        <div class="line-item" *ngIf="pendingOrderData.orderInfo.discount > 0">
+          <span>Discount:</span>
+          <span>-{{ pendingOrderData.orderInfo.discount | currency }}</span>
+        </div>
+        <div class="line-item">
+          <span>Tax:</span>
+          <span>{{ pendingOrderData.financialDetails.tax | currency }}</span>
+        </div>
+        <div class="line-item total">
+          <span>Total:</span>
+          <span>{{ pendingOrderData.financialDetails.totalAmount | currency }}</span>
         </div>
       </div>
     </div>
@@ -44,13 +82,9 @@
       </button>
       <button class="process-btn" (click)="processPayment()" [disabled]="processing">
         <i class="fas fa-check"></i>
-        <span *ngIf="!processing">Process Payment</span>
+        <span *ngIf="!processing">{{ isPendingOrder ? 'Process Payment' : 'Process Payment' }}</span>
         <span *ngIf="processing">Processing...</span>
       </button>
     </div>
-
-    <div class="error-message" *ngIf="error">
-      {{ error }}
-    </div>
   </div>
-</div>]]>
+</div>
