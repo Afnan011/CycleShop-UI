@@ -2,26 +2,13 @@
   <div class="products-section">
     <div class="filters-header">
       <div class="search-filters">
-        <input
-          type="text"
-          [(ngModel)]="searchQuery"
-          (ngModelChange)="filterCycles()"
-          placeholder="Search cycles..."
-          class="form-control search-box"
-        />
-        <select
-          [(ngModel)]="selectedType"
-          (ngModelChange)="filterCycles()"
-          class="form-control"
-        >
+        <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="filterCycles()" placeholder="Search cycles..."
+          class="form-control search-box" />
+        <select [(ngModel)]="selectedType" (ngModelChange)="filterCycles()" class="form-control">
           <option value="All Types">All Types</option>
           <option *ngFor="let type of types" [value]="type">{{ type }}</option>
         </select>
-        <select
-          [(ngModel)]="selectedBrand"
-          (ngModelChange)="filterCycles()"
-          class="form-control"
-        >
+        <select [(ngModel)]="selectedBrand" (ngModelChange)="filterCycles()" class="form-control">
           <option value="All Brands">All Brands</option>
           <option *ngFor="let brand of brands" [value]="brand">
             {{ brand }}
@@ -32,42 +19,30 @@
         <i class="fas fa-shopping-cart"></i>
         <span class="cart-badge" *ngIf="cartItems.length > 0">{{
           cartItems.length
-        }}</span>
+          }}</span>
       </button>
     </div>
 
     <div class="products-grid-container">
       <div class="products-grid">
-        <div
-          class="product-card"
-          *ngFor="let cycle of filteredCycles"
-          (click)="viewCycleDetails(cycle)"
-        >
+        <div class="product-card" *ngFor="let cycle of filteredCycles" (click)="viewCycleDetails(cycle)">
           <div class="product-image">
-            <img
-              [src]="cycle.imageUrl || 'assets/images/default_cycle2.jpg'"
-              [alt]="cycle.model"
-              [class.no-image]="!cycle.imageUrl"
-              (error)="handleImageError($event)"
-            />
-            <div
-              class="stock-badge"
-              *ngIf="cycle.stockQuantity <= cycle.reorderThreshold"
-            >
+            <img [src]="cycle.imageUrl || 'assets/images/default_cycle2.jpg'" [alt]="cycle.model"
+              [class.no-image]="!cycle.imageUrl" (error)="handleImageError($event)" />
+            <div class="stock-badge" *ngIf="
+                cycle.stockQuantity <= cycle.reorderThreshold &&
+                cycle.stockQuantity > 0
+              ">
               Only {{ cycle.stockQuantity }} left!
             </div>
           </div>
           <div class="product-info">
             <h3>{{ cycle.model }}</h3>
             <p class="brand">{{ cycle.brand }}</p>
-            <p class="price">₹{{ cycle.price.toFixed(2) }}</p>
+            <p class="price">{{ cycle.price.toFixed(2) | currency }}</p>
           </div>
-          <button
-            class="add-to-cart-btn"
-            [class.disabled]="cycle.stockQuantity === 0"
-            [disabled]="cycle.stockQuantity === 0"
-            (click)="addToCart(cycle); $event.stopPropagation()"
-          >
+          <button class="add-to-cart-btn" [class.disabled]="cycle.stockQuantity === 0"
+            [disabled]="cycle.stockQuantity === 0" (click)="addToCart(cycle); $event.stopPropagation()">
             <i class="fas fa-cart-plus"></i>
             {{ cycle.stockQuantity === 0 ? "Out of Stock" : "Add to Cart" }}
           </button>
@@ -86,26 +61,18 @@
       <div class="cart-items" *ngIf="cartItems.length > 0">
         <div class="cart-item" *ngFor="let item of cartItems">
           <div class="item-image">
-            <img
-              [src]="item.cycle.imageUrl || 'assets/images/default_cycle2.jpg'"
-              [alt]="item.cycle.model"
-            />
+            <img [src]="item.cycle.imageUrl || 'assets/images/default_cycle2.jpg'" [alt]="item.cycle.model" />
           </div>
           <div class="item-details">
             <h4>{{ item.cycle.model }}</h4>
             <p class="brand">{{ item.cycle.brand }}</p>
-            <p class="price">₹{{ item.cycle.price.toFixed(2) }}</p>
+            <p class="price">{{ item.cycle.price.toFixed(2) | currency}}</p>
             <div class="quantity-controls">
               <button (click)="updateQuantity(item, item.quantity - 1)">
                 -
               </button>
-              <input
-                type="number"
-                [ngModel]="item.quantity"
-                (ngModelChange)="updateQuantity(item, $event)"
-                min="1"
-                [max]="item.cycle.stockQuantity"
-              />
+              <input type="number" [ngModel]="item.quantity" (ngModelChange)="updateQuantity(item, $event)" min="1"
+                [max]="item.cycle.stockQuantity" />
               <button (click)="updateQuantity(item, item.quantity + 1)">
                 +
               </button>
@@ -125,15 +92,15 @@
       <div class="cart-summary" *ngIf="cartItems.length > 0">
         <div class="summary-row">
           <span>Subtotal</span>
-          <span>₹{{ getSubtotal().toFixed(2) }}</span>
+          <span>{{ getSubtotal().toFixed(2) | currency}} </span>
         </div>
         <div class="summary-row">
           <span>Tax (18%)</span>
-          <span>₹{{ getTax().toFixed(2) }}</span>
+          <span>{{ getTax().toFixed(2) | currency }} </span>
         </div>
         <div class="summary-row total">
           <span>Total</span>
-          <span>₹{{ getTotal().toFixed(2) }}</span>
+          <span>{{ getTotal().toFixed(2) | currency }}</span>
         </div>
         <button class="checkout-btn">
           <i class="fas fa-credit-card"></i> Proceed to Checkout
@@ -142,11 +109,7 @@
     </div>
 
     <!-- Product Details Modal -->
-    <div
-      class="product-details-modal"
-      *ngIf="showProductDetails"
-      (click)="closeProductDetails()"
-    >
+    <div class="product-details-modal" *ngIf="showProductDetails" (click)="closeProductDetails()">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <button class="close-btn" (click)="closeProductDetails()">
           <i class="fas fa-times"></i>
@@ -154,12 +117,9 @@
 
         <div class="product-details" *ngIf="selectedCycle">
           <div class="product-image">
-            <img
-              [src]="
+            <img [src]="
                 selectedCycle.imageUrl || 'assets/images/default_cycle2.jpg'
-              "
-              [alt]="selectedCycle.model"
-            />
+              " [alt]="selectedCycle.model" />
           </div>
 
           <div class="product-info">
@@ -170,15 +130,12 @@
             </div>
 
             <div class="price-section">
-              <h3>₹{{ selectedCycle.price.toFixed(2) }}</h3>
+              <h3>{{ selectedCycle.price.toFixed(2) | currency:'INR'}}</h3>
             </div>
 
-            <div
-              class="stock-info"
-              [class.low-stock]="
+            <div class="stock-info" [class.low-stock]="
                 selectedCycle.stockQuantity <= selectedCycle.reorderThreshold
-              "
-            >
+              ">
               <span class="label">Stock Level:</span>
               <span class="value">{{ selectedCycle.stockQuantity }}</span>
             </div>
@@ -188,8 +145,15 @@
               <p>{{ selectedCycle.description }}</p>
             </div>
 
-            <button class="add-to-cart-btn" (click)="addToCart(selectedCycle)">
-              <i class="fas fa-cart-plus"></i> Add to Cart
+            <button class="add-to-cart-btn" (click)="addToCart(selectedCycle)"
+              [disabled]="selectedCycle.stockQuantity === 0"
+              [class.disabled]="selectedCycle.stockQuantity === 0">
+              <i class="fas fa-cart-plus"></i>
+              {{
+              selectedCycle.stockQuantity === 0
+              ? "Out of Stock"
+              : "Add to Cart"
+              }}
             </button>
           </div>
         </div>

@@ -55,7 +55,7 @@
           <td>{{ cycle.model }}</td>
           <td>{{ cycle.brand }}</td>
           <td>{{ cycle.type }}</td>
-          <td>₹{{ cycle.price.toFixed(2) }}</td>
+          <td>{{ cycle.price.toFixed(2) | currency }}</td>
           <td>
             <span class="stocks" [class.low-stock]="cycle.stockQuantity <= cycle.reorderThreshold">
               {{ cycle.stockQuantity }}

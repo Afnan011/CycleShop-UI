@@ -21,8 +21,8 @@
       </div>
 
       <div class="cycle-price">
-        <h2>₹{{cycle.price.toFixed(2)}}</h2>
-        <span class="cost-price">Cost: ₹{{cycle.costPrice.toFixed(2)}}</span>
+        <h2>{{cycle.price.toFixed(2) | currency }}</h2>
+        <span class="cost-price">Cost: {{cycle.costPrice.toFixed(2) | currency}}</span>
       </div>
 
       <div class="stock-info">

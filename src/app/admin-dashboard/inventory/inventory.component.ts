@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, ModalComponent, CycleFormComponent, ConfirmModalComponent, FormsModule], // ConfirmModalComponent is used in the template with *ngIf
+  imports: [CommonModule, ModalComponent, CycleFormComponent, ConfirmModalComponent, FormsModule], 
   templateUrl: './inventory.component.html',
   styleUrls: ['./inventory.component.scss']
 })

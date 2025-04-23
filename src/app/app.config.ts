@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, DEFAULT_CURRENCY_CODE, LOCALE_ID, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideToastr } from 'ngx-toastr';
@@ -20,6 +20,10 @@ export const appConfig: ApplicationConfig = {
       preventDuplicates: true,
       progressBar: true
     }),
-    provideImageKit()
+    provideImageKit(),
+    { provide: LOCALE_ID, useValue: 'en-IN' },
+    { provide: DEFAULT_CURRENCY_CODE, useValue: 'INR' }
   ]
 };
+
+

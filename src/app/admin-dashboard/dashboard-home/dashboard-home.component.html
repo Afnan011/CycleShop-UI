@@ -4,7 +4,7 @@
       <div class="stat-icon">₹</div>
       <div class="stat-content">
         <h3>Total Sales</h3>
-        <p class="stat-value">${{totalSales | number}}</p>
+        <p class="stat-value">{{totalSales | currency }}</p>
       </div>
     </div>
 
@@ -51,7 +51,7 @@
             <td>{{ order.id }}</td>
             <td>{{ order.customer }}</td>
             <td>{{ order.product }}</td>
-            <td>₹{{ order.amount }}</td>
+            <td>{{ order.amount | currency }}</td>
             <td>
               <span [class]="'status ' + order.status.toLowerCase()">
                 {{ order.status }}

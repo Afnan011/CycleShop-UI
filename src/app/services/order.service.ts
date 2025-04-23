@@ -204,17 +204,17 @@ export class OrderService {
                   <tr>
                     <td>${item.cycle?.sku} ${item.cycle?.modelName}</td>
                     <td>${item.quantity}</td>
-                    <td>$${item.priceSnapshot.toFixed(2)}</td>
-                    <td>$${(item.quantity * item.priceSnapshot).toFixed(2)}</td>
+                    <td>₹${item.priceSnapshot.toFixed(2)}</td>
+                    <td>₹${(item.quantity * item.priceSnapshot).toFixed(2)}</td>
                   </tr>
                 `).join('')}
               </tbody>
             </table>
             <div class="total-section">
-              <p><strong>Subtotal:</strong> $${order.subtotal.toFixed(2)}</p>
-              <p><strong>Tax:</strong> $${order.tax.toFixed(2)}</p>
-              <p><strong>Discount:</strong> $${order.discount.toFixed(2)}</p>
-              <p><strong>Total:</strong> $${order.totalAmount.toFixed(2)}</p>
+              <p><strong>Subtotal:</strong> ₹${order.subtotal.toFixed(2)}</p>
+              <p><strong>Tax:</strong> ₹${order.tax.toFixed(2)}</p>
+              <p><strong>Discount:</strong> ₹${order.discount.toFixed(2)}</p>
+              <p><strong>Total:</strong> ₹${order.totalAmount.toFixed(2)}</p>
             </div>
           </body>
         </html>

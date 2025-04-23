@@ -17,6 +17,14 @@
   }
 }
 
+.disabled{
+  pointer-events: none;
+  background: $color-border !important;
+  color: $color-light-font !important;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
 .products-section {
   flex: 1;
   display: flex;
