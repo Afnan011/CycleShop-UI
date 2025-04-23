@@ -100,6 +100,32 @@ export class PosComponent implements OnInit {
     }
   }
 
+  proceedToCheckout() {
+    if (this.cartItems.length === 0) return;
+
+    const order = {
+      id: Date.now().toString(), // Temporary ID for demo
+      items: this.cartItems.map(item => ({
+        cycleId: item.cycle.id,
+        quantity: item.quantity,
+        price: item.cycle.price
+      })),
+      subtotal: this.getSubtotal(),
+      tax: this.getTax(),
+      discount: 0,
+      totalAmount: this.getTotal()
+    };
+
+    // Redirect to orders page with create order flag instead of payment
+    this.router.navigate(['/admin/dashboard/orders'], { 
+      state: { 
+        createOrder: true,
+        orderData: order,
+        cartItems: this.cartItems
+      } 
+    });
+  }
+
   updateQuantity(item: {cycle: CycleInventoryView, quantity: number}, newQuantity: number) {
     if (newQuantity > 0 && newQuantity <= item.cycle.stockQuantity) {
       item.quantity = newQuantity;

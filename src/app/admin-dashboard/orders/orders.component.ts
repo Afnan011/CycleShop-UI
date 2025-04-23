@@ -66,6 +66,63 @@ export class OrdersComponent implements OnInit {
     this.loadOrders();
     this.loadCustomers();
     this.loadCycles();
+    
+    // Check if we're coming from POS with cart data
+    const navigation = window.history.state;
+    if (navigation && navigation.createOrder && navigation.cartItems) {
+      // Wait for data to load first
+      setTimeout(() => {
+        this.prepareOrderFromPOS(navigation.cartItems);
+      }, 500);
+    }
+  }
+
+  // New method to handle data from POS
+  prepareOrderFromPOS(cartItems: any[]): void {
+    this.resetOrderForm();
+    
+    // Add cart items to order form
+    if (cartItems && cartItems.length > 0) {
+      // Remove the default empty order item
+      while (this.orderItemsFormArray.length !== 0) {
+        this.orderItemsFormArray.removeAt(0);
+      }
+      
+      // Add each item from POS cart
+      cartItems.forEach(item => {
+        // Create detailed cycle info
+        const cycleDetails = {
+          modelName: item.cycle.model,
+          sku: item.cycle.sku || 'N/A',
+          brandName: item.cycle.brand
+        };
+        
+        const itemGroup = this.fb.group({
+          cycleId: [item.cycle.id, Validators.required],
+          quantity: [item.quantity, [Validators.required, Validators.min(1)]],
+          priceSnapshot: [item.cycle.price, Validators.required],
+          taxRate: [0.1],
+          maxQuantity: [item.cycle.stockQuantity],
+          cycleDetails: this.fb.group({
+            modelName: [cycleDetails.modelName],
+            sku: [cycleDetails.sku],
+            brandName: [cycleDetails.brandName]
+          })
+        });
+        
+        this.orderItemsFormArray.push(itemGroup);
+        console.log('Added item to order:', item);
+      });
+      
+      // Calculate totals
+      this.updateTotals();
+      
+      // Open the create order modal
+      this.showCreateModal = true;
+      
+      // Show a notification to the user
+      this.toastr.info('Items from POS have been added to the order. Please select a customer to continue.');
+    }
   }
 
   // Getters

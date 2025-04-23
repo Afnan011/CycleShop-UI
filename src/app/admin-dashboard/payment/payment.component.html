@@ -1,0 +1,56 @@
+<div class="payment-container">
+  <div class="payment-card">
+    <div class="order-summary">
+      <h2>Order Summary</h2>
+      <div class="order-details" *ngIf="order">
+        <div class="line-item">
+          <span>Subtotal:</span>
+          <span>{{ order.subtotal | currency }}</span>
+        </div>
+        <div class="line-item" *ngIf="order.discount > 0">
+          <span>Discount:</span>
+          <span>-{{ order.discount | currency }}</span>
+        </div>
+        <div class="line-item">
+          <span>Tax:</span>
+          <span>{{ order.tax | currency }}</span>
+        </div>
+        <div class="line-item total">
+          <span>Total:</span>
+          <span>{{ order.totalAmount | currency }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="payment-methods">
+      <h3>Select Payment Method</h3>
+      <div class="payment-options">
+        <label class="payment-option" [class.selected]="paymentMethod === 'cash'">
+          <input type="radio" [(ngModel)]="paymentMethod" value="cash" name="paymentMethod">
+          <i class="fas fa-money-bill-wave"></i>
+          <span>Cash</span>
+        </label>
+        <label class="payment-option" [class.selected]="paymentMethod === 'stripe'">
+          <input type="radio" [(ngModel)]="paymentMethod" value="stripe" name="paymentMethod">
+          <i class="fab fa-cc-stripe"></i>
+          <span>Card</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="cancel-btn" (click)="cancelPayment()">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button class="process-btn" (click)="processPayment()" [disabled]="processing">
+        <i class="fas fa-check"></i>
+        <span *ngIf="!processing">Process Payment</span>
+        <span *ngIf="processing">Processing...</span>
+      </button>
+    </div>
+
+    <div class="error-message" *ngIf="error">
+      {{ error }}
+    </div>
+  </div>
+</div>]]>

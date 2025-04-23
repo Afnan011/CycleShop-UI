@@ -14,6 +14,7 @@ import { CustomerDetailsComponent } from './admin-dashboard/customers/customer-d
 import { EmployeesComponent } from './admin-dashboard/employees/employees.component';
 import { ReportsComponent } from './admin-dashboard/reports/reports.component';
 import { SettingsComponent } from './admin-dashboard/settings/settings.component';
+import { PaymentComponent } from './admin-dashboard/payment/payment.component';
 
 export const routes: Routes = [
   {
@@ -55,6 +56,10 @@ export const routes: Routes = [
       {
         path: 'pos',
         component: PosComponent
+      },
+      {
+        path: 'payment',
+        component: PaymentComponent
       },
       {
         path: 'orders',
