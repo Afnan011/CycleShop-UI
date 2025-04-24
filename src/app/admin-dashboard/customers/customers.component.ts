@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
 import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal.component';
@@ -54,14 +54,74 @@ export class CustomersComponent implements OnInit {
       this.customers = customers;
       this.updatePagination();
     });
+
+    // Add phone number value changes subscription
+    this.customerForm.get('phone')?.valueChanges.subscribe(phone => {
+      if (phone && phone.length === 10) {
+        this.checkExistingCustomer(phone);
+      }
+    });
+  }
+
+  checkExistingCustomer(phone: string) {
+    const existingCustomer = this.customers.find(c => c.phone === phone);
+    if (existingCustomer) {
+      this.editMode = true;
+      this.selectedCustomer = existingCustomer;
+      this.modalTitle = 'Edit Customer';
+
+      this.customerForm.patchValue({
+        firstName: existingCustomer.firstName,
+        lastName: existingCustomer.lastName,
+        email: existingCustomer.email,
+        phone: existingCustomer.phone,
+        billingAddress: existingCustomer.billingAddress,
+        shippingAddress: existingCustomer.shippingAddress
+      });
+    } else {
+      // Reset form except phone number if no existing customer found
+      const currentPhone = this.customerForm.get('phone')?.value;
+      this.customerForm.reset();
+      this.customerForm.patchValue({ phone: currentPhone });
+      this.editMode = false;
+      this.selectedCustomer = null;
+      this.modalTitle = 'Add New Customer';
+    }
+  }
+  getErrorMessage(controlName: string): string {
+    let control = this.customerForm.get(controlName);
+
+    // Handle nested form controls for addresses
+    if (controlName.includes('.')) {
+      const [group, field] = controlName.split('.');
+      control = this.customerForm.get(group)?.get(field) ?? null;
+    }
+
+    if (!control) return '';
+
+    if (control.hasError('required')) {
+      return 'This field is required';
+    }
+    else if (controlName === 'email' || controlName.endsWith('.email')) {
+      if (control.hasError('email') || control.hasError('pattern')) {
+        return 'Please enter a valid email address';
+      }
+    }
+    else if (controlName === 'phone' || controlName.endsWith('.phone')) {
+      if (control.hasError('pattern')) {
+        return 'Please enter a valid phone number (10 digits)';
+      }
+    }
+
+    return '';
   }
 
   createCustomerForm(): FormGroup {
     return this.fb.group({
+      phone: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      phone: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
       billingAddress: this.fb.group({
         streetLine1: ['', Validators.required],
         streetLine2: [''],
@@ -87,6 +147,7 @@ export class CustomersComponent implements OnInit {
 
   showAddModal() {
     this.editMode = false;
+    this.selectedCustomer = null;
     this.modalTitle = 'Add New Customer';
     this.customerForm.reset();
     this.currentFormPage = 0;

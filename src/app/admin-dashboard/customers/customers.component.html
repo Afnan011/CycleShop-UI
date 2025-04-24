@@ -2,12 +2,7 @@
   <div class="inventory-header">
     <div class="search-filters">
       <div class="search-box">
-        <input
-          type="text"
-          [(ngModel)]="searchQuery"
-          placeholder="Search customers..."
-          class="form-control"
-        />
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Search customers..." class="form-control" />
       </div>
     </div>
     <button class="add-customer-btn" (click)="showAddModal()">
@@ -26,10 +21,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          *ngFor="let customer of filteredCustomers()"
-          (click)="viewCustomer(customer)"
-        >
+        <tr *ngFor="let customer of filteredCustomers()" (click)="viewCustomer(customer)">
           <td class="customer-name">
             {{ customer.firstName }} {{ customer.lastName }}
           </td>
@@ -42,25 +34,14 @@
           </td>
           <td>
             <div class="actions">
-              <button
-                class="action-btn view"
-                (click)="viewCustomer(customer); $event.stopPropagation()"
-                title="View"
-              >
+              <button class="action-btn view" (click)="viewCustomer(customer); $event.stopPropagation()" title="View">
                 <i class="fas fa-eye"></i>
               </button>
-              <button
-                class="action-btn edit"
-                (click)="editCustomer(customer); $event.stopPropagation()"
-                title="Edit"
-              >
+              <button class="action-btn edit" (click)="editCustomer(customer); $event.stopPropagation()" title="Edit">
                 <i class="fas fa-edit"></i>
               </button>
-              <button
-                class="action-btn delete"
-                (click)="deleteCustomer(customer); $event.stopPropagation()"
-                title="Delete"
-              >
+              <button class="action-btn delete" (click)="deleteCustomer(customer); $event.stopPropagation()"
+                title="Delete">
                 <i class="fas fa-trash"></i>
               </button>
             </div>
@@ -69,31 +50,18 @@
       </tbody>
     </table>
     <div class="pagination-controls">
-      <button
-        class="pagination-btn"
-        [disabled]="currentPage === 1"
-        (click)="previousPage()"
-      >
+      <button class="pagination-btn" [disabled]="currentPage === 1" (click)="previousPage()">
         <i class="fas fa-chevron-left"></i> Previous
       </button>
       <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
-      <button
-        class="pagination-btn"
-        [disabled]="currentPage === totalPages"
-        (click)="nextPage()"
-      >
+      <button class="pagination-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
         Next <i class="fas fa-chevron-right"></i>
       </button>
     </div>
   </div>
 
   <!-- Add/Edit Customer Modal -->
-  <app-modal
-    *ngIf="showModal"
-    [isOpen]="true"
-    (close)="closeModal()"
-    [title]="modalTitle"
-  >
+  <app-modal *ngIf="showModal" [isOpen]="true" (close)="closeModal()" [title]="modalTitle">
     <div class="modal-body">
       <form [formGroup]="customerForm" (ngSubmit)="submitForm()" class="form-grid">
         <!-- Progress indicator -->
@@ -114,77 +82,40 @@
         <!-- Personal Information Page -->
         <div class="form-section" *ngIf="currentFormPage === 0">
           <h3>Personal Information</h3>
-          <div class="form-group">
-            <label for="firstName">First Name</label>
-            <input
-              type="text"
-              id="firstName"
-              formControlName="firstName"
-              placeholder="Enter first name"
-              class="form-control"
-            />
-            <span
-              class="error-message"
-              *ngIf="customerForm.get('firstName')?.errors?.['required'] && customerForm.get('firstName')?.touched"
+          <div class="form-group"> <label for="phone">Phone *</label>
+            <input type="tel" id="phone" formControlName="phone" placeholder="Enter phone number" class="form-control"
+             pattern="\d{10}" />
+            <span class="error-message"
+            *ngIf="customerForm.get('phone')?.invalid && customerForm.get('phone')?.touched"
             >
-              First name is required
+              {{getErrorMessage('phone')}}
+            </span>
+          </div>
+          <div class="form-group"> <label for="firstName">First Name *</label>
+            <input type="text" id="firstName" formControlName="firstName" placeholder="Enter first name"
+              class="form-control" />
+            <span class="error-message"
+              *ngIf="customerForm.get('firstName')?.invalid && customerForm.get('firstName')?.touched">
+              {{getErrorMessage('firstName')}}
             </span>
           </div>
 
           <div class="form-group">
-            <label for="lastName">Last Name</label>
-            <input
-              type="text"
-              id="lastName"
-              formControlName="lastName"
-              placeholder="Enter last name"
-              class="form-control"
-            />
-            <span
-              class="error-message"
-              *ngIf="customerForm.get('lastName')?.errors?.['required'] && customerForm.get('lastName')?.touched"
-            >
-              Last name is required
+            <label for="lastName">Last Name *</label>
+            <input type="text" id="lastName" formControlName="lastName" placeholder="Enter last name"
+              class="form-control" />
+            <span class="error-message"
+              *ngIf="customerForm.get('lastName')?.invalid && customerForm.get('lastName')?.touched">
+              {{getErrorMessage('lastName')}}
             </span>
           </div>
 
           <div class="form-group">
-            <label for="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              formControlName="email"
-              placeholder="Enter email"
-              class="form-control"
-            />
-            <span
-              class="error-message"
-              *ngIf="customerForm.get('email')?.errors?.['required'] && customerForm.get('email')?.touched"
-            >
-              Email is required
-            </span>
-            <span
-              class="error-message"
-              *ngIf="customerForm.get('email')?.errors?.['email'] && customerForm.get('email')?.touched"
-            >
-              Please enter a valid email address
-            </span>
-          </div>
-
-          <div class="form-group">
-            <label for="phone">Phone</label>
-            <input
-              type="tel"
-              id="phone"
-              formControlName="phone"
-              placeholder="Enter phone number"
-              class="form-control"
-            />
-            <span
-              class="error-message"
-              *ngIf="customerForm.get('phone')?.errors?.['required'] && customerForm.get('phone')?.touched"
-            >
-              Phone number is required
+            <label for="email">Email *</label>
+            <input type="email" id="email" formControlName="email" placeholder="Enter email" class="form-control" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"/>
+            <span class="error-message"
+              *ngIf="customerForm.get('email')?.invalid && customerForm.get('email')?.touched">
+              {{getErrorMessage('email')}}
             </span>
           </div>
         </div>
@@ -192,99 +123,53 @@
         <!-- Billing Address Page -->
         <div class="form-section" formGroupName="billingAddress" *ngIf="currentFormPage === 1">
           <h3>Billing Address</h3>
-          <div class="form-group">
-            <label for="billingStreetLine1">Street Line 1</label>
-            <input
-              type="text"
-              id="billingStreetLine1"
-              formControlName="streetLine1"
-              placeholder="Enter street address"
-              class="form-control"
-            />
-            <span
-              class="error-message"
-              *ngIf="customerForm.get('billingAddress.streetLine1')?.errors?.['required'] && customerForm.get('billingAddress.streetLine1')?.touched"
-            >
-              Street address is required
+          <div class="form-group"> <label for="billingStreetLine1">Street Line 1 *</label>
+            <input type="text" id="billingStreetLine1" formControlName="streetLine1" placeholder="Enter street address"
+              class="form-control" />
+            <span class="error-message"
+              *ngIf="customerForm.get('billingAddress.streetLine1')?.invalid && customerForm.get('billingAddress.streetLine1')?.touched">
+              {{getErrorMessage('billingAddress.streetLine1')}}
             </span>
           </div>
 
           <div class="form-group">
             <label for="billingStreetLine2">Street Line 2</label>
-            <input
-              type="text"
-              id="billingStreetLine2"
-              formControlName="streetLine2"
-              placeholder="Enter additional address info"
-              class="form-control"
-            />
+            <input type="text" id="billingStreetLine2" formControlName="streetLine2"
+              placeholder="Enter apartment, suite, etc." class="form-control" />
           </div>
 
-          <div class="form-group">
-            <label for="billingCity">City</label>
-            <input
-              type="text"
-              id="billingCity"
-              formControlName="city"
-              placeholder="Enter city"
-              class="form-control"
-            />
-            <span
-              class="error-message"
-              *ngIf="customerForm.get('billingAddress.city')?.errors?.['required'] && customerForm.get('billingAddress.city')?.touched"
-            >
-              City is required
+          <div class="form-group"> <label for="billingCity">City *</label>
+            <input type="text" id="billingCity" formControlName="city" placeholder="Enter city" class="form-control" />
+            <span class="error-message"
+              *ngIf="customerForm.get('billingAddress.city')?.invalid && customerForm.get('billingAddress.city')?.touched">
+              {{getErrorMessage('billingAddress.city')}}
             </span>
           </div>
 
-          <div class="form-group">
-            <label for="billingState">State</label>
-            <input
-              type="text"
-              id="billingState"
-              formControlName="state"
-              placeholder="Enter state"
-              class="form-control"
-            />
-            <span
-              class="error-message"
-              *ngIf="customerForm.get('billingAddress.state')?.errors?.['required'] && customerForm.get('billingAddress.state')?.touched"
-            >
-              State is required
+          <div class="form-group"> <label for="billingState">State *</label>
+            <input type="text" id="billingState" formControlName="state" placeholder="Enter state"
+              class="form-control" />
+            <span class="error-message"
+              *ngIf="customerForm.get('billingAddress.state')?.invalid && customerForm.get('billingAddress.state')?.touched">
+              {{getErrorMessage('billingAddress.state')}}
             </span>
           </div>
 
-          <div class="form-group">
-            <label for="billingPostalCode">Postal Code</label>
-            <input
-              type="text"
-              id="billingPostalCode"
-              formControlName="postalCode"
-              placeholder="Enter postal code"
-              class="form-control"
-            />
-            <span
-              class="error-message"
-              *ngIf="customerForm.get('billingAddress.postalCode')?.errors?.['required'] && customerForm.get('billingAddress.postalCode')?.touched"
-            >
-              Postal code is required
+          <div class="form-group"> <label for="billingPostalCode">Postal Code *</label>
+            <input type="text" id="billingPostalCode" formControlName="postalCode" placeholder="Enter postal code"
+              class="form-control" />
+            <span class="error-message"
+              *ngIf="customerForm.get('billingAddress.postalCode')?.invalid && customerForm.get('billingAddress.postalCode')?.touched">
+              {{getErrorMessage('billingAddress.postalCode')}}
             </span>
           </div>
 
-          <div class="form-group">
-            <label for="billingCountry">Country</label>
-            <input
-              type="text"
-              id="billingCountry"
-              formControlName="country"
-              placeholder="Enter country"
-              class="form-control"
-            />
-            <span
-              class="error-message"
-              *ngIf="customerForm.get('billingAddress.country')?.errors?.['required'] && customerForm.get('billingAddress.country')?.touched"
-            >
-              Country is required
+          <div class="form-group"> <label for="billingCountry">Country *</label>
+            <input type="text" id="billingCountry" formControlName="country" placeholder="Enter country"
+              class="form-control" />
+            <span class="error-message"
+              *ngIf="customerForm.get('billingAddress.country')?.invalid && customerForm.get('billingAddress.country')?.touched">
+              {{getErrorMessage('billingAddress.country')}}
             </span>
           </div>
         </div>
@@ -292,99 +177,53 @@
         <!-- Shipping Address Page -->
         <div class="form-section" formGroupName="shippingAddress" *ngIf="currentFormPage === 2">
           <h3>Shipping Address</h3>
-          <div class="form-group">
-            <label for="shippingStreetLine1">Street Line 1</label>
-            <input
-              type="text"
-              id="shippingStreetLine1"
-              formControlName="streetLine1"
-              placeholder="Enter street address"
-              class="form-control"
-            />
-            <span
-              class="error-message"
-              *ngIf="customerForm.get('shippingAddress.streetLine1')?.errors?.['required'] && customerForm.get('shippingAddress.streetLine1')?.touched"
-            >
-              Street address is required
+          <div class="form-group"> <label for="shippingStreetLine1">Street Line 1 *</label>
+            <input type="text" id="shippingStreetLine1" formControlName="streetLine1" placeholder="Enter street address"
+              class="form-control" />
+            <span class="error-message"
+              *ngIf="customerForm.get('shippingAddress.streetLine1')?.invalid && customerForm.get('shippingAddress.streetLine1')?.touched">
+              {{getErrorMessage('shippingAddress.streetLine1')}}
             </span>
           </div>
 
           <div class="form-group">
             <label for="shippingStreetLine2">Street Line 2</label>
-            <input
-              type="text"
-              id="shippingStreetLine2"
-              formControlName="streetLine2"
-              placeholder="Enter additional address info"
-              class="form-control"
-            />
+            <input type="text" id="shippingStreetLine2" formControlName="streetLine2"
+              placeholder="Enter apartment, suite, etc." class="form-control" />
           </div>
 
-          <div class="form-group">
-            <label for="shippingCity">City</label>
-            <input
-              type="text"
-              id="shippingCity"
-              formControlName="city"
-              placeholder="Enter city"
-              class="form-control"
-            />
-            <span
-              class="error-message"
-              *ngIf="customerForm.get('shippingAddress.city')?.errors?.['required'] && customerForm.get('shippingAddress.city')?.touched"
-            >
-              City is required
+          <div class="form-group"> <label for="shippingCity">City *</label>
+            <input type="text" id="shippingCity" formControlName="city" placeholder="Enter city" class="form-control" />
+            <span class="error-message"
+              *ngIf="customerForm.get('shippingAddress.city')?.invalid && customerForm.get('shippingAddress.city')?.touched">
+              {{getErrorMessage('shippingAddress.city')}}
             </span>
           </div>
 
-          <div class="form-group">
-            <label for="shippingState">State</label>
-            <input
-              type="text"
-              id="shippingState"
-              formControlName="state"
-              placeholder="Enter state"
-              class="form-control"
-            />
-            <span
-              class="error-message"
-              *ngIf="customerForm.get('shippingAddress.state')?.errors?.['required'] && customerForm.get('shippingAddress.state')?.touched"
-            >
-              State is required
+          <div class="form-group"> <label for="shippingState">State *</label>
+            <input type="text" id="shippingState" formControlName="state" placeholder="Enter state"
+              class="form-control" />
+            <span class="error-message"
+              *ngIf="customerForm.get('shippingAddress.state')?.invalid && customerForm.get('shippingAddress.state')?.touched">
+              {{getErrorMessage('shippingAddress.state')}}
             </span>
           </div>
 
-          <div class="form-group">
-            <label for="shippingPostalCode">Postal Code</label>
-            <input
-              type="text"
-              id="shippingPostalCode"
-              formControlName="postalCode"
-              placeholder="Enter postal code"
-              class="form-control"
-            />
-            <span
-              class="error-message"
-              *ngIf="customerForm.get('shippingAddress.postalCode')?.errors?.['required'] && customerForm.get('shippingAddress.postalCode')?.touched"
-            >
-              Postal code is required
+          <div class="form-group"> <label for="shippingPostalCode">Postal Code *</label>
+            <input type="text" id="shippingPostalCode" formControlName="postalCode" placeholder="Enter postal code"
+              class="form-control" />
+            <span class="error-message"
+              *ngIf="customerForm.get('shippingAddress.postalCode')?.invalid && customerForm.get('shippingAddress.postalCode')?.touched">
+              {{getErrorMessage('shippingAddress.postalCode')}}
             </span>
           </div>
 
-          <div class="form-group">
-            <label for="shippingCountry">Country</label>
-            <input
-              type="text"
-              id="shippingCountry"
-              formControlName="country"
-              placeholder="Enter country"
-              class="form-control"
-            />
-            <span
-              class="error-message"
-              *ngIf="customerForm.get('shippingAddress.country')?.errors?.['required'] && customerForm.get('shippingAddress.country')?.touched"
-            >
-              Country is required
+          <div class="form-group"> <label for="shippingCountry">Country *</label>
+            <input type="text" id="shippingCountry" formControlName="country" placeholder="Enter country"
+              class="form-control" />
+            <span class="error-message"
+              *ngIf="customerForm.get('shippingAddress.country')?.invalid && customerForm.get('shippingAddress.country')?.touched">
+              {{getErrorMessage('shippingAddress.country')}}
             </span>
           </div>
         </div>
@@ -392,36 +231,21 @@
     </div>
     <div class="modal-footer">
       <div class="form-actions">
-        <button 
-          type="button" 
-          class="nav-btn" 
-          *ngIf="currentFormPage > 0" 
-          (click)="previousPage()"
-        >
+        <button type="button" class="nav-btn" *ngIf="currentFormPage > 0" (click)="previousPage()">
           <i class="fas fa-chevron-left"></i> Previous
         </button>
-        
+
         <button type="button" class="cancel-btn" (click)="closeModal()">
           <i class="fas fa-times"></i> Cancel
         </button>
-        
-        <button
-          type="button"
-          class="nav-btn"
-          *ngIf="currentFormPage < 2"
-          (click)="nextPage()"
-          [disabled]="!isCurrentPageValid()"
-        >
+
+        <button type="button" class="nav-btn" *ngIf="currentFormPage < 2" (click)="nextPage()"
+          [disabled]="!isCurrentPageValid()">
           Next <i class="fas fa-chevron-right"></i>
         </button>
-        
-        <button
-          type="submit"
-          class="save-btn"
-          *ngIf="currentFormPage === 2"
-          [disabled]="customerForm.invalid"
-          (click)="submitForm()"
-        >
+
+        <button type="submit" class="save-btn" *ngIf="currentFormPage === 2" [disabled]="customerForm.invalid"
+          (click)="submitForm()">
           <i class="fas fa-check"></i> {{ editMode ? "Update" : "Create" }}
         </button>
       </div>
@@ -429,23 +253,13 @@
   </app-modal>
 
   <!-- Delete Confirmation Modal -->
-  <app-confirm-modal
-    *ngIf="showDeleteModal"
-    [isOpen]="true"
-    title="Delete Customer"
-    message="Are you sure you want to delete this customer? This action cannot be undone."
-    (onConfirm)="confirmDelete()"
-    (onClose)="showDeleteModal = false"
-  >
+  <app-confirm-modal *ngIf="showDeleteModal" [isOpen]="true" title="Delete Customer"
+    message="Are you sure you want to delete this customer? This action cannot be undone." (onConfirm)="confirmDelete()"
+    (onClose)="showDeleteModal = false">
   </app-confirm-modal>
 
   <!-- Customer Detail Modal -->
-  <app-modal
-    *ngIf="showDetailModal"
-    [isOpen]="true"
-    (close)="closeDetailModal()"
-    [title]="'Customer Details'"
-  >
+  <app-modal *ngIf="showDetailModal" [isOpen]="true" (close)="closeDetailModal()" [title]="'Customer Details'">
     <div class="modal-body customer-details" *ngIf="selectedCustomer">
       <div class="detail-section personal-info">
         <h3>Personal Information</h3>

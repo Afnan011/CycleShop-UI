@@ -90,7 +90,7 @@ export class PosComponent implements OnInit {
       this.cartItems.push({ cycle, quantity: 1 });
     }
     this.closeProductDetails();
-    this.isCartExpanded = true; 
+    this.isCartExpanded = true;
   }
 
   removeFromCart(cycleId: string) {
@@ -104,7 +104,6 @@ export class PosComponent implements OnInit {
     if (this.cartItems.length === 0) return;
 
     const order = {
-      id: Date.now().toString(), // Temporary ID for demo
       items: this.cartItems.map(item => ({
         cycleId: item.cycle.id,
         quantity: item.quantity,
@@ -117,12 +116,12 @@ export class PosComponent implements OnInit {
     };
 
     // Redirect to orders page with create order flag instead of payment
-    this.router.navigate(['/admin/dashboard/orders'], { 
-      state: { 
+    this.router.navigate(['/admin/dashboard/orders'], {
+      state: {
         createOrder: true,
         orderData: order,
         cartItems: this.cartItems
-      } 
+      }
     });
   }
 
