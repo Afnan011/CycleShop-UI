@@ -31,7 +31,19 @@ export class PaymentService {
     return this.http.get(`${this.apiUrl}/${paymentId}` , { headers: this.getAuthHeaders() });
   }
 
+  getPaymentsByOrder(orderId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/order/${orderId}`, { headers: this.getAuthHeaders() });
+  }
+
   processStripePayment(paymentRequest: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/stripe`, paymentRequest, { headers: this.getAuthHeaders() });
+  }
+
+  processRazorpayPayment(paymentRequest: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/razorpay/create-order`, paymentRequest, { headers: this.getAuthHeaders() });
+  }
+
+  verifyRazorpayPayment(verificationData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/razorpay/verify-payment`, verificationData, { headers: this.getAuthHeaders() });
   }
 }

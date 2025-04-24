@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { OrderService, Order, Customer, Address, Cycle, CreateOrderRequest, Inventory, statusType } from '../../services/order.service';
@@ -11,7 +10,7 @@ import { OrderDetailsModalComponent } from "./order-details-modal/order-details-
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, HttpClientModule, OrderDetailsModalComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, OrderDetailsModalComponent],
   templateUrl: './orders.component.html',
   styleUrls: ['./orders.component.scss'],
 })
@@ -148,6 +147,7 @@ export class OrdersComponent implements OnInit {
   loadCycles(): void {
     this.orderService.getAllCycles().subscribe((cycles) => {
       this.availableCycles = cycles;
+      
     });
   }
 

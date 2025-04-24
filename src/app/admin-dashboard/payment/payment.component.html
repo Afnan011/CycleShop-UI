@@ -68,10 +68,10 @@
           <i class="fas fa-money-bill-wave"></i>
           <span>Cash</span>
         </label>
-        <label class="payment-option" [class.selected]="paymentMethod === 'stripe'">
-          <input type="radio" [(ngModel)]="paymentMethod" value="stripe" name="paymentMethod">
-          <i class="fab fa-cc-stripe"></i>
-          <span>Card</span>
+        <label class="payment-option" [class.selected]="paymentMethod === 'razorpay'">
+          <input type="radio" [(ngModel)]="paymentMethod" value="razorpay" name="paymentMethod">
+          <i class="fas fa-credit-card"></i>
+          <span>Card / UPI</span>
         </label>
       </div>
     </div>

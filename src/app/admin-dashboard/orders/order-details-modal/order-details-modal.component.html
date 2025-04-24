@@ -115,6 +115,52 @@
           <span>{{ order.totalAmount | currency }}</span>
         </div>
       </div>
+
+      <!-- Payment Information -->
+      <div class="details-section">
+        <h4>Payment Information</h4>
+        <div class="payment-info" *ngIf="loadingPayments">
+          <p>Loading payment details...</p>
+        </div>
+        <div class="payment-info" *ngIf="paymentError">
+          <p class="error">Error loading payment details. Please try again later.</p>
+        </div>
+        <div class="payment-info" *ngIf="!loadingPayments && !paymentError">
+          <div *ngIf="payments.length === 0" class="no-data">
+            <p>No payment records found for this order</p>
+          </div>
+          <div *ngIf="payments.length > 0" class="payment-details-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Reference</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let payment of payments">
+                  <td>{{ payment.createdAt | date:'medium' }}</td>
+                  <td>{{ formatPaymentType(payment.paymentType) }}</td>
+                  <td>{{ payment.amount | currency }}</td>
+                  <td>
+                    <span class="status-badge" [ngClass]="getPaymentStatusClass(payment.status)">
+                      {{ payment.status | titlecase }}
+                    </span>
+                  </td>
+                  <td>
+                    <span *ngIf="payment.paymentType === 'razorpay'">{{ payment.razorpayPaymentId }}</span>
+                    <span *ngIf="payment.paymentType === 'stripe'">{{ payment.stripePaymentId }}</span>
+                    <span *ngIf="payment.paymentType === 'cash'">Cash payment</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="cancel-btn" (click)="closeModal()">Close</button>
