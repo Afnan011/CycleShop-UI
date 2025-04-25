@@ -5,20 +5,11 @@
     <div class="filters-row">
       <div class="search-filters">
         <div class="search-box">
-          <input
-            type="text"
-            [(ngModel)]="searchQuery"
-            (ngModelChange)="onSearchChange()"
-            placeholder="Search orders..."
-            class="form-control"
-          />
+          <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()" placeholder="Search orders..."
+            class="form-control" />
         </div>
 
-        <select
-          [(ngModel)]="statusFilter"
-          (ngModelChange)="onSearchChange()"
-          class="form-control"
-        >
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onSearchChange()" class="form-control">
           <option value="all">All Statuses</option>
           <option value="pending">Pending</option>
           <option value="processing">Processing</option>
@@ -28,19 +19,9 @@
         </select>
 
         <div class="date-filters">
-          <input
-            type="date"
-            [(ngModel)]="startDate"
-            (ngModelChange)="onSearchChange()"
-            class="form-control"
-          />
+          <input type="date" [(ngModel)]="startDate" (ngModelChange)="onSearchChange()" class="form-control" />
           <span>to</span>
-          <input
-            type="date"
-            [(ngModel)]="endDate"
-            (ngModelChange)="onSearchChange()"
-            class="form-control"
-          />
+          <input type="date" [(ngModel)]="endDate" (ngModelChange)="onSearchChange()" class="form-control" />
         </div>
       </div>
 
@@ -60,31 +41,31 @@
             Order #
             <span *ngIf="sortField === 'orderNumber'">{{
               sortDirection === "asc" ? "▲" : "▼"
-            }}</span>
+              }}</span>
           </th>
           <th (click)="sortBy('customer')">
             Customer
             <span *ngIf="sortField === 'customer'">{{
               sortDirection === "asc" ? "▲" : "▼"
-            }}</span>
+              }}</span>
           </th>
           <th (click)="sortBy('orderDate')">
             Date
             <span *ngIf="sortField === 'orderDate'">{{
               sortDirection === "asc" ? "▲" : "▼"
-            }}</span>
+              }}</span>
           </th>
           <th (click)="sortBy('status')">
             Status
             <span *ngIf="sortField === 'status'">{{
               sortDirection === "asc" ? "▲" : "▼"
-            }}</span>
+              }}</span>
           </th>
           <th (click)="sortBy('totalAmount')">
             Total
             <span *ngIf="sortField === 'totalAmount'">{{
               sortDirection === "asc" ? "▲" : "▼"
-            }}</span>
+              }}</span>
           </th>
           <th>Actions</th>
         </tr>
@@ -98,27 +79,26 @@
           <td>{{ order.orderDate | date : "medium" }}</td>
           <td>
             <span class="status-badge" [ngClass]="'status-' + order.status">
-              {{ order.status == 'completed' ? 'Delivered': order.status| titlecase }}
+              {{
+              order.status == "completed"
+              ? "Delivered"
+              : (order.status | titlecase)
+              }}
             </span>
           </td>
           <td>{{ order.totalAmount | currency }}</td>
-          <td class="actions">
-            <button
-              class="action-btn view-btn"
-              (click)="viewOrderDetails(order)"
-            >
-              <i class="fas fa-eye"></i>
-            </button>
-            <button class="action-btn edit-btn" (click)="editOrder(order)">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button
-              class="action-btn"
-              [ngClass]="{ 'print-btn': true }"
-              (click)="printOrder(order)"
-            >
-              <i class="fas fa-print"></i>
-            </button>
+          <td>
+            <div class="actions">
+              <button class="action-btn view-btn" (click)="viewOrderDetails(order)">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="action-btn edit-btn" (click)="editOrder(order)">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="action-btn" [ngClass]="{ 'print-btn': true }" (click)="printOrder(order)">
+                <i class="fas fa-print"></i>
+              </button>
+            </div>
           </td>
         </tr>
         <tr *ngIf="paginatedOrders().length === 0">
@@ -129,22 +109,14 @@
 
     <!-- Pagination Controls -->
     <div class="pagination-controls" *ngIf="totalItems > 0">
-      <button
-        class="pagination-btn"
-        [disabled]="currentPage === 1"
-        (click)="changePage(currentPage - 1)"
-      >
+      <button class="pagination-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
         <i class="fas fa-chevron-left"></i> Previous
       </button>
       <span class="page-info">
         Page {{ currentPage }} of {{ getTotalPages() }}
         <!-- <span class="entries-info">({{ totalItems }} entries)</span> -->
       </span>
-      <button
-        class="pagination-btn"
-        [disabled]="currentPage === getTotalPages()"
-        (click)="changePage(currentPage + 1)"
-      >
+      <button class="pagination-btn" [disabled]="currentPage === getTotalPages()" (click)="changePage(currentPage + 1)">
         Next <i class="fas fa-chevron-right"></i>
       </button>
 
@@ -158,7 +130,7 @@
     </div>
   </div>   -->
 
-  <!-- Create Order Modal -->
+      <!-- Create Order Modal -->
       <div class="modal" *ngIf="showCreateModal">
         <div class="modal-content">
           <div class="modal-header">
@@ -170,43 +142,25 @@
               <!-- Customer Selection -->
               <div class="form-group">
                 <label>Customer:</label>
-                <select
-                  formControlName="customerId"
-                  class="form-control"
-                  required
-                  (change)="onCustomerSelect()"
-                >
+                <select formControlName="customerId" class="form-control" required (change)="onCustomerSelect()">
                   <option [ngValue]="null" disabled>Select a customer</option>
-                  <option
-                    *ngFor="let customer of customers"
-                    [value]="customer.customerId"
-                  >
+                  <option *ngFor="let customer of customers" [value]="customer.customerId">
                     {{ customer.firstName }} {{ customer.lastName }}
                   </option>
                 </select>
-                <div
-                  *ngIf="
+                <div *ngIf="
                     orderForm.get('customerId')?.invalid &&
                     orderForm.get('customerId')?.touched
-                  "
-                  class="error-message"
-                >
+                  " class="error-message">
                   Customer is required
                 </div>
               </div>
               <!-- Shipping Address -->
               <div class="form-group">
                 <label>Shipping Address:</label>
-                <select
-                  formControlName="shippingAddressId"
-                  class="form-control"
-                  (change)="onAddressSelect()"
-                >
+                <select formControlName="shippingAddressId" class="form-control" (change)="onAddressSelect()">
                   <option [ngValue]="null" disabled>Select an address</option>
-                  <option
-                    *ngFor="let address of customerAddresses"
-                    [value]="address.addressId"
-                  >
+                  <option *ngFor="let address of customerAddresses" [value]="address.addressId">
                     {{ formatAddress(address) }}
                   </option>
                 </select>
@@ -216,113 +170,73 @@
               <div class="order-items">
                 <div class="section-header">
                   <h4>Order Items</h4>
-                  <button
-                    type="button"
-                    class="add-item-btn"
-                    (click)="addOrderItem()"
-                  >
+                  <button type="button" class="add-item-btn" (click)="addOrderItem()">
                     <i class="fas fa-plus"></i>
                     <span>Add Item</span>
                   </button>
                 </div>
 
                 <div formArrayName="orderItems">
-                  <div
-                    *ngFor="
+                  <div *ngFor="
                       let item of orderItemsFormArray.controls;
                       let i = index
-                    "
-                    class="order-item"
-                    [formGroupName]="i"
-                  >
+                    " class="order-item" [formGroupName]="i">
                     <div class="item-header">
                       <h5>Item #{{ i + 1 }}</h5>
-                      <button
-                        type="button"
-                        class="remove-item-btn"
-                        (click)="removeOrderItem(i)"
-                        title="Remove Item"
-                      >
+                      <button type="button" class="remove-item-btn" (click)="removeOrderItem(i)" title="Remove Item">
                         ×
                       </button>
                     </div>
                     <div class="item-details">
                       <div class="form-group cycle-selection">
                         <label>Cycle:</label>
-                        <select
-                          formControlName="cycleId"
-                          class="form-control"
-                          required
-                          (change)="onCycleSelect(i)"
-                        >
+                        <select formControlName="cycleId" class="form-control" required (change)="onCycleSelect(i)">
                           <option [ngValue]="null" disabled>
                             Select a cycle
                           </option>
-                          <option
-                            *ngFor="let cycle of availableCycles"
-                            [value]="cycle.cycleId"
-                          >
+                          <option *ngFor="let cycle of availableCycles" [value]="cycle.cycleId">
                             {{ cycle.modelName }} (SKU: {{ cycle.sku }}) -
                             {{ cycle.price | currency }}
                           </option>
                         </select>
 
                         <!-- Display selected cycle details -->
-                        <div
-                          class="cycle-details"
-                          *ngIf="item.get('cycleDetails')?.value?.modelName"
-                        >
+                        <div class="cycle-details" *ngIf="item.get('cycleDetails')?.value?.modelName">
                           <div class="detail-row">
                             <span class="detail-label">Model:</span>
                             <span class="detail-value">{{
                               item.get("cycleDetails")?.value?.modelName
-                            }}</span>
+                              }}</span>
                           </div>
                           <div class="detail-row">
                             <span class="detail-label">Brand:</span>
                             <span class="detail-value">{{
                               item.get("cycleDetails")?.value?.brandName
-                            }}</span>
+                              }}</span>
                           </div>
                           <div class="detail-row">
                             <span class="detail-label">SKU:</span>
                             <span class="detail-value">{{
                               item.get("cycleDetails")?.value?.sku
-                            }}</span>
+                              }}</span>
                           </div>
                         </div>
                       </div>
 
                       <div class="form-group">
                         <label>Quantity:</label>
-                        <input
-                          type="number"
-                          formControlName="quantity"
-                          class="form-control"
-                          min="1"
-                          (change)="onQuantityChange(i)"
-                          [max]="item.get('maxQuantity')?.value"
-                        />
+                        <input type="number" formControlName="quantity" class="form-control" min="1"
+                          (change)="onQuantityChange(i)" [max]="item.get('maxQuantity')?.value" />
                       </div>
 
                       <div class="form-group">
                         <label>Unit Price:</label>
-                        <input
-                          type="number"
-                          formControlName="priceSnapshot"
-                          class="form-control"
-                          readonly
-                        />
+                        <input type="number" formControlName="priceSnapshot" class="form-control" readonly />
                       </div>
 
                       <div class="form-group">
                         <label>Total:</label>
-                        <input
-                          type="text"
-                          [value]="calculateItemTotal(i) | currency"
-                          class="form-control"
-                          readonly
-                        />
+                        <input type="text" [value]="calculateItemTotal(i) | currency" class="form-control" readonly />
                       </div>
                     </div>
                   </div>
@@ -342,13 +256,8 @@
                 </div>
                 <div class="summary-row discount">
                   <label>Discount:</label>
-                  <input
-                    type="number"
-                    formControlName="discount"
-                    class="form-control"
-                    min="0"
-                    (change)="updateTotals()"
-                  />
+                  <input type="number" formControlName="discount" class="form-control" min="0"
+                    (change)="updateTotals()" />
                 </div>
                 <div class="summary-row total">
                   <span>Total:</span>
@@ -359,29 +268,17 @@
               <!-- Notes -->
               <div class="form-group">
                 <label>Notes:</label>
-                <textarea
-                  formControlName="notes"
-                  class="form-control"
-                  rows="3"
-                ></textarea>
+                <textarea formControlName="notes" class="form-control" rows="3"></textarea>
               </div>
 
               <!-- Form Actions -->
               <div class="modal-actions">
-                <button
-                  type="button"
-                  class="cancel-btn"
-                  (click)="closeModals()"
-                >
+                <button type="button" class="cancel-btn" (click)="closeModals()">
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  class="submit-btn"
-                  [disabled]="
+                <button type="submit" class="submit-btn" [disabled]="
                     orderForm.invalid || orderItemsFormArray.length === 0
-                  "
-                >
+                  ">
                   Proceed to Payment
                 </button>
               </div>
@@ -390,13 +287,13 @@
         </div>
       </div>
       <!-- Order Details Modal -->
-      <app-order-details-modal
-        [order]="selectedOrder"
-        [isOpen]="showDetailsModal"
+      <app-order-details-modal 
+        [order]="selectedOrder" 
+        [isOpen]="showDetailsModal" 
         (close)="closeModals()"
-        (statusUpdate)="updateOrderStatus($event)"
-        (print)="printOrder($event)"
-      ></app-order-details-modal>
+        (statusUpdate)="updateOrderStatus($event)" 
+        (print)="printOrder($event)">
+      </app-order-details-modal>
     </div>
   </div>
 </div>

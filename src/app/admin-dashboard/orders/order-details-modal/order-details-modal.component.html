@@ -29,28 +29,25 @@
               {{ order.orderDate | date : "medium" }}
             </p>
             <div class="order-status-group">
-                <strong>Status:</strong>
-                <span class="status-badge" [ngClass]="'status-' + order.status">
-                    {{ order.status == 'completed' ? 'Delivered': order.status| titlecase }}
-                </span>
+              <strong>Status:</strong>
+              <span class="status-badge" [ngClass]="'status-' + order.status">
+                {{ order.status == 'completed' ? 'Delivered': order.status| titlecase }}
+              </span>
             </div>
             <div class="status-update" *ngIf="isEditingStatus">
-                <select [(ngModel)]="newStatus" class="form-control">
-                    <option [ngValue]="null" disabled>Select an option</option>
-                    <!-- Show Processing only if current status is pending -->
-                    <option value="processing" *ngIf="order.status === 'pending'">Processing</option>
-                    <!-- Show Completed (Delivered) only if current status is processing -->
-                    <option value="completed" *ngIf="order.status === 'processing'">Delivered</option>
-                    <!-- Show Cancelled for both pending and processing status -->
-                    <option value="cancelled" *ngIf="order.status && ['pending', 'processing'].includes(order.status)">Cancelled</option>
-                </select>
-                <button (click)="updateOrderStatus()" [disabled]="!isValidStatusTransition()">Update</button>
-            </div>            <button
-              *ngIf="!isEditingStatus"
-              class="change-status-btn"
-              (click)="isEditingStatus = true"
-              [disabled]="order.status === 'completed' || order.status === 'cancelled'"
-            >
+              <select [(ngModel)]="newStatus" class="form-control">
+                <option [ngValue]="null" disabled>Select an option</option>
+                <!-- Show Processing only if current status is pending -->
+                <option value="processing" *ngIf="order.status === 'pending'">Processing</option>
+                <!-- Show Completed (Delivered) only if current status is processing -->
+                <option value="completed" *ngIf="order.status === 'processing'">Delivered</option>
+                <!-- Show Cancelled for both pending and processing status -->
+                <option value="cancelled" *ngIf="order.status && ['pending', 'processing'].includes(order.status)">
+                  Cancelled</option>
+              </select>
+              <button (click)="updateOrderStatus()" [disabled]="!isValidStatusTransition()">Update</button>
+            </div> <button *ngIf="!isEditingStatus" class="change-status-btn" (click)="isEditingStatus = true"
+              [disabled]="order.status === 'completed' || order.status === 'cancelled'">
               Change Status
             </button>
           </div>
@@ -164,10 +161,7 @@
     </div>
     <div class="modal-footer">
       <button class="cancel-btn" (click)="closeModal()">Close</button>
-      <button
-        class="print-btn"
-        (click)="order && printOrder(order)"
-      >
+      <button class="print-btn" (click)="order && printOrder(order)">
         <i class="fas fa-print"></i> Print
       </button>
     </div>

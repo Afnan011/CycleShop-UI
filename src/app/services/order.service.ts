@@ -167,60 +167,81 @@ export class OrderService {
     console.log('Printing order', order);
     const printWindow = window.open('', '_blank');
     if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Order #${order.orderNumber}</title>
-            <style>
-              body { font-family: Arial, sans-serif; margin: 20px; }
-              .print-header { text-align: center; margin-bottom: 20px; }
-              .order-info { margin-bottom: 20px; }
-              table { width: 100%; border-collapse: collapse; }
-              th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
-              .total-section { margin-top: 20px; text-align: right; }
-            </style>
-          </head>
-          <body>
-            <div class="print-header">
-              <h1>CycleShop</h1>
-              <h2>Order #${order.orderNumber}</h2>
-            </div>
-            <div class="order-info">
-              <p><strong>Date:</strong> ${new Date(order.orderDate || new Date()).toLocaleDateString()}</p>
-              <p><strong>Customer:</strong> ${order.customer?.firstName} ${order.customer?.lastName}</p>
-              <p><strong>Status:</strong> ${order.status}</p>
-            </div>
-            <table>
-              <thead>
-                <tr>
-                  <th>Item</th>
-                  <th>Quantity</th>
-                  <th>Price</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${order.orderItems.map(item => `
-                  <tr>
-                    <td>${item.cycle?.sku} ${item.cycle?.modelName}</td>
-                    <td>${item.quantity}</td>
-                    <td>₹${item.priceSnapshot.toFixed(2)}</td>
-                    <td>₹${(item.quantity * item.priceSnapshot).toFixed(2)}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-            <div class="total-section">
-              <p><strong>Subtotal:</strong> ₹${order.subtotal.toFixed(2)}</p>
-              <p><strong>Tax:</strong> ₹${order.tax.toFixed(2)}</p>
-              <p><strong>Discount:</strong> ₹${order.discount.toFixed(2)}</p>
-              <p><strong>Total:</strong> ₹${order.totalAmount.toFixed(2)}</p>
-            </div>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.print();
+      // First get payment details
+      this.http.get<any[]>(`${this.apiUrl}/payments/order/${order.orderId}`, { headers: this.getAuthHeaders() })
+        .subscribe((payments) => {
+          const latestPayment = payments.length > 0 ? payments[payments.length - 1] : null;
+
+          printWindow.document.write(`
+            <html>
+              <head>
+                <title>Order #${order.orderNumber}</title>
+                <style>
+                  body { font-family: Arial, sans-serif; margin: 20px; }
+                  .print-header { text-align: center; margin-bottom: 20px; }
+                  .order-info { margin-bottom: 20px; }
+                  .payment-info { margin-bottom: 20px; border-top: 1px solid #ddd; padding-top: 10px; }
+                  table { width: 100%; border-collapse: collapse; }
+                  th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+                  .total-section { margin-top: 20px; text-align: right; }
+                </style>
+              </head>
+              <body>
+                <div class="print-header">
+                  <h1>CycleShop</h1>
+                  <h2>Order #${order.orderNumber}</h2>
+                </div>
+                <div class="order-info">
+                  <p><strong>Date:</strong> ${new Date(order.orderDate || new Date()).toLocaleDateString()}</p>
+                  <p><strong>Customer:</strong> ${order.customer?.firstName} ${order.customer?.lastName}</p>
+                  <p><strong>Status:</strong> ${order.status}</p>
+                  ${order.shippingAddress ? `
+                    <p><strong>Shipping Address:</strong><br/>
+                    ${this.formatAddress(order.shippingAddress)}</p>
+                  ` : ''}
+                </div>
+                ${latestPayment ? `
+                <div class="payment-info">
+                  <h3>Payment Details</h3>
+                  <p><strong>Payment Mode:</strong> ${latestPayment.paymentType?.charAt(0).toUpperCase() + latestPayment.paymentType?.slice(1)}</p>
+                  <p><strong>Payment Date:</strong> ${new Date(latestPayment.createdAt).toLocaleString()}</p>
+                  <p><strong>Payment Status:</strong> ${latestPayment.status?.replace('_', ' ').charAt(0).toUpperCase() + latestPayment.status?.slice(1)}</p>
+                  ${latestPayment.razorpayPaymentId ? `<p><strong>Transaction ID:</strong> ${latestPayment.razorpayPaymentId}</p>` : ''}
+                  ${latestPayment.stripePaymentId ? `<p><strong>Transaction ID:</strong> ${latestPayment.stripePaymentId}</p>` : ''}
+                </div>
+                ` : ''}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th>Quantity</th>
+                      <th>Price</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${order.orderItems.map(item => `
+                      <tr>
+                        <td>${item.cycle?.sku} ${item.cycle?.modelName}</td>
+                        <td>${item.quantity}</td>
+                        <td>₹${item.priceSnapshot.toFixed(2)}</td>
+                        <td>₹${(item.quantity * item.priceSnapshot).toFixed(2)}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+                <div class="total-section">
+                  <p><strong>Subtotal:</strong> ₹${order.subtotal.toFixed(2)}</p>
+                  <p><strong>Tax:</strong> ₹${order.tax.toFixed(2)}</p>
+                  <p><strong>Discount:</strong> ₹${order.discount.toFixed(2)}</p>
+                  <p><strong>Total:</strong> ₹${order.totalAmount.toFixed(2)}</p>
+                </div>
+              </body>
+            </html>
+          `);
+          printWindow.document.close();
+          printWindow.print();
+        });
     }
   }
 }

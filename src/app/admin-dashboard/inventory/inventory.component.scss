@@ -1,7 +1,7 @@
-@use 'sass:color';
-@use 'sass:map';
+@use "sass:color";
+@use "sass:map";
 
-@use '../../../styles.scss' as *;
+@use "../../../styles.scss" as *;
 
 .inventory-container {
   padding: 1.5rem;
@@ -43,7 +43,8 @@
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid $color-border;
-  border-radius: 0.25rem;  background-color: $color-white;
+  border-radius: 0.25rem;
+  background-color: $color-white;
   font-size: map.get($font-sizes, base);
   color: $color-dark-font;
   transition: all 0.2s;
@@ -62,7 +63,7 @@
   color: white;
   border: none;
   border-radius: 4px;
-  font-weight:map.get($font-weights, medium);
+  font-weight: map.get($font-weights, medium);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -155,9 +156,11 @@
       }
     }
 
-    td {      color: $color-dark-font;
-      font-size: map.get($font-sizes, sm);
-      font-family: 'Inter', sans-serif;      font-weight: map.get($font-weights, regular);
+    td {
+      color: $color-dark-font;
+      font-size: map.get($font-sizes, base);
+      font-family: "Inter", sans-serif;
+      font-weight: map.get($font-weights, regular);
 
       .stocks {
         padding: 0.5rem 1.5rem;
@@ -167,7 +170,7 @@
       .low-stock {
         background-color: $color-warning;
         color: $color-dark-font;
-        font-weight:map.get($font-weights, medium);
+        font-weight: map.get($font-weights, medium);
       }
     }
 
@@ -189,7 +192,7 @@
         cursor: pointer;
         transition: all 0.2s;
 
-        &.view{
+        &.view {
           background-color: rgba($color-body-font, 0.1);
           color: $color-dark-font;
 
@@ -233,7 +236,7 @@
       border-radius: 6px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       display: block;
-      margin: 0 auto; 
+      margin: 0 auto;
     }
 
     &:hover {
@@ -244,7 +247,6 @@
     }
   }
 }
-
 
 .image-upload {
   margin-top: 0.5rem;

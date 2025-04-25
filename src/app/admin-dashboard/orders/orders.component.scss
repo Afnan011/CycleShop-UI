@@ -224,13 +224,13 @@
   table {
     width: 100%;
     border-collapse: collapse;
-
+    
     th, td {
       padding: 1rem;
       text-align: left;
       border-bottom: 1px solid $color-border;
     }
-
+    
     th {
       background-color: $color-table-header;
       font-weight: map.get($font-weights, semibold);
@@ -239,11 +239,11 @@
       transition: background-color 0.2s;
       user-select: none;
       position: relative;
-
+      
       &:hover {
         background-color: darken($color-table-header, 3%);
       }
-
+      
       span {
         position: absolute;
         right: 8px;
@@ -252,9 +252,14 @@
         font-size: map.get($font-sizes, xs);
       }
     }
-
+    
     tr:hover {
       background-color: #f9f9f9;
+    }
+    td {
+      font-family: "Inter", sans-serif;
+      font-size: map.get($font-sizes, base);
+      font-weight: map.get($font-weights, regular);
     }
 
     .no-orders {
