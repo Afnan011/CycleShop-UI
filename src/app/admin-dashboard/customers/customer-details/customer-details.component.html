@@ -15,6 +15,7 @@
   </div>
 
   <div class="customer-content" *ngIf="customer && !loading">
+    <!-- Personal Information Section -->
     <div class="content-section personal-info">
       <div class="section-header">
         <h2>Personal Information</h2>
@@ -43,6 +44,7 @@
       </div>
     </div>
 
+    <!-- Address Sections -->
     <div class="address-sections">
       <div class="content-section">
         <div class="section-header">
@@ -69,5 +71,182 @@
       </div>
     </div>
 
+    <!-- Customer Orders Section -->
+    <div class="content-section orders-section">
+      <div class="section-header">
+        <h2>Customer Orders</h2>
+      </div>
+      
+      <div class="loading-indicator" *ngIf="loadingOrders">
+        <i class="fas fa-spinner fa-spin"></i> Loading customer orders...
+      </div>
+      
+      <div class="error-message" *ngIf="ordersError">
+        <i class="fas fa-exclamation-circle"></i> Failed to load customer orders.
+      </div>
+
+      <div class="no-orders-message" *ngIf="!loadingOrders && !ordersError && orders.length === 0">
+        <p>This customer has not placed any orders yet.</p>
+      </div>
+
+      <div class="orders-table-container" *ngIf="!loadingOrders && !ordersError && orders.length > 0">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Order #</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of paginatedOrders" (click)="viewOrderDetails(order.orderId!)">
+              <td class="order-number">{{order.orderNumber}}</td>
+              <td>{{formatDate(order.orderDate)}}</td>
+              <td>
+                <span class="order-status" [ngClass]="getOrderStatusClass(order.status)">
+                  {{order.status}}
+                </span>
+              </td>
+              <td>{{order.orderItems.length}} item(s)</td>
+              <td class="order-total">{{formatCurrency(order.totalAmount)}}</td>
+              <td>
+                <button class="view-btn">
+                  <i class="fas fa-eye"></i> View
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-controls" *ngIf="getTotalPages() > 1">
+          <button 
+            class="pagination-btn" 
+            [disabled]="currentPage === 1" 
+            (click)="changePage(currentPage - 1)">
+            <i class="fas fa-chevron-left"></i> Previous
+          </button>
+          <span class="page-info">Page {{ currentPage }} of {{ getTotalPages() }}</span>
+          <button 
+            class="pagination-btn" 
+            [disabled]="currentPage === getTotalPages()" 
+            (click)="changePage(currentPage + 1)">
+            Next <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <!-- Orders Count -->
+        <div class="orders-count" *ngIf="orders.length > 0">
+          Showing {{((currentPage - 1) * pageSize) + 1}} to {{(currentPage * pageSize) > totalOrders ? totalOrders : (currentPage * pageSize)}} of {{totalOrders}} orders
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Order Details Modal -->
+  <div class="modal-overlay" *ngIf="showOrderDetailsModal" (click)="closeOrderDetailsModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Order Details #{{selectedOrder?.orderNumber}}</h3>
+        <button class="close-btn" (click)="closeOrderDetailsModal()">×</button>
+      </div>
+      <div class="modal-body" *ngIf="selectedOrder">
+        <!-- Order Details -->
+        <div class="details-section">
+          <div class="details-group">
+            <div class="detail-item">
+              <span class="label">Order Date:</span>
+              <span class="value">{{formatDate(selectedOrder.orderDate)}}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Status:</span>
+              <span class="value">
+                <span class="order-status" [ngClass]="getOrderStatusClass(selectedOrder.status)">
+                  {{selectedOrder.status}}
+                </span>
+              </span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Customer:</span>
+              <span class="value">{{selectedOrder.customer?.firstName}} {{selectedOrder.customer?.lastName}}</span>
+            </div>
+            <div class="detail-item" *ngIf="selectedOrder.shippingAddress">
+              <span class="label">Shipping Address:</span>
+              <span class="value address-value">
+                {{selectedOrder.shippingAddress.streetLine1}},
+                <span *ngIf="selectedOrder.shippingAddress?.streetLine2">{{selectedOrder.shippingAddress.streetLine2}},</span>
+                {{selectedOrder.shippingAddress.city}}, {{selectedOrder.shippingAddress.state}} {{selectedOrder.shippingAddress.postalCode}},
+                {{selectedOrder.shippingAddress.country}}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="order-items-section">
+          <h4>Order Items</h4>
+          <table class="order-items-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of selectedOrder.orderItems">
+                <td>
+                  <div class="item-details">
+                    <div class="item-name">{{item.cycle?.brand?.name}} {{item.cycle?.modelName}}</div>
+                    <div class="item-sku" *ngIf="item.cycle?.sku">SKU: {{item.cycle?.sku}}</div>
+                  </div>
+                </td>
+                <td>{{item.quantity}}</td>
+                <td>{{formatCurrency(item.priceSnapshot)}}</td>
+                <td>{{formatCurrency(item.priceSnapshot * item.quantity)}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="order-summary">
+          <div class="summary-item">
+            <span class="label">Subtotal:</span>
+            <span class="value">{{formatCurrency(selectedOrder.subtotal)}}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Tax:</span>
+            <span class="value">{{formatCurrency(selectedOrder.tax)}}</span>
+          </div>
+          <div class="summary-item" *ngIf="selectedOrder.discount > 0">
+            <span class="label">Discount:</span>
+            <span class="value">{{formatCurrency(selectedOrder.discount)}}</span>
+          </div>
+          <div class="summary-item total">
+            <span class="label">Total:</span>
+            <span class="value">{{formatCurrency(selectedOrder.totalAmount)}}</span>
+          </div>
+        </div>
+
+        <!-- Order Notes -->
+        <div class="order-notes" *ngIf="selectedOrder.notes">
+          <h4>Notes</h4>
+          <div class="notes-content">{{selectedOrder.notes}}</div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+          <button class="btn print-btn" (click)="printOrder()">
+            <i class="fas fa-print"></i> Print Order
+          </button>
+          <button class="btn close-btn" (click)="closeOrderDetailsModal()">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

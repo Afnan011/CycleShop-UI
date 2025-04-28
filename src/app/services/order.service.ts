@@ -15,11 +15,13 @@ export interface Customer {
 
 export interface Address {
   addressId: string;
-  street: string;
+  streetLine1: string;
+  streetLine2: string;
   city: string;
   state: string;
   postalCode: string;
   country: string;
+
 }
 
 export interface Brand {
@@ -134,26 +136,26 @@ export class OrderService {
 
   getOrdersByEmployee(employeeId: string, filters?: any): Observable<Order[]> {
     let url = `${this.apiUrl}/orders/employee/${employeeId}/orders`;
-    
+
     // Create HttpParams object for query parameters
     let params = new HttpParams();
-    
+
     // Add query parameters for filters if provided
     if (filters) {
       if (filters.status) {
         params = params.set('status', filters.status);
       }
-      
+
       if (filters.startDate) {
         params = params.set('startDate', filters.startDate);
       }
-      
+
       if (filters.endDate) {
         params = params.set('endDate', filters.endDate);
       }
     }
-    
-    return this.http.get<Order[]>(url, { 
+
+    return this.http.get<Order[]>(url, {
       headers: this.getAuthHeaders(),
       params: params
     });
@@ -185,7 +187,7 @@ export class OrderService {
 
   formatAddress(address: Address): string {
     if (!address) return 'No address provided';
-    return `${address.street}, ${address.city}, ${address.state} ${address.postalCode}, ${address.country}`;
+    return `${address.streetLine1} ${address.streetLine2}, ${address.city}, ${address.state} ${address.postalCode}, ${address.country}`;
   }
 
   // Print functionality
