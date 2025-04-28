@@ -1,4 +1,237 @@
 <div class="reports-container">
-  <h2>Reports and Analytics</h2>
-  <p>Reports system works! Here you can view various business analytics and generate reports.</p>
+  <header class="reports-header">
+    <h1>Reports and Analytics</h1>
+    <div class="time-filter">
+      <button 
+        *ngFor="let period of timePeriods" 
+        class="filter-btn" 
+        [class.active]="selectedPeriod === period.value"
+        (click)="selectTimePeriod(period.value)">
+        {{ period.label }}
+      </button>
+    </div>
+    <div class="date-filter" *ngIf="showCustomDateFilter">
+      <div class="filter-group">
+        <label for="startDate">From:</label>
+        <input type="date" id="startDate" [(ngModel)]="startDate" (change)="onDateFilterChange()">
+      </div>
+      <div class="filter-group">
+        <label for="endDate">To:</label>
+        <input type="date" id="endDate" [(ngModel)]="endDate" (change)="onDateFilterChange()">
+      </div>
+    </div>
+  </header>
+
+  <div *ngIf="isLoading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading report data...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>{{ error }}</p>
+    <button class="refresh-btn" (click)="loadReportData()">
+      <i class="fas fa-sync-alt"></i> Retry
+    </button>
+  </div>
+
+  <div *ngIf="!isLoading && !error" class="reports-content">
+    <!-- Summary Cards -->
+    <section class="summary-cards">
+      <div class="summary-card">
+        <div class="card-icon">
+          <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="card-content">
+          <h3>Total Sales</h3>
+          <p class="card-value">{{ totalSales | currency }}</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="card-content">
+          <h3>New Customers</h3>
+          <p class="card-value">{{ newCustomersCount }}</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon">
+          <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="card-content">
+          <h3>Low Stock Items</h3>
+          <p class="card-value">{{ lowStockItems.length }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sales Analytics -->
+    <section class="report-section">
+      <div class="section-header">
+        <h2>Sales Analytics</h2>
+      </div>
+      <div class="chart-container">
+        <canvas baseChart
+          [type]="salesChartType"
+          [data]="salesChartData"
+          [options]="salesChartOptions">
+        </canvas>
+      </div>
+      <div class="table-container">
+        <h3>Daily Sales</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of getPaginatedSalesData()">
+              <td>{{ item.date }}</td>
+              <td>{{ item.amount | currency }}</td>
+            </tr>
+            <tr *ngIf="dailySalesData.length === 0">
+              <td colspan="2" class="no-data">No sales data available</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <!-- Pagination controls -->
+        <div class="pagination-container" *ngIf="dailySalesData.length > pageSize">
+          <div class="pagination-controls">
+            <button class="pagination-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
+              <i class="fas fa-chevron-left"></i> Previous
+            </button>
+            <span class="page-info">Page {{ currentPage }} of {{ getTotalPages() }}</span>
+            <button class="pagination-btn" [disabled]="currentPage === getTotalPages()" (click)="changePage(currentPage + 1)">
+              Next <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Order Status Distribution -->
+    <section class="report-section">
+      <div class="section-header">
+        <h2>Order Status Distribution</h2>
+      </div>
+      <div class="charts-row">
+        <div class="chart-container">
+          <canvas baseChart
+            [type]="orderStatusChartType"
+            [data]="orderStatusChartData"
+            [options]="orderStatusChartOptions">
+          </canvas>
+        </div>
+        <div class="chart-info">
+          <h3>Status Breakdown</h3>
+          <ul class="status-list">
+            <li *ngFor="let label of orderStatusChartData.labels; let i = index" class="status-item">
+              <span 
+                class="status-color"
+                [style.backgroundColor]="getBackgroundColor(i, 'doughnut')">
+              </span>
+              <span class="status-label">{{ label }}</span>
+              <span class="status-value">{{ orderStatusChartData.datasets[0].data[i]}}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Inventory Analytics -->
+    <section class="report-section">
+      <div class="section-header">
+        <h2>Inventory Analytics</h2>
+      </div>
+      <div class="charts-row">
+        <div class="chart-container">
+          <canvas baseChart
+            [type]="categoryPieChartType"
+            [data]="categoryPieChartData"
+            [options]="categoryPieChartOptions">
+          </canvas>
+        </div>
+        <div class="table-container">
+          <h3>Low Stock Alert</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Brand</th>
+                <th>Type</th>
+                <th>Stock</th>
+                <th>Threshold</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of lowStockItems">
+                <td>{{ item.model }}</td>
+                <td>{{ item.brand }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.stock }}</td>
+                <td>{{ item.threshold }}</td>
+                <!-- <td [ngClass]="{'out-of-stock': item.status === 'Out of Stock', 'low-stock': item.status === 'Low Stock'}">
+                  {{ item.status }}
+                </td> -->
+              </tr>
+              <tr *ngIf="lowStockItems.length === 0">
+                <td colspan="6" class="no-data">No low stock items</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Customer Analytics -->
+    <section class="report-section">
+      <div class="section-header">
+        <h2>Customer Analytics</h2>
+      </div>
+      <div class="charts-row">
+        <div class="table-container">
+          <h3>Customers by Location</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Location</th>
+                <th>Customer Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of customersByLocation">
+                <td>{{ item.location }}</td>
+                <td>{{ item.count }}</td>
+              </tr>
+              <tr *ngIf="customersByLocation.length === 0">
+                <td colspan="2" class="no-data">No customer location data available</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="stats-container">
+          <div class="stat-card">
+            <div class="stat-title">New Customers</div>
+            <div class="stat-value">{{ newCustomersCount }}</div>
+            <div class="stat-description">in selected date range</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <section class="report-actions">
+      <button class="action-btn print-btn" (click)="printReport()">
+        <i class="fas fa-print"></i> Print Report
+      </button>
+      <button class="action-btn refresh-btn" (click)="loadReportData()">
+        <i class="fas fa-sync-alt"></i> Refresh Data
+      </button>
+    </section>
+  </div>
 </div>
