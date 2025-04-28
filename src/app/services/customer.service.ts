@@ -121,6 +121,6 @@ export class CustomerService {
   }
 
   updateLoyaltyPoints(id: string, points: number): Observable<Customer> {
-    return this.http.put<Customer>(`${this.apiUrl}/${id}/loyalty-points`, { points }, { headers: this.getAuthHeaders() });
+    return this.http.patch<Customer>(`${this.apiUrl}/${id}/loyalty-points`, points , { headers: this.getAuthHeaders() });
   }
 }

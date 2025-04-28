@@ -145,15 +145,25 @@
     }
 
     .status {
-      padding: 0.25rem 0.75rem;
+      padding: 0.5rem 0.75rem;
       border-radius: 50px;
       font-size: 0.875rem;
       font-weight: 500;
 
-      &.delivered {
+      &.completed {
         background-color: #d1e7dd;
         color: #0f5132;
       }
+
+      &.pending {
+        background-color: #fff3cd;
+        color: #856404;
+      }
+
+      &.cancelled {
+        background-color: #f8d7da;
+        color: #721c24;
+      }      
 
       &.processing {
         background-color: #fff3cd;

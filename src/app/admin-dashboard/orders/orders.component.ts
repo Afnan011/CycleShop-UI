@@ -464,6 +464,20 @@ export class OrdersComponent implements OnInit {
         next: () => {
           if (this.selectedOrder) {
             this.selectedOrder.status = this.newStatus as statusType;
+            
+            // Add 1 loyalty point when order is marked as completed
+            if (newStatus === 'completed' && this.selectedOrder.customerId) {
+              this.customerService.updateLoyaltyPoints(this.selectedOrder.customerId, 1)
+                .subscribe({
+                  next: (updatedCustomer) => {
+                    this.toastr.success(`Added 1 loyalty point to ${updatedCustomer.firstName} ${updatedCustomer.lastName}`);
+                  },
+                  error: (err) => {
+                    console.error('Error updating loyalty points:', err);
+                    this.toastr.error('Failed to update loyalty points');
+                  }
+                });
+            }
           }
           this.isEditingStatus = false;
           this.loadOrders();
