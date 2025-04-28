@@ -1,0 +1,178 @@
+<div class="employee-details-container">
+  <!-- Back button and header -->
+  <div class="employee-header">
+    <button class="back-btn" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i> Back to Employees
+    </button>
+    <h1 class="page-title">Employee Details</h1>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading employee details...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <i class="fas fa-exclamation-circle"></i>
+    <p>{{ error }}</p>
+  </div>
+
+  <div *ngIf="!loading && !error && employee" class="employee-content">
+    <!-- Profile Section -->
+    <div class="profile-section">
+      <div class="profile-header">
+        <div class="profile-image">
+          <img [src]="employee.imageUrl || 'assets/images/user-avatar.png'" 
+               [alt]="employee.username"
+               (error)="handleImageError($event)">
+        </div>
+        <div class="profile-info">
+          <h2>{{ employee.username }}</h2>
+          <div class="badge-container">
+            <span class="role-badge" [ngClass]="employee.role">{{ employee.role | titlecase }}</span>
+            <span class="status-badge" [ngClass]="employee.isActive ? 'active' : 'inactive'">
+              {{ employee.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-details">
+        <div class="detail-item">
+          <span class="label"><i class="fas fa-envelope"></i> Email:</span>
+          <span class="value">{{ employee.email }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label"><i class="fas fa-calendar"></i> Joined:</span>
+          <span class="value">{{ employee.createdAt | date:'mediumDate' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label"><i class="fas fa-clock"></i> Last Login:</span>
+          <span class="value">{{ employee.lastLogin ? (employee.lastLogin | date:'medium') : 'Never' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-section">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="stat-details">
+          <h3>Total Orders</h3>
+          <p class="stat-value">{{ stats.totalOrders }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-rupee-sign"></i>
+        </div>
+        <div class="stat-details">
+          <h3>Total Sales</h3>
+          <p class="stat-value">₹{{ stats.totalSales | number:'1.2-2' }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="stat-details">
+          <h3>Avg Order Value</h3>
+          <p class="stat-value">₹{{ stats.averageOrderValue | number:'1.2-2' }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-details">
+          <h3>Customers Served</h3>
+          <p class="stat-value">{{ stats.customersServed }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders Section -->
+    <div class="orders-section">
+      <div class="section-header">
+        <h2>Orders Processed</h2>
+        <div class="filter-container">
+          <div class="filter-item">
+            <label for="startDate">From:</label>
+            <input type="date" id="startDate" [(ngModel)]="startDate">
+          </div>
+          <div class="filter-item">
+            <label for="endDate">To:</label>
+            <input type="date" id="endDate" [(ngModel)]="endDate">
+          </div>
+          <div class="filter-item">
+            <label for="statusFilter">Status:</label>
+            <select id="statusFilter" [(ngModel)]="statusFilter">
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="completed">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <button class="apply-filters-btn" (click)="applyFilters()">
+            <i class="fas fa-filter"></i> Apply
+          </button>
+          <button class="reset-filters-btn" (click)="resetFilters()">
+            <i class="fas fa-undo"></i> Reset
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="orders.length === 0" class="no-orders">
+        <i class="fas fa-info-circle"></i>
+        <p>No orders found for this employee.</p>
+      </div>
+
+      <div *ngIf="orders.length > 0" class="orders-table-container">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Date</th>
+              <th>Customer</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of paginatedOrders()">
+              <td><span class="order-id">{{ order.orderNumber || order.orderId }}</span></td>
+              <td>{{ order.orderDate | date:'short' }}</td>
+              <td>
+                <span *ngIf="order.customer?.firstName && order.customer?.lastName; else noCustomer">
+                  {{ order.customer?.firstName }} {{ order.customer?.lastName }}
+                </span>
+                <ng-template #noCustomer>N/A</ng-template>
+              </td>
+              <td><span class="item-count">{{ order.orderItems.length || 0 }}</span></td>
+              <td><span class="amount">₹{{ order.totalAmount | number:'1.2-2' }}</span></td>
+              <td>
+                <span class="status-pill" [ngClass]="order.status?.toLowerCase() || 'pending'">
+                  {{ order.status || 'Pending' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="pagination-controls">
+          <button class="pagination-btn" [disabled]="currentPage === 1" (click)="previousPage()">
+            <i class="fas fa-chevron-left"></i> Previous
+          </button>
+          <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
+          <button class="pagination-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
+            Next <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -12,6 +12,7 @@ import { OrdersComponent } from './admin-dashboard/orders/orders.component';
 import { CustomersComponent } from './admin-dashboard/customers/customers.component';
 import { CustomerDetailsComponent } from './admin-dashboard/customers/customer-details/customer-details.component';
 import { EmployeesComponent } from './admin-dashboard/employees/employees.component';
+import { EmployeeDetailsComponent } from './admin-dashboard/employees/employee-details/employee-details.component';
 import { ReportsComponent } from './admin-dashboard/reports/reports.component';
 import { SettingsComponent } from './admin-dashboard/settings/settings.component';
 import { PaymentComponent } from './admin-dashboard/payment/payment.component';
@@ -79,7 +80,16 @@ export const routes: Routes = [
       },
       {
         path: 'employees',
-        component: EmployeesComponent
+        children: [
+          {
+            path: '',
+            component: EmployeesComponent
+          },
+          {
+            path: ':id',
+            component: EmployeeDetailsComponent
+          }
+        ]
       },
       {
         path: 'reports',

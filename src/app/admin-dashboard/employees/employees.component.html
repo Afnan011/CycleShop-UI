@@ -94,6 +94,13 @@
           <td>
             <div class="actions">
               <button
+                class="action-btn view"
+                (click)="viewEmployeeDetails(employee)"
+                title="View Details"
+              >
+                <i class="fas fa-eye"></i>
+              </button>
+              <button
                 class="action-btn edit"
                 (click)="editEmployee(employee)"
                 title="Edit"

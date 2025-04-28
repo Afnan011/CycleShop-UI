@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -59,7 +60,8 @@ export class EmployeesComponent implements OnInit {
   constructor(
     private userService: UserService,
     private fb: FormBuilder,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private router: Router
   ) {
     this.employeeForm = this.createEmployeeForm();
   }
@@ -284,5 +286,9 @@ export class EmployeesComponent implements OnInit {
 
   onImageRemove() {
     this.employeeForm.patchValue({ imageUrl: '' });
+  }
+
+  viewEmployeeDetails(employee: User): void {
+    this.router.navigate(['/admin/dashboard/employees', employee.userId]);
   }
 }

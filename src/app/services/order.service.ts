@@ -1,6 +1,5 @@
-// filepath: c:\Users\mafna\Desktop\DotNet\CycleShop App\UI\CycleShop\src\app\services\order.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -131,6 +130,33 @@ export class OrderService {
 
   getOrdersByCustomer(customerId: string): Observable<Order[]> {
     return this.http.get<Order[]>(`${this.apiUrl}/orders/customer/${customerId}`, { headers: this.getAuthHeaders() });
+  }
+
+  getOrdersByEmployee(employeeId: string, filters?: any): Observable<Order[]> {
+    let url = `${this.apiUrl}/orders/employee/${employeeId}/orders`;
+    
+    // Create HttpParams object for query parameters
+    let params = new HttpParams();
+    
+    // Add query parameters for filters if provided
+    if (filters) {
+      if (filters.status) {
+        params = params.set('status', filters.status);
+      }
+      
+      if (filters.startDate) {
+        params = params.set('startDate', filters.startDate);
+      }
+      
+      if (filters.endDate) {
+        params = params.set('endDate', filters.endDate);
+      }
+    }
+    
+    return this.http.get<Order[]>(url, { 
+      headers: this.getAuthHeaders(),
+      params: params
+    });
   }
 
   createOrder(orderRequest: CreateOrderRequest): Observable<Order> {
