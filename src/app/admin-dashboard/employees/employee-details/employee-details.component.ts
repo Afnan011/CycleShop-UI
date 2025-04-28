@@ -45,7 +45,7 @@ export class EmployeeDetailsComponent implements OnInit {
   startDate: string = '';
   endDate: string = '';
   statusFilter: string = 'all';
-  
+  backBtnTxt = 'Back to Employees';
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -55,8 +55,15 @@ export class EmployeeDetailsComponent implements OnInit {
   ) { }
   
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      if (params['from'] === 'dashboard') {
+        this.backBtnTxt = 'Back';
+      } 
+    });
+
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
+
       if (id) {
         this.employeeId = id;
         this.loadEmployeeDetails();
@@ -74,7 +81,6 @@ export class EmployeeDetailsComponent implements OnInit {
     this.userService.getUser(this.employeeId).pipe(
       switchMap(employee => {
         this.employee = employee;
-        // Using the updated method that matches the OrdersController endpoint
         return this.orderService.getOrdersByEmployee(this.employeeId, this.getOrderFilters());
       }),
       catchError(error => {
@@ -165,6 +171,12 @@ export class EmployeeDetailsComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/admin/dashboard/employees']);
+    this.route.queryParams.subscribe(params => {
+      if (params['from'] === 'dashboard') {
+        this.router.navigate(['/admin/dashboard']);
+      } else {
+        this.router.navigate(['/admin/dashboard/employees']);
+      }
+    });
   }
 }

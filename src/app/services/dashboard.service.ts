@@ -30,7 +30,7 @@ export interface LowStockItem {
   providedIn: 'root'
 })
 export class DashboardService {
-  constructor(private apiService: ApiService, private inventoryService: InventoryService) { }
+  constructor(private apiService: ApiService) { }
 
   getDashboardSummary(): Observable<DashboardSummary> {
     return forkJoin({
@@ -62,8 +62,6 @@ export class DashboardService {
           const firstItem = order.orderItems && order.orderItems.length > 0 
             ? order.orderItems[0].cycle.modelName
             : { product: { name: 'Unknown' } };
-
-          console.log('firstItem', firstItem);
             
           return {
             id: `#${order.orderNumber || order.orderId.substring(0, 8)}`,
@@ -94,4 +92,18 @@ export class DashboardService {
       ))
     );
   }
+
+
+  getUserDetails(userName: string): Observable<any> {
+    
+    return this.apiService.get<any>(`Users/by-username/${userName}`).pipe(
+      map(user => ({
+        id: user.userId,
+        name: user.username,
+        email: user.email,
+        role: user.role
+      }))
+    );
+  }
+
 }
