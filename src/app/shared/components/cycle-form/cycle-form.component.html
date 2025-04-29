@@ -6,32 +6,43 @@
       [(ngModel)]="formData.modelName"
       class="form-control"
       placeholder="Enter model name"
+      (blur)="markAsTouched('modelName')"
     />
-    <span class="error-message" *ngIf="formData.modelName?.trim() === ''">
+    <span class="error-message" *ngIf="shouldShowError('modelName')">
       Model name is required
     </span>
   </div>
   <div class="form-group">
     <label>Brand</label>
-    <select [(ngModel)]="formData.brandName" class="form-control">
+    <select 
+      [(ngModel)]="formData.brandName" 
+      class="form-control"
+      (change)="markAsTouched('brandName')"
+      (blur)="markAsTouched('brandName')"
+    >
       <option value="">Select Brand</option>
       <option *ngFor="let brand of brands" [value]="brand.name">
         {{ brand.name }}
       </option>
     </select>
-    <span class="error-message" *ngIf="!formData.brandName">
+    <span class="error-message" *ngIf="shouldShowError('brandName')">
       Brand is required
     </span>
   </div>
   <div class="form-group">
     <label>Type</label>
-    <select [(ngModel)]="formData.typeName" class="form-control">
+    <select 
+      [(ngModel)]="formData.typeName" 
+      class="form-control"
+      (change)="markAsTouched('typeName')"
+      (blur)="markAsTouched('typeName')"
+    >
       <option value="">Select Type</option>
       <option *ngFor="let type of types" [value]="type.name">
         {{ type.name }}
       </option>
     </select>
-    <span class="error-message" *ngIf="formData.typeName === ''">
+    <span class="error-message" *ngIf="shouldShowError('typeName')">
       Type is required
     </span>
   </div>
@@ -42,8 +53,9 @@
       [(ngModel)]="formData.price"
       class="form-control"
       placeholder="Enter selling price"
+      (blur)="markAsTouched('price')"
     />
-    <span class="error-message" *ngIf="formData.price <= 0">
+    <span class="error-message" *ngIf="shouldShowError('price')">
       Price must be greater than 0
     </span>
   </div>
@@ -54,8 +66,9 @@
       [(ngModel)]="formData.costPrice"
       class="form-control"
       placeholder="Enter cost price"
+      (blur)="markAsTouched('costPrice')"
     />
-    <span class="error-message" *ngIf="formData.costPrice <= 0">
+    <span class="error-message" *ngIf="shouldShowError('costPrice')">
       Cost price must be greater than 0
     </span>
   </div>
@@ -66,8 +79,9 @@
       [(ngModel)]="formData.stockQuantity"
       class="form-control"
       placeholder="Enter stock quantity"
+      (blur)="markAsTouched('stockQuantity')"
     />
-    <span class="error-message" *ngIf="formData.stockQuantity < 0">
+    <span class="error-message" *ngIf="shouldShowError('stockQuantity')">
       Stock cannot be negative
     </span>
   </div>
@@ -78,8 +92,9 @@
       [(ngModel)]="formData.reorderThreshold"
       class="form-control"
       placeholder="Enter reorder threshold"
+      (blur)="markAsTouched('reorderThreshold')"
     />
-    <span class="error-message" *ngIf="formData.reorderThreshold <= 0">
+    <span class="error-message" *ngIf="shouldShowError('reorderThreshold')">
       Reorder threshold must be greater than 0
     </span>
   </div>
@@ -90,8 +105,9 @@
       [(ngModel)]="formData.warehouseLocation"
       class="form-control"
       placeholder="Enter warehouse location (e.g. A1-02)"
+      (blur)="markAsTouched('warehouseLocation')"
     />
-    <span class="error-message" *ngIf="formData.warehouseLocation?.trim() === ''">
+    <span class="error-message" *ngIf="shouldShowError('warehouseLocation')">
       Warehouse location is required
     </span>
   </div>
@@ -101,8 +117,9 @@
       [(ngModel)]="formData.description"
       class="form-control"
       placeholder="Enter cycle description"
+      (blur)="markAsTouched('description')"
     ></textarea>
-    <span class="error-message" *ngIf="formData.description?.trim() === ''">
+    <span class="error-message" *ngIf="shouldShowError('description')">
       Description is required
     </span>
   </div>

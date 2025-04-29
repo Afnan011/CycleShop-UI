@@ -90,25 +90,37 @@
 
   <!-- Add New Cycle Modal -->
   <app-modal *ngIf="showAddModal" [isOpen]="true" (close)="showAddModal = false" title="Add New Cycle">
-    <app-cycle-form
-      [formData]="newCycle"
-      [brands]="brands"
-      [types]="types"
-      (formSubmit)="onAddCycleSubmit($event)"
-      (cancel)="showAddModal = false">
-    </app-cycle-form>
+    <div class="cycle-modal-content">
+      <div class="modal-description">
+        <i class="fas fa-bicycle"></i>
+        <p>Add a new cycle to your inventory with complete details. Fields marked with * are required.</p>
+      </div>
+      <app-cycle-form
+        [formData]="newCycle"
+        [brands]="brands"
+        [types]="types"
+        (formSubmit)="onAddCycleSubmit($event)"
+        (cancel)="showAddModal = false">
+      </app-cycle-form>
+    </div>
   </app-modal>
 
   <!-- Edit Cycle Modal -->
   <app-modal *ngIf="showEditModal" [isOpen]="true" (close)="showEditModal = false" title="Edit Cycle">
-    <app-cycle-form
-      [formData]="editingCycle"
-      [brands]="brands"
-      [types]="types"
-      [isEdit]="true"
-      (formSubmit)="onEditCycleSubmit($event)"
-      (cancel)="showEditModal = false">
-    </app-cycle-form>
+    <div class="cycle-modal-content">
+      <div class="modal-description">
+        <i class="fas fa-edit"></i>
+        <p>Update the details for this cycle. Any changes will be reflected across the system.</p>
+      </div>
+      <app-cycle-form
+        [formData]="editingCycle"
+        [brands]="brands"
+        [types]="types"
+        [isEdit]="true"
+        (formSubmit)="onEditCycleSubmit($event)"
+        (cancel)="showEditModal = false">
+      </app-cycle-form>
+    </div>
   </app-modal>
 
   <!-- Delete Confirmation Modal -->  <app-confirm-modal

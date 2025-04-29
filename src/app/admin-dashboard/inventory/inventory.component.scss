@@ -4,10 +4,16 @@
 @use "../../../styles.scss" as *;
 
 .inventory-container {
-  padding: 1.5rem;
+  padding: 1.75rem;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;
+  animation: fadeIn 0.5s ease-out;
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 }
 
 .inventory-header {
@@ -15,26 +21,72 @@
   justify-content: flex-start;
   align-items: center;
   margin-bottom: 2rem;
-  gap: 1rem;
+  gap: 1.25rem;
   background-color: white;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 1.25rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: linear-gradient($color-primary, $color-secondary);
+  }
 
   .search-filters {
     display: flex;
-    gap: 1rem;
+    gap: 1.25rem;
     align-items: center;
     flex: 1;
 
     .search-box {
-      max-width: 300px;
-      min-width: 200px;
+      max-width: 320px;
+      min-width: 240px;
+      position: relative;
+      
+      &::before {
+        content: '\f002';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: $color-light-font;
+        font-size: 0.875rem;
+        pointer-events: none;
+        z-index: 1;
+      }
+      
+      input.form-control {
+        padding-left: 2.5rem;
+        transition: all 0.3s ease;
+        
+        &:focus {
+          transform: translateY(-2px);
+        }
+      }
     }
 
     .form-control {
-      min-width: 120px;
-      border-radius: 4px;
+      min-width: 140px;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+      transition: all 0.3s ease;
+      
+      &:hover {
+        border-color: color.adjust($color-primary, $lightness: 10%);
+      }
+      
+      &:focus {
+        transform: translateY(-2px);
+      }
     }
   }
 }
@@ -43,36 +95,43 @@
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid $color-border;
-  border-radius: 0.25rem;
+  border-radius: 6px;
   background-color: $color-white;
   font-size: map.get($font-sizes, base);
   color: $color-dark-font;
-  transition: all 0.2s;
+  transition: all 0.3s;
 
   &:focus {
     outline: none;
     border-color: $color-primary;
-    box-shadow: 0 0 0 2px rgba($color-primary, 0.1);
+    box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
   }
 }
 
 .add-cycle-btn {
   padding: 0 1.5rem;
-  height: 40px;
-  background-color: $color-primary;
+  height: 42px;
+  background: linear-gradient(135deg, $color-primary, color.adjust($color-primary, $lightness: -10%));
   color: white;
   border: none;
-  border-radius: 4px;
-  font-weight: map.get($font-weights, medium);
+  border-radius: 6px;
+  font-weight: map.get($font-weights, semibold);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s;
   margin-left: auto;
+  box-shadow: 0 4px 8px rgba($color-primary, 0.2);
 
   &:hover {
-    background-color: color.adjust($color-primary, $blackness: 5%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba($color-primary, 0.25);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba($color-primary, 0.2);
   }
 
   i {
@@ -82,31 +141,41 @@
 
 .inventory-table {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  
+  &:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  }
 
   .pagination-controls {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 1rem;
-    gap: 1rem;
+    padding: 1.25rem;
+    gap: 1.25rem;
+    border-top: 1px solid $color-border;
+    background-color: rgba($color-background, 0.3);
 
     .pagination-btn {
-      padding: 0.5rem 1rem;
+      padding: 0.6rem 1.25rem;
       border: 1px solid $color-border;
       background: white;
-      border-radius: 4px;
+      border-radius: 6px;
       color: $color-dark-font;
-      font-weight: 500;
+      font-weight: map.get($font-weights, medium);
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      transition: all 0.3s ease;
 
       &:hover:not(:disabled) {
-        background-color: #f8f9fa;
+        transform: translateY(-2px);
+        border-color: $color-primary;
+        color: $color-primary;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
       }
 
       &:disabled {
@@ -116,44 +185,69 @@
 
       i {
         font-size: 0.75rem;
+        transition: transform 0.2s ease;
+      }
+      
+      &:hover:not(:disabled) i.fa-chevron-right {
+        transform: translateX(3px);
+      }
+      
+      &:hover:not(:disabled) i.fa-chevron-left {
+        transform: translateX(-3px);
       }
     }
 
     .page-info {
       color: $color-dark-font;
-      font-size: 0.875rem;
-      font-weight: 500;
+      font-size: 0.925rem;
+      font-weight: map.get($font-weights, medium);
+      padding: 0.5rem 0.75rem;
+      background-color: rgba($color-background, 0.5);
+      border-radius: 6px;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.03);
     }
   }
 
   table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
 
     th,
     td {
-      padding: 1rem;
+      padding: 1.125rem 1.25rem;
       text-align: left;
-      border-bottom: 1px solid $color-border;
+      border-bottom: 1px solid rgba($color-border, 0.7);
     }
 
     th {
       cursor: pointer;
       user-select: none;
       position: relative;
-      padding-right: 20px;
+      padding-right: 28px;
       background-color: $color-table-header;
+      color: $color-dark-font;
+      font-weight: map.get($font-weights, semibold);
+      font-size: map.get($font-sizes, sm);
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      transition: all 0.2s;
 
       &:hover {
-        background-color: rgba(0, 0, 0, 0.05);
+        background-color: color.adjust($color-table-header, $lightness: -3%);
       }
 
       span {
         position: absolute;
-        right: 5px;
+        right: 10px;
         top: 50%;
         transform: translateY(-50%);
+        font-size: 0.75rem;
       }
+    }
+
+    tr:hover td {
+      background-color: rgba($color-primary, 0.02);
     }
 
     td {
@@ -161,95 +255,129 @@
       font-size: map.get($font-sizes, base);
       font-family: "Inter", sans-serif;
       font-weight: map.get($font-weights, regular);
+      transition: all 0.15s ease;
 
       .stocks {
-        padding: 0.5rem 1.5rem;
-        border-radius: 15px;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        display: inline-block;
+        text-align: center;
+        min-width: 80px;
+        font-size: map.get($font-sizes, sm);
+        font-weight: map.get($font-weights, medium);
+        background-color: rgba($color-success, 0.1);
+        color: $color-success;
       }
 
       .low-stock {
-        background-color: $color-warning;
-        color: $color-dark-font;
+        background-color: rgba($color-warning, 0.15);
+        color: darken($color-warning, 15%);
         font-weight: map.get($font-weights, medium);
       }
     }
 
     .actions {
       display: flex;
-      gap: 0.7rem;
+      gap: 0.85rem;
       justify-content: flex-start;
       align-items: center;
       min-width: 120px;
 
       .action-btn {
-        width: 32px;
-        height: 32px;
-        border-radius: 4px;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
         border: none;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.2s ease;
+
+        i {
+          font-size: 0.95rem;
+          transition: all 0.2s ease;
+        }
 
         &.view {
-          background-color: rgba($color-body-font, 0.1);
+          background-color: rgba($color-body-font, 0.08);
           color: $color-dark-font;
 
           &:hover {
             background-color: $color-body-font;
             color: $color-white;
+            transform: translateY(-3px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            
+            i {
+              transform: scale(1.1);
+            }
           }
         }
 
         &.edit {
-          background-color: rgba($color-primary, 0.1);
+          background-color: rgba($color-primary, 0.08);
           color: $color-primary;
 
           &:hover {
             background-color: $color-primary;
             color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 3px 6px rgba($color-primary, 0.2);
+            
+            i {
+              transform: scale(1.1);
+            }
           }
         }
 
         &.delete {
-          background-color: rgba($color-error, 0.1);
+          background-color: rgba($color-error, 0.08);
           color: $color-error;
 
           &:hover {
             background-color: $color-error;
             color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 3px 6px rgba($color-error, 0.2);
+            
+            i {
+              transform: scale(1.1);
+            }
           }
         }
       }
     }
   }
+  
   td.cycle-image {
     width: 80px;
-    padding: 0.5rem;
+    padding: 0.75rem;
     cursor: pointer;
+    text-align: center;
 
     img {
-      width: 60px;
-      height: 60px;
+      width: 64px;
+      height: 64px;
       object-fit: cover;
-      border-radius: 6px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
       display: block;
       margin: 0 auto;
+      transition: all 0.3s ease;
     }
 
     &:hover {
       img {
-        transform: scale(1.05);
-        transition: transform 0.2s;
+        transform: scale(1.08);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
       }
     }
   }
 }
 
 .image-upload {
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
 
   .image-preview {
     margin-top: 1rem;
@@ -257,40 +385,292 @@
     width: 150px;
     height: 150px;
     border: 1px solid $color-border;
-    border-radius: 4px;
+    border-radius: 8px;
     overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+    }
 
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: all 0.3s ease;
     }
 
     .remove-image {
       position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
+      top: 8px;
+      right: 8px;
       background: rgba(255, 255, 255, 0.9);
       border: none;
       border-radius: 50%;
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       color: $color-error;
-      transition: all 0.2s;
-
+      transition: all 0.2s ease;
+      opacity: 0.8;
+      
       &:hover {
         background: rgba(255, 255, 255, 1);
-        transform: scale(1.1);
+        transform: scale(1.15);
+        opacity: 1;
       }
     }
   }
 
   input[type="file"] {
-    padding: 0.375rem;
+    padding: 0.5rem;
     font-size: 0.875rem;
+    cursor: pointer;
+    color: $color-body-font;
+  }
+}
+
+.cycle-modal-content {
+  .modal-description {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: rgba($color-primary, 0.05);
+    border-left: 4px solid $color-primary;
+    border-radius: 0.5rem;
+    
+    i {
+      font-size: 1.75rem;
+      color: $color-primary;
+    }
+    
+    p {
+      margin: 0;
+      color: $color-body-font;
+      font-size: map.get($font-sizes, sm);
+      line-height: 1.5;
+    }
+  }
+  
+  app-cycle-form {
+    ::ng-deep {
+      .form-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        
+        @media screen and (max-width: 767px) {
+          grid-template-columns: 1fr;
+        }
+      }
+      
+      .form-group {
+        label {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          font-weight: map.get($font-weights, medium);
+          margin-bottom: 0.6rem;
+          color: $color-dark-font;
+          
+          &::after {
+            content: "*";
+            color: $color-error;
+            font-weight: bold;
+          }
+          
+          &:has(+ select), &:has(+ input[type="number"]) {
+            &::after {
+              content: "*";
+              color: $color-error;
+            }
+          }
+        }
+        
+        .form-control {
+          border-radius: 6px;
+          padding: 0.75rem 1rem;
+          transition: all 0.2s ease;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+          
+          &:hover {
+            border-color: rgba($color-primary, 0.5);
+          }
+          
+          &:focus {
+            box-shadow: 0 0 0 2px rgba($color-primary, 0.15);
+            transform: translateY(-1px);
+          }
+        }
+      }
+      
+      .form-actions {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid $color-border;
+        
+        .cancel-btn {
+          padding: 0.75rem 1.5rem;
+          border-radius: 6px;
+          font-weight: map.get($font-weights, medium);
+          transition: all 0.2s ease;
+          
+          &:hover {
+            border-color: $color-primary;
+            color: $color-primary;
+          }
+        }
+        
+        .save-btn {
+          border-radius: 6px;
+          padding: 0.75rem 1.75rem;
+          font-weight: map.get($font-weights, medium);
+          background: linear-gradient(135deg, $color-primary, color.adjust($color-primary, $lightness: -10%));
+          box-shadow: 0 4px 10px rgba($color-primary, 0.25);
+          transition: all 0.3s ease;
+          
+          &:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba($color-primary, 0.3);
+          }
+          
+          &:disabled {
+            background: linear-gradient(135deg, lighten($color-primary, 20%), lighten($color-primary, 25%));
+            box-shadow: none;
+          }
+        }
+      }
+      
+      textarea.form-control {
+        min-height: 120px;
+        line-height: 1.5;
+      }
+      
+      .error-message {
+        margin-top: 0.4rem;
+        font-size: map.get($font-sizes, xs);
+        color: $color-error;
+        display: flex;
+        align-items: center;
+        
+        &::before {
+          content: "⚠️";
+          margin-right: 0.3rem;
+          font-size: 0.75rem;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .inventory-header {
+    flex-direction: column;
+    align-items: stretch;
+    
+    .search-filters {
+      flex-direction: column;
+      
+      .search-box {
+        max-width: none;
+        width: 100%;
+      }
+    }
+    
+    .add-cycle-btn {
+      width: 100%;
+      margin-top: 0.75rem;
+      justify-content: center;
+    }
+  }
+  
+  .inventory-table {
+    border-radius: 8px;
+    
+    table {
+      th, td {
+        padding: 0.875rem 1rem;
+      }
+      
+      th {
+        font-size: map.get($font-sizes, xs);
+        padding-right: 20px;
+      }
+    }
+    
+    .pagination-controls {
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding: 1rem;
+      
+      .pagination-btn {
+        padding: 0.5rem 1rem;
+        font-size: map.get($font-sizes, sm);
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .inventory-container {
+    padding: 1rem;
+  }
+  
+  .inventory-header {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .inventory-table {
+    overflow-x: auto;
+    
+    table {
+      min-width: 650px;
+      
+      td.cycle-image {
+        width: 60px;
+        
+        img {
+          width: 48px;
+          height: 48px;
+        }
+      }
+      
+      .actions {
+        gap: 0.5rem;
+        
+        .action-btn {
+          width: 32px;
+          height: 32px;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .inventory-header {
+    .search-filters {
+      flex-wrap: wrap;
+      
+      .search-box,
+      .form-control {
+        min-width: 200px;
+      }
+    }
+  }
+  
+  .inventory-table {
+    table {
+      th, td {
+        padding: 1rem;
+      }
+    }
   }
 }

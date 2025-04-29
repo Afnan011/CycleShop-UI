@@ -1,54 +1,128 @@
 <div class="cycle-details-container" *ngIf="cycle">
   <div class="cycle-header">
-    <button class="back-button" (click)="goBack()">
-      <i class="fas fa-arrow-left"></i> Back to Inventory
-    </button>
-  </div>
-
-  <div class="cycle-content">
-    <div class="cycle-image">
-      <img [src]="cycle.imageUrl || 'assets/images/default_cycle2.jpg'" [alt]="cycle.model">
-      <button class="full-screen-btn" (click)="openFullScreenImage()" *ngIf="cycle.imageUrl">
-        <i class="fas fa-expand"></i>
+    <div class="header-left">
+      <button class="back-button" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i> Back to Inventory
+      </button>
+      <h1 class="page-title">Cycle Details</h1>
+    </div>
+    <div class="header-actions">
+      <button class="action-btn edit-btn">
+        <i class="fas fa-edit"></i> Edit Details
       </button>
     </div>
+  </div>
 
-    <div class="cycle-info">
-      <h1 class="cycle-title">{{cycle.model}}</h1>
-      <div class="cycle-meta">
-        <span class="brand">{{cycle.brand}}</span>
-        <span class="type">{{cycle.type}}</span>
-      </div>
-
-      <div class="cycle-price">
-        <h2>{{cycle.price.toFixed(2) | currency }}</h2>
-        <span class="cost-price">Cost: {{cycle.costPrice.toFixed(2) | currency}}</span>
-      </div>
-
-      <div class="stock-info">
-        <div class="stock-status" [class.low-stock]="cycle.stockQuantity <= cycle.reorderThreshold">
-          <span class="label">Stock Level:</span>
-          <span class="value">{{cycle.stockQuantity}}</span>
+  <div class="detail-card product-overview">
+    <div class="card-content">
+      <div class="cycle-content">
+        <div class="cycle-image-section">
+          <div class="cycle-image">
+            <div class="image-wrapper">
+              <img [src]="cycle.imageUrl || 'assets/images/default_cycle2.jpg'" [alt]="cycle.model">
+              <div class="image-overlay">
+                <button class="full-screen-btn" (click)="openFullScreenImage()" *ngIf="cycle.imageUrl">
+                  <i class="fas fa-expand"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="image-meta">
+            <div class="meta-item">
+              <i class="fas fa-barcode"></i>
+              <span class="model-id">SKU: {{cycle.sku}}</span>
+            </div>
+            <div class="meta-item">
+              <i class="fas fa-clock"></i>
+              <span class="last-update">Last Updated: {{cycle.lastStockUpdate | date:'medium'}}</span>
+            </div>
+          </div>
         </div>
-        <div class="reorder-info">
-          <span class="label">Reorder Threshold:</span>
-          <span class="value">{{cycle.reorderThreshold}}</span>
-        </div>
-        <div class="location">
-          <span class="label">Warehouse Location:</span>
-          <span class="value">{{cycle.warehouseLocation}}</span>
+
+        <div class="cycle-info">
+          <div class="status-badge-container">
+            <div class="status-badge" [class.inactive]="!cycle.isActive">
+              <i class="fas" [class.fa-check-circle]="cycle.isActive" [class.fa-times-circle]="!cycle.isActive"></i>
+              {{cycle.isActive ? 'Active' : 'Inactive'}}
+            </div>
+          </div>
+          
+          <div class="cycle-header-info">
+            <h1 class="cycle-title">{{cycle.model}}</h1>
+            <div class="cycle-meta">
+              <span class="brand"><i class="fas fa-tag"></i> {{cycle.brand}}</span>
+              <span class="type"><i class="fas fa-bicycle"></i> {{cycle.type}}</span>
+            </div>
+          </div>
+
+          <div class="cycle-price">
+            <div class="price-display">
+              <h2>{{cycle.price.toFixed(2) | currency }}</h2>
+              <span class="cost-price">Cost: {{cycle.costPrice.toFixed(2) | currency}}</span>
+            </div>
+            <div class="margin-info">
+              <div class="margin-circle" [attr.data-percentage]="((cycle.price - cycle.costPrice) / cycle.price * 100).toFixed(0)">
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                  <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                  <path class="circle" [attr.stroke-dasharray]="((cycle.price - cycle.costPrice) / cycle.price * 100).toFixed(0) + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                  <text x="18" y="20.35" class="percentage">{{((cycle.price - cycle.costPrice) / cycle.price * 100).toFixed(0)}}%</text>
+                </svg>
+                <span class="margin-label">Profit Margin</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
+  </div>
 
-      <div class="cycle-description">
-        <h3>Description</h3>
-        <p>{{cycle.description}}</p>
+  <div class="detail-cards-row">
+    <div class="detail-card inventory-card">
+      <div class="card-header" [class.low-stock-header]="cycle.stockQuantity <= cycle.reorderThreshold">
+        <h3><i class="fas fa-cubes"></i> Inventory Status</h3>
+        <div class="stock-indicator" [class.low-stock]="cycle.stockQuantity <= cycle.reorderThreshold">
+          {{cycle.stockQuantity <= cycle.reorderThreshold ? 'Low Stock' : 'In Stock'}}
+        </div>
       </div>
+      <div class="card-content">
+        <div class="stock-details">
+          <div class="stock-item" [class.highlight]="cycle.stockQuantity <= cycle.reorderThreshold">
+            <div class="stock-icon">
+              <i class="fas fa-boxes"></i>
+            </div>
+            <div class="stock-info-content">
+              <span class="label">Current Stock</span>
+              <span class="value" [class.low-stock-value]="cycle.stockQuantity <= cycle.reorderThreshold">{{cycle.stockQuantity}}</span>
+            </div>
+          </div>
+          <div class="stock-item">
+            <div class="stock-icon">
+              <i class="fas fa-level-down-alt"></i>
+            </div>
+            <div class="stock-info-content">
+              <span class="label">Reorder Threshold</span>
+              <span class="value">{{cycle.reorderThreshold}}</span>
+            </div>
+          </div>
+          <div class="stock-item">
+            <div class="stock-icon">
+              <i class="fas fa-warehouse"></i>
+            </div>
+            <div class="stock-info-content">
+              <span class="label">Warehouse Location</span>
+              <span class="value">{{cycle.warehouseLocation}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      <div class="additional-info">
-        <p><strong>SKU:</strong> {{cycle.sku}}</p>
-        <p><strong>Last Stock Update:</strong> {{cycle.lastStockUpdate | date:'medium'}}</p>
-        <p><strong>Status:</strong> <span [class.inactive]="!cycle.isActive">{{cycle.isActive ? 'Active' : 'Inactive'}}</span></p>
+    <div class="detail-card description-card">
+      <div class="card-header">
+        <h3><i class="fas fa-info-circle"></i> Product Description</h3>
+      </div>
+      <div class="card-content">
+        <p class="description-text">{{cycle.description || 'No description available.'}}</p>
       </div>
     </div>
   </div>
