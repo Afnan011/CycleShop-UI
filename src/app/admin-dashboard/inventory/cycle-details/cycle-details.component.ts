@@ -14,13 +14,13 @@ import { CycleInventoryView } from '../../../models/cycle.model';
 export class CycleDetailsComponent implements OnInit {
   cycle: CycleInventoryView | null = null;
   showFullScreenImage = false;
-
+  
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private inventoryService: InventoryService
   ) {}
-
+  
   ngOnInit() {
     this.route.params.subscribe(params => {
       if (params['id']) {
@@ -41,18 +41,22 @@ export class CycleDetailsComponent implements OnInit {
       }
     });
   }
-
+  
   goBack() {
     this.router.navigate(['/admin/dashboard/inventory']);
   }
-
+  
   openFullScreenImage() {
     this.showFullScreenImage = true;
     document.body.style.overflow = 'hidden';
   }
-
+  
   closeFullScreenImage() {
     this.showFullScreenImage = false;
     document.body.style.overflow = 'auto';
+  }
+
+  editCycle(cycle: CycleInventoryView) {
+    
   }
 }

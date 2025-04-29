@@ -330,12 +330,12 @@
     padding: 1rem 0.5rem;
     border-top: 1px solid #f1f5f9;
 
-    .nav-item.logout {
-      color: #ef4444;
-
-      &:hover {
-        background-color: rgba(#ef4444, 0.1);
+    .nav-item.logout:hover {
+      i{
+        color: $color-error;
       }
+        background-color: rgba(#ef4444, 0.1);
+        color: $color-error;
     }
   }
 }
