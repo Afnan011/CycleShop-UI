@@ -76,7 +76,9 @@
           <td>
             {{ order.customer?.firstName }} {{ order.customer?.lastName }}
           </td>
-          <td>{{ order.orderDate | date : "medium" }}</td>
+          <td>{{ order.orderDate | date : "mediumDate" }} 
+              {{ order.orderDate | date : "shortTime" }}
+          </td>
           <td>
             <span class="status-badge" [ngClass]="'status-' + order.status">
               {{

@@ -28,78 +28,83 @@ export class AdminDashboardComponent implements OnInit {
     private orderService: OrderService, 
     private dashboardService: DashboardService,
     private router: Router) {
-    const user = this.authService.getCurrentUser();
-    if (user) {
-      this.username = user.username;
+      const user = this.authService.getCurrentUser();
+      if (user) {
+        this.username = user.username;
+      }
     }
-  }
-  
-  ngOnInit(): void {
-    this.fetchProcessingOrderCount();
-    this.fetchLowStockCount();
-    this.getUserDetails();
-  }
-  
-  toggleSidebar() {
-    this.sidebarCollapsed = !this.sidebarCollapsed;
-  }
-  
-  toggleUserMenu() {
-    this.showUserMenu = !this.showUserMenu;
-  }
-  
-  logout() {
-    this.showLogoutModal = true;
-  }
-  
-  fetchLowStockCount() {
-    this.dashboardService.getLowStockItems().subscribe({
-      next: (lowStockItems) => {
-        this.lowStockCount = lowStockItems.length;       
-      },
-      error: (error) => {
-        console.error('Error fetching low stock items:', error);
-        this.lowStockCount = 0;
-      }
-    });
-  }
-  
-  fetchProcessingOrderCount() {
-    this.orderService.getAllOrders().subscribe({
-      next: (orders) => {
-        const processing: statusType = 'processing';
-        const processingOrders = orders.filter(order => order.status === processing);
-        
-        this.processingOrderCount = processingOrders.length;
-      },
-      error: (error) => {
-        console.error('Error fetching orders:', error);
-        this.processingOrderCount = 0;
-      }
-    });
-  }
-  
-  getUserDetails() {
-    const user = this.authService.getCurrentUser();
-    if (user) {
-      this.dashboardService.getUserDetails(user.username).subscribe({
-        next: (userDetails) => {
-          this.currentUser = userDetails;
+    
+    ngOnInit(): void {
+      this.fetchProcessingOrderCount();
+      this.fetchLowStockCount();
+      this.getUserDetails();
+    }
+    
+    toggleSidebar() {
+      this.sidebarCollapsed = !this.sidebarCollapsed;
+    }
+    
+    toggleUserMenu() {
+      this.showUserMenu = !this.showUserMenu;
+    }
+    
+    logout() {
+      this.showLogoutModal = true;
+    }
+    
+    fetchLowStockCount() {
+      this.dashboardService.getLowStockItems().subscribe({
+        next: (lowStockItems) => {
+          this.lowStockCount = lowStockItems.length;       
         },
         error: (error) => {
-          console.error('Error fetching user details:', error);
+          console.error('Error fetching low stock items:', error);
+          this.lowStockCount = 0;
         }
       });
     }
-
-
-  }
-
+    
+    fetchProcessingOrderCount() {
+      this.orderService.getAllOrders().subscribe({
+        next: (orders) => {
+          const processing: statusType = 'processing';
+          const processingOrders = orders.filter(order => order.status === processing);
+        
+          this.processingOrderCount = processingOrders.length;
+        },
+        error: (error) => {
+          console.error('Error fetching orders:', error);
+          this.processingOrderCount = 0;
+        }
+      });
+    }
+    
+    getUserDetails() {
+      const user = this.authService.getCurrentUser();
+      if (user) {
+        this.dashboardService.getUserDetails(user.username).subscribe({
+          next: (userDetails) => {
+            this.currentUser = userDetails;
+          },
+          error: (error) => {
+            console.error('Error fetching user details:', error);
+          }
+        });
+      }
+      
+      
+    }
+    
   viewProfile() {
     this.router.navigate(
       ['/admin/dashboard/employees/' + this.currentUser.id], 
       { queryParams: { from: 'dashboard' } }
     );
+    this.showUserMenu = false;
+  }
+  
+  viewSettings() {
+    this.router.navigate(['/admin/dashboard/settings']);
     this.showUserMenu = false;
   }
   
