@@ -8,6 +8,7 @@ import { CustomerStateService } from '../../services/customer-state.service';
 import { Customer } from '../../services/customer.service';
 import { ToastrService } from 'ngx-toastr';
 import { DatePipe } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-customers',
@@ -39,13 +40,21 @@ export class CustomersComponent implements OnInit {
   sortDirection: 'asc' | 'desc' = 'asc';
   showDetailModal = false;
   currentFormPage: number = 0;
+  isAdmin: boolean = false;
+
   constructor(
     private customerState: CustomerStateService,
     private fb: FormBuilder,
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
     this.customerForm = this.createCustomerForm();
+    // Check if the current user is an admin
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      this.isAdmin = currentUser.role === 'admin';
+    }
   }
 
   ngOnInit(): void {

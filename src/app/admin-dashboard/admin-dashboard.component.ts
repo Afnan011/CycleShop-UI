@@ -22,6 +22,9 @@ export class AdminDashboardComponent implements OnInit {
   processingOrderCount: number = 0;
   lowStockCount: number = 0;
   currentUser: any = null;
+  isAdmin: boolean = false;
+  userRole: string = '';
+  userId: string = '';
   
   constructor(
     private authService: AuthService, 
@@ -31,12 +34,12 @@ export class AdminDashboardComponent implements OnInit {
       const user = this.authService.getCurrentUser();
       if (user) {
         this.username = user.username;
+        this.isAdmin = user.role === 'admin';
+        this.userRole = user.role;
       }
     }
     
     ngOnInit(): void {
-      this.fetchProcessingOrderCount();
-      this.fetchLowStockCount();
       this.getUserDetails();
     }
     
@@ -65,18 +68,35 @@ export class AdminDashboardComponent implements OnInit {
     }
     
     fetchProcessingOrderCount() {
-      this.orderService.getAllOrders().subscribe({
-        next: (orders) => {
-          const processing: statusType = 'processing';
-          const processingOrders = orders.filter(order => order.status === processing);
-        
-          this.processingOrderCount = processingOrders.length;
-        },
-        error: (error) => {
-          console.error('Error fetching orders:', error);
-          this.processingOrderCount = 0;
-        }
-      });
+      if (this.isAdmin) {
+        // Admin sees all processing orders
+        this.orderService.getAllOrders().subscribe({
+          next: (orders) => {
+            const processing: statusType = 'processing';
+            const processingOrders = orders.filter(order => order.status === processing);
+          
+            this.processingOrderCount = processingOrders.length;
+          },
+          error: (error) => {
+            console.error('Error fetching orders:', error);
+            this.processingOrderCount = 0;
+          }
+        });
+      } else {
+        this.orderService.getOrdersByEmployee(this.userId).subscribe({
+          next: (orders) => {
+            
+            const processing: statusType = 'processing';
+            const processingOrders = orders.filter(order => order.status === processing);
+          
+            this.processingOrderCount = processingOrders.length;
+          },
+          error: (error) => {
+            console.error('Error fetching employee orders:', error);
+            this.processingOrderCount = 0;
+          }
+        });
+      }
     }
     
     getUserDetails() {
@@ -85,14 +105,15 @@ export class AdminDashboardComponent implements OnInit {
         this.dashboardService.getUserDetails(user.username).subscribe({
           next: (userDetails) => {
             this.currentUser = userDetails;
+            this.userId = userDetails.id;
+            this.fetchProcessingOrderCount();
+            this.fetchLowStockCount();
           },
           error: (error) => {
             console.error('Error fetching user details:', error);
           }
         });
       }
-      
-      
     }
     
   viewProfile() {

@@ -21,7 +21,7 @@
       <div class="user-profile" (click)="toggleUserMenu()">
         <div class="user-profile-text">
           <span class="user-name">{{username}}</span>
-          <span class="user-role">Store Manager</span>
+          <span class="user-role">{{userRole === 'admin' ? 'Store Manager' : 'Employee'}}</span>
         </div>
         <img class="user-avatar" src="assets/images/user-avatar.svg" alt="User avatar" />
         <i class="fas fa-chevron-down"></i>
@@ -45,7 +45,7 @@
         <a routerLink="/admin/dashboard/inventory" routerLinkActive="active" class="nav-item">
           <i class="fas fa-bicycle"></i>
           <span>Inventory</span>
-          <span class="item-count">{{lowStockCount}}</span>
+          <span class="item-count" *ngIf="lowStockCount > 0">{{lowStockCount}}</span>
         </a>
         <a routerLink="/admin/dashboard/pos" routerLinkActive="active" class="nav-item">
           <i class="fa fa-cash-register"></i>
@@ -54,21 +54,24 @@
         <a routerLink="/admin/dashboard/orders" routerLinkActive="active" class="nav-item">
           <i class="fas fa-shopping-cart"></i>
           <span>Orders</span>
-          <span class="item-count">{{processingOrderCount}}</span>
+          <span class="item-count" *ngIf="processingOrderCount > 0">{{processingOrderCount}}</span>
         </a>
         <a routerLink="/admin/dashboard/customers" routerLinkActive="active" class="nav-item">
           <i class="fas fa-users"></i>
           <span>Customers</span>
         </a>
-        <a routerLink="/admin/dashboard/employees" routerLinkActive="active" class="nav-item">
+        <!-- Only show Employees section to admins -->
+        <a *ngIf="isAdmin" routerLink="/admin/dashboard/employees" routerLinkActive="active" class="nav-item">
           <i class="fas fa-user-tie"></i>
           <span>Employees</span>
         </a>
-        <a routerLink="/admin/dashboard/reports" routerLinkActive="active" class="nav-item">
+        <!-- Only show Reports section to admins -->
+        <a *ngIf="isAdmin" routerLink="/admin/dashboard/reports" routerLinkActive="active" class="nav-item">
           <i class="fas fa-chart-bar"></i>
           <span>Reports</span>
         </a>
-        <a routerLink="/admin/dashboard/settings" routerLinkActive="active" class="nav-item">
+        <!-- Only show Settings section to admins -->
+        <a *ngIf="isAdmin" routerLink="/admin/dashboard/settings" routerLinkActive="active" class="nav-item">
           <i class="fas fa-cog"></i>
           <span>Settings</span>
         </a>
@@ -83,7 +86,7 @@
     
     <div class="dashboard-content">
       <div class="breadcrumb">
-        <span>Admin</span>
+        <span>{{isAdmin ? 'Admin' : 'Employee'}}</span>
         <i class="fas fa-chevron-right"></i>
         <span>Dashboard</span>
       </div>
@@ -100,25 +103,28 @@
   (onClose)="showLogoutModal = false">
 </app-confirm-modal>
 
-<!-- User dropdown menu -->
 <div class="user-menu" *ngIf="showUserMenu">
   <div class="user-menu-header">
-    <img class="user-avatar" src="assets/images/user-avatar.svg" alt="User avatar" />
-    <div>
-      <div class="user-name">{{username}}</div>
-      <div class="user-email">{{userEmail}}</div>
+    <div class="user-avatar-large">
+      <img src="assets/images/user-avatar.svg" alt="User avatar" />
+    </div>
+    <div class="user-info">
+      <h3 class="user-name">{{username}}</h3>
+      <p class="user-email">{{currentUser?.email || 'Loading...'}}</p>
+      <span class="user-role-badge">{{userRole === 'admin' ? 'Administrator' : 'Employee'}}</span>
     </div>
   </div>
+  <hr />
   <div class="user-menu-items">
     <a class="user-menu-item" (click)="viewProfile()">
       <i class="fas fa-user"></i>
       <span>My Profile</span>
     </a>
-    <a class="user-menu-item" (click)="viewSettings()">
+    <a *ngIf="isAdmin" class="user-menu-item" (click)="viewSettings()">
       <i class="fas fa-cog"></i>
       <span>Account Settings</span>
     </a>
-    <hr>
+    <hr />
     <a class="user-menu-item" (click)="logout()">
       <i class="fas fa-sign-out-alt"></i>
       <span>Logout</span>

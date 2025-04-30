@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { DashboardService, Order, LowStockItem } from '../../services/dashboard.service';
 import { catchError, finalize, forkJoin, of } from 'rxjs';
 import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
 import {
   BaseChartDirective,
   provideCharts,
@@ -48,6 +49,9 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit {
   
   isLoading: boolean = true;
   error: string | null = null;
+  isAdmin: boolean = false;
+  currentUsername: string = '';
+  userId: string = ''; 
 
   // Colors for charts
   chartColors: string[] = [
@@ -165,7 +169,19 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit {
 
   public categoryChartType: ChartType = 'pie';
 
-  constructor(private dashboardService: DashboardService, private apiService: ApiService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private dashboardService: DashboardService, 
+    private apiService: ApiService, 
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
+  ) {
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.isAdmin = user.role === 'admin';
+      this.currentUsername = user.username;
+      this.loadCurrentUserDetails(); 
+    }
+  }
 
   ngOnInit(): void {
     this.loadDashboardData();
@@ -180,7 +196,37 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit {
     this.isLoading = true;
     this.error = null;
 
-    // Use forkJoin to load all data in parallel
+    // Different loading strategies based on user role
+    if (this.isAdmin) {
+      this.loadAdminDashboard();
+    } else {
+      // For employees, ensure we have the userId before loading data
+      if (this.userId) {
+        this.loadEmployeeDashboard();
+      } else {
+        // If userId is not available yet, load it and then load the dashboard
+        this.dashboardService.getUserDetails(this.currentUsername).subscribe({
+          next: (userDetails) => {
+            if (userDetails && userDetails.id) {
+              this.userId = userDetails.id;
+              this.loadEmployeeDashboard();
+            } else {
+              this.error = 'Failed to load employee data. User details missing ID.';
+              this.isLoading = false;
+            }
+          },
+          error: (err) => {
+            console.error('Error fetching user details:', err);
+            this.error = 'Failed to load employee data. Please try again later.';
+            this.isLoading = false;
+          }
+        });
+      }
+    }
+  }
+
+  loadAdminDashboard(): void {
+    // Admin sees overall data - use forkJoin to load all data in parallel
     forkJoin({
       summary: this.dashboardService.getDashboardSummary().pipe(
         catchError(err => {
@@ -219,14 +265,7 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit {
         })
       )
     }).pipe(
-      finalize(() => {
-        this.isLoading = false;
-        // Force change detection and chart updates
-        setTimeout(() => {
-          this.cdr.detectChanges();
-          this.forceChartRendering();
-        }, 100);
-      })
+      finalize(() => this.finalizeDashboardLoad())
     ).subscribe(results => {
       // Process summary data
       this.totalSales = results.summary.totalSales;
@@ -249,6 +288,134 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit {
       // Process sales data
       this.processSalesData(results.orders);
     });
+  }
+
+  loadEmployeeDashboard(): void {
+    // Employee specific data loading
+    forkJoin({
+      // Get orders processed by this employee
+      employeeOrders: this.apiService.get<any[]>(`Orders/employee/${this.userId}/orders`).pipe(
+        catchError(err => {
+          console.error('Error loading employee orders', err);
+          return of([]);
+        })
+      ),
+      // Still load cycles data for sales breakdown
+      cycles: this.apiService.get<any[]>('Cycles').pipe(
+        catchError(err => {
+          console.error('Error loading cycles', err);
+          return of([]);
+        })
+      ),
+      // Load low stock items (relevant for all users)
+      lowStockItems: this.dashboardService.getLowStockItems(5).pipe(
+        catchError(err => {
+          console.error('Error loading low stock items', err);
+          return of([]);
+        })
+      )
+    }).pipe(
+      finalize(() => this.finalizeDashboardLoad())
+    ).subscribe(results => {
+      const employeeOrders = results.employeeOrders;
+      
+      // Calculate employee-specific summary data
+      this.calculateEmployeeSummary(employeeOrders);
+      
+      // Get recent orders specific to this employee (last 5)
+      this.recentOrders = employeeOrders
+        .sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime())
+        .slice(0, 5);
+      
+      // Process low stock items
+      this.lowStockItems = results.lowStockItems;
+      
+      // Process orders for status chart - only this employee's orders
+      this.processOrderStatusData(employeeOrders);
+      
+      // For employee, use the cycles they sold most
+      this.processEmployeeSalesCategories(employeeOrders, results.cycles);
+      
+      // Process sales data - employee specific
+      this.processSalesData(employeeOrders);
+      
+      // Update chart titles for employee context
+      this.updateChartTitlesForEmployee();
+    });
+  }
+
+  finalizeDashboardLoad(): void {
+    this.isLoading = false;
+    // Force change detection and chart updates
+    setTimeout(() => {
+      this.cdr.detectChanges();
+      this.forceChartRendering();
+    }, 100);
+  }
+
+  calculateEmployeeSummary(employeeOrders: any[]): void {
+    // Calculate total sales for this employee
+    this.totalSales = employeeOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+    
+    // Count of orders processed by this employee
+    this.totalOrders = employeeOrders.length;
+    
+    // Count of unique customers served by this employee
+    const uniqueCustomers = new Set(employeeOrders.map(order => order.customerId));
+    this.totalCustomers = uniqueCustomers.size;
+    
+    // For inventory items, we'll just display count of unique products sold by employee
+    const uniqueProducts = new Set();
+    employeeOrders.forEach(order => {
+      interface OrderItem {
+        cycleId: string | number;
+      }
+
+      order.orderItems?.forEach((item: OrderItem) => {
+        uniqueProducts.add(item.cycleId);
+      });
+    });
+    this.inventoryItems = uniqueProducts.size;
+  }
+
+  updateChartTitlesForEmployee(): void {
+    // Update chart titles to reflect employee-specific data
+    this.salesChartOptions.plugins!.title!.text = 'My Sales Trend';
+    this.orderStatusChartOptions.plugins!.title!.text = 'My Order Status Distribution';
+    this.categoryChartOptions.plugins!.title!.text = 'My Top Selling Categories';
+  }
+
+  processEmployeeSalesCategories(employeeOrders: any[], allCycles: any[]): void {
+    // Create a map of cycle IDs to their categories
+    const cycleMap = new Map();
+    allCycles.forEach(cycle => {
+      cycleMap.set(cycle.cycleId, cycle.cycleType?.name || 'Unknown');
+    });
+    
+    // Count sales by category
+    const categorySales: Record<string, number> = {};
+    
+    // Go through each order
+    employeeOrders.forEach(order => {
+      if (order.orderItems && Array.isArray(order.orderItems)) {
+        // Process each order item
+        order.orderItems.forEach((item: any) => {
+          const cycleId = item.cycleId;
+          const category = cycleMap.get(cycleId) || 'Unknown';
+          
+          // Increment category sale count by quantity sold
+          categorySales[category] = (categorySales[category] || 0) + (item.quantity || 1);
+        });
+      }
+    });
+    
+    // Convert to chart data
+    const labels = Object.keys(categorySales);
+    const data = Object.values(categorySales);
+    
+    // Update chart
+    this.categoryChartData.labels = labels;
+    this.categoryChartData.datasets[0].data = data;
   }
 
   forceChartRendering(): void {
@@ -375,4 +542,24 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return months[date.getMonth()];
   }
+
+  loadCurrentUserDetails(): void {
+    if (this.currentUsername) {
+      this.dashboardService.getUserDetails(this.currentUsername).subscribe({
+        next: (userDetails) => {
+          if (userDetails && userDetails.id) {
+            this.userId = userDetails.id;
+            console.log('User ID:', this.userId);
+          } else {
+            console.error('Failed to load employee ID, user details missing ID');
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching user details:', error);
+        }
+      });
+    }
+  }
 }
+
+

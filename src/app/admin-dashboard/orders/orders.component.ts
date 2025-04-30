@@ -6,6 +6,8 @@ import { Router } from '@angular/router';
 import { OrderService, Order, Customer, Address, Cycle, CreateOrderRequest, Inventory, statusType } from '../../services/order.service';
 import { CustomerService } from 'src/app/services/customer.service';
 import { OrderDetailsModalComponent } from "./order-details-modal/order-details-modal.component";
+import { AuthService } from '../../services/auth.service';
+import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-orders',
@@ -15,6 +17,11 @@ import { OrderDetailsModalComponent } from "./order-details-modal/order-details-
   styleUrls: ['./orders.component.scss'],
 })
 export class OrdersComponent implements OnInit {
+  // Role-based properties
+  isAdmin: boolean = false;
+  currentUsername: string = '';
+  currentEmployeeId: string = ''; 
+  
   // Search & Filter properties
   searchQuery: string = '';
   statusFilter: string = 'all';
@@ -50,10 +57,20 @@ export class OrdersComponent implements OnInit {
   constructor(
     private orderService: OrderService,
     private customerService: CustomerService,
+    private authService: AuthService,
+    private dashboardService: DashboardService,
     private fb: FormBuilder,
     private toastr: ToastrService,
     private router: Router
   ) {
+    // Check user role
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.isAdmin = user.role === 'admin';
+      this.currentUsername = user.username;
+      // We'll fetch the actual employee ID in ngOnInit
+    }
+    
     this.orderForm = this.fb.group({
       customerId: ['', Validators.required],
       shippingAddressId: [''],
@@ -64,7 +81,7 @@ export class OrdersComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadOrders();
+    this.loadCurrentUserDetails();
     this.loadCustomers();
     this.loadCycles();
     
@@ -75,6 +92,26 @@ export class OrdersComponent implements OnInit {
       setTimeout(() => {
         this.prepareOrderFromPOS(navigation.cartItems);
       }, 500);
+    }
+  }
+  
+
+  loadCurrentUserDetails(): void {
+    if (this.currentUsername) {
+      this.dashboardService.getUserDetails(this.currentUsername).subscribe({
+        next: (userDetails) => {
+          if (userDetails && userDetails.id) {
+            this.currentEmployeeId = userDetails.id;
+          } else {
+            console.error('Failed to load employee ID, user details missing ID');
+          }
+          this.loadOrders();
+        },
+        error: (error) => {
+          console.error('Error fetching user details:', error);
+          this.toastr.error('Error loading user information');
+        }
+      });
     }
   }
 
@@ -133,9 +170,17 @@ export class OrdersComponent implements OnInit {
 
   // CRUD Operations
   loadOrders(): void {
-    this.orderService.getAllOrders().subscribe((orders) => {
-      this.orders = orders;
-    });
+    if (this.isAdmin) {
+      // Admin sees all orders
+      this.orderService.getAllOrders().subscribe((orders) => {
+        this.orders = orders;
+      });
+    } else {
+      // Employee sees only their orders
+      this.orderService.getOrdersByEmployee(this.currentEmployeeId).subscribe((orders) => {
+        this.orders = orders;
+      });
+    }
   }
 
   loadCustomers(): void {
@@ -381,28 +426,10 @@ export class OrdersComponent implements OnInit {
 
     if (hasStockIssue) return;
 
-    // Get the employee ID from the JWT token
-    const storedUser = localStorage.getItem('currentUser');
-    let employeeId = '';
-
-    if (storedUser) {
-      try {
-        const user = JSON.parse(storedUser);
-        const tokenPayload = JSON.parse(atob(user.token.split('.')[1]));
-        employeeId = tokenPayload.nameid || tokenPayload.sub || ''; // JWT commonly uses nameid or sub for user ID
-
-        // If employee ID not found in typical claims, check for custom claims
-        if (!employeeId && tokenPayload.userId) {
-          employeeId = tokenPayload.userId;
-        }
-      } catch (error) {
-        console.error('Error extracting employee ID from token:', error);
-        // Fallback to default ID if there's an error
-        employeeId = '00000000-0000-0000-0000-000000000000';
-      }
-    } else {
-      // Fallback if no user found in localStorage
-      employeeId = '00000000-0000-0000-0000-000000000000';
+    // Make sure we have a valid employee ID
+    if (!this.currentEmployeeId) {
+      this.toastr.error('Error: Employee ID is missing. Please refresh the page and try again.');
+      return;
     }
 
     // Prepare order data for payment page
@@ -412,7 +439,7 @@ export class OrdersComponent implements OnInit {
         shippingAddressId: this.orderForm.get('shippingAddressId')?.value,
         discount: this.orderForm.get('discount')?.value || 0,
         notes: this.orderForm.get('notes')?.value || '',
-        employeeId: employeeId,
+        employeeId: this.currentEmployeeId, // Use the employee ID (GUID) instead of username
         customer: this.customers.find(c => c.customerId === this.orderForm.get('customerId')?.value),
       },
       items: this.orderItemsFormArray.controls.map((item) => ({
@@ -442,7 +469,6 @@ export class OrdersComponent implements OnInit {
 
   viewOrderDetails(order: Order): void {
     this.selectedOrder = order;
-
     this.newStatus = order.status || 'pending';
     this.showDetailsModal = true;
   }

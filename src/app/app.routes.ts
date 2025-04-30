@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { authGuard } from './guards/auth.guard';
@@ -20,7 +19,7 @@ import { PaymentComponent } from './admin-dashboard/payment/payment.component';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: '/dashboard',
+    redirectTo: '/admin/dashboard',
     pathMatch: 'full'
   },
   {
@@ -35,7 +34,6 @@ export const routes: Routes = [
     path: 'admin/dashboard',
     component: AdminDashboardComponent,
     canActivate: [authGuard],
-    data: { requiresAdmin: true },
     children: [
       {
         path: '',
@@ -65,7 +63,8 @@ export const routes: Routes = [
       {
         path: 'orders',
         component: OrdersComponent
-      },      {
+      },      
+      {
         path: 'customers',
         children: [
           {
@@ -80,34 +79,33 @@ export const routes: Routes = [
       },
       {
         path: 'employees',
-        children: [
-          {
-            path: '',
-            component: EmployeesComponent
-          },
-          {
-            path: ':id',
-            component: EmployeeDetailsComponent
-          }
-        ]
+        component: EmployeesComponent,
+        data: { requiresAdmin: true }
+      },
+      {
+        path: 'employees/:id',
+        component: EmployeeDetailsComponent,
+        data: { requiresAdmin: true }
       },
       {
         path: 'reports',
-        component: ReportsComponent
+        component: ReportsComponent,
+        data: { requiresAdmin: true }
       },
       {
         path: 'settings',
-        component: SettingsComponent
+        component: SettingsComponent,
+        data: { requiresAdmin: true }
       }
     ]
   },
   {
     path: 'dashboard',
-    component: DashboardComponent,
-    canActivate: [authGuard]
+    redirectTo: '/admin/dashboard',
+    pathMatch: 'full'
   },
   {
     path: '**',
-    redirectTo: '/dashboard'
+    redirectTo: '/admin/dashboard'
   }
 ];

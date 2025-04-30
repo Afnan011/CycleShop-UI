@@ -12,13 +12,29 @@ export const authGuard: CanActivateFn = (route) => {
     return false;
   }
 
-  if (route.data['requiresAdmin']) {
-    if (user.role === 'admin') {
-      return true;
+  // Check if the route requires admin privileges
+  if (route.data['requiresAdmin'] && user.role !== 'admin') {
+    // If user is an employee, redirect to dashboard
+    // This allows employees to access the dashboard but not admin-only routes
+    if (user.role === 'employee') {
+      router.navigate(['/admin/dashboard']);
     } else {
-      router.navigate(['/dashboard']);
-      return false;
+      // For other non-admin roles, redirect to login
+      router.navigate(['/login']);
     }
+    return false;
+  }
+
+  // Check if route is restricted by role
+  if (route.data['roles'] && !route.data['roles'].includes(user.role)) {
+    if (user.role === 'admin') {
+      router.navigate(['/admin/dashboard']);
+    } else if (user.role === 'employee') {
+      router.navigate(['/admin/dashboard']);
+    } else {
+      router.navigate(['/login']);
+    }
+    return false;
   }
 
   return true;

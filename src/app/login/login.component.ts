@@ -41,11 +41,9 @@ export class LoginComponent {
     this.authService.login(loginData).subscribe({
       next: (response) => {
         this.toastr.success('Login successful', 'Success');
-        if (response.role === 'admin') {
-          this.router.navigate(['/admin/dashboard']);
-        } else {
-          this.router.navigate(['/dashboard']);
-        }
+        // Both admin and employee should go to the admin dashboard
+        // The role-based restrictions will be applied within the dashboard
+        this.router.navigate(['/admin/dashboard']);
       },
       error: (error) => {
         this.errorMessage = error.message;

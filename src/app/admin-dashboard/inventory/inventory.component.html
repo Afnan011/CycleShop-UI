@@ -69,7 +69,8 @@
               <button class="action-btn edit" (click)="editCycle(cycle)">
                 <i class="fas fa-edit"></i>
               </button>
-              <button class="action-btn delete" (click)="deleteCycle(cycle)">
+              <!-- Only show delete button for admin users -->
+              <button *ngIf="isAdmin" class="action-btn delete" (click)="deleteCycle(cycle)">
                 <i class="fas fa-trash"></i>
               </button>
             </div>

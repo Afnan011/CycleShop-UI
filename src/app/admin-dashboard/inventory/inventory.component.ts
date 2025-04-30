@@ -8,6 +8,7 @@ import { CycleFormComponent } from '../../shared/components/cycle-form/cycle-for
 import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal.component';
 import { InventoryStateService } from '../../services/inventory-state.service';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-inventory',
@@ -30,6 +31,7 @@ export class InventoryComponent implements OnInit {
   totalPages = 1;
   sortField: string = 'model';
   sortDirection: 'asc' | 'desc' = 'asc';
+  isAdmin: boolean = false;
 
   // Data state
   cycles: CycleInventoryView[] = [];
@@ -56,8 +58,15 @@ export class InventoryComponent implements OnInit {
   constructor(
     private inventoryState: InventoryStateService,
     private toastr: ToastrService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private authService: AuthService
+  ) {
+    // Check if the current user is an admin
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      this.isAdmin = currentUser.role === 'admin';
+    }
+  }
 
   ngOnInit() {
     // Subscribe to state updates

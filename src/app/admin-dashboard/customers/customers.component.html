@@ -40,7 +40,8 @@
               <button class="action-btn edit" (click)="editCustomer(customer); $event.stopPropagation()" title="Edit">
                 <i class="fas fa-edit"></i>
               </button>
-              <button class="action-btn delete" (click)="deleteCustomer(customer); $event.stopPropagation()"
+              <!-- Only show delete button for admin users -->
+              <button *ngIf="isAdmin" class="action-btn delete" (click)="deleteCustomer(customer); $event.stopPropagation()"
                 title="Delete">
                 <i class="fas fa-trash"></i>
               </button>

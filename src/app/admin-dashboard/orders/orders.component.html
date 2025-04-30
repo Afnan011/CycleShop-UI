@@ -128,174 +128,172 @@
           <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
         </select>
         <span>per page</span>
-      </div>
+      </div> -->
     </div>
-  </div>   -->
+  </div>
 
-      <!-- Create Order Modal -->
-      <div class="modal" *ngIf="showCreateModal">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3>Create New Order</h3>
-            <button class="close-btn" (click)="closeModals()">×</button>
+  <!-- Create Order Modal -->
+  <div class="modal" *ngIf="showCreateModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Create New Order</h3>
+        <button class="close-btn" (click)="closeModals()">×</button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="orderForm" (ngSubmit)="submitOrder()">
+          <!-- Customer Selection -->
+          <div class="form-group">
+            <label>Customer:</label>
+            <select formControlName="customerId" class="form-control" required (change)="onCustomerSelect()">
+              <option [ngValue]="null" disabled>Select a customer</option>
+              <option *ngFor="let customer of customers" [value]="customer.customerId">
+                {{ customer.firstName }} {{ customer.lastName }}
+              </option>
+            </select>
+            <div *ngIf="
+                orderForm.get('customerId')?.invalid &&
+                orderForm.get('customerId')?.touched
+              " class="error-message">
+              Customer is required
+            </div>
           </div>
-          <div class="modal-body">
-            <form [formGroup]="orderForm" (ngSubmit)="submitOrder()">
-              <!-- Customer Selection -->
-              <div class="form-group">
-                <label>Customer:</label>
-                <select formControlName="customerId" class="form-control" required (change)="onCustomerSelect()">
-                  <option [ngValue]="null" disabled>Select a customer</option>
-                  <option *ngFor="let customer of customers" [value]="customer.customerId">
-                    {{ customer.firstName }} {{ customer.lastName }}
-                  </option>
-                </select>
-                <div *ngIf="
-                    orderForm.get('customerId')?.invalid &&
-                    orderForm.get('customerId')?.touched
-                  " class="error-message">
-                  Customer is required
-                </div>
-              </div>
-              <!-- Shipping Address -->
-              <div class="form-group">
-                <label>Shipping Address:</label>
-                <select formControlName="shippingAddressId" class="form-control" (change)="onAddressSelect()">
-                  <option [ngValue]="null" disabled>Select an address</option>
-                  <option *ngFor="let address of customerAddresses" [value]="address.addressId">
-                    {{ formatAddress(address) }}
-                  </option>
-                </select>
-              </div>
+          <!-- Shipping Address -->
+          <div class="form-group">
+            <label>Shipping Address:</label>
+            <select formControlName="shippingAddressId" class="form-control" (change)="onAddressSelect()">
+              <option [ngValue]="null" disabled>Select an address</option>
+              <option *ngFor="let address of customerAddresses" [value]="address.addressId">
+                {{ formatAddress(address) }}
+              </option>
+            </select>
+          </div>
 
-              <!-- Order Items Section -->
-              <div class="order-items">
-                <div class="section-header">
-                  <h4>Order Items</h4>
-                  <button type="button" class="add-item-btn" (click)="addOrderItem()">
-                    <i class="fas fa-plus"></i>
-                    <span>Add Item</span>
+          <!-- Order Items Section -->
+          <div class="order-items">
+            <div class="section-header">
+              <h4>Order Items</h4>
+              <button type="button" class="add-item-btn" (click)="addOrderItem()">
+                <i class="fas fa-plus"></i>
+                <span>Add Item</span>
+              </button>
+            </div>
+
+            <div formArrayName="orderItems">
+              <div *ngFor="
+                  let item of orderItemsFormArray.controls;
+                  let i = index
+                " class="order-item" [formGroupName]="i">
+                <div class="item-header">
+                  <h5>Item #{{ i + 1 }}</h5>
+                  <button type="button" class="remove-item-btn" (click)="removeOrderItem(i)" title="Remove Item">
+                    ×
                   </button>
                 </div>
+                <div class="item-details">
+                  <div class="form-group cycle-selection">
+                    <label>Cycle:</label>
+                    <select formControlName="cycleId" class="form-control" required (change)="onCycleSelect(i)">
+                      <option [ngValue]="null" disabled>
+                        Select a cycle
+                      </option>
+                      <option *ngFor="let cycle of availableCycles" [value]="cycle.cycleId">
+                        {{ cycle.modelName }} (SKU: {{ cycle.sku }}) -
+                        {{ cycle.price | currency }}
+                      </option>
+                    </select>
 
-                <div formArrayName="orderItems">
-                  <div *ngFor="
-                      let item of orderItemsFormArray.controls;
-                      let i = index
-                    " class="order-item" [formGroupName]="i">
-                    <div class="item-header">
-                      <h5>Item #{{ i + 1 }}</h5>
-                      <button type="button" class="remove-item-btn" (click)="removeOrderItem(i)" title="Remove Item">
-                        ×
-                      </button>
-                    </div>
-                    <div class="item-details">
-                      <div class="form-group cycle-selection">
-                        <label>Cycle:</label>
-                        <select formControlName="cycleId" class="form-control" required (change)="onCycleSelect(i)">
-                          <option [ngValue]="null" disabled>
-                            Select a cycle
-                          </option>
-                          <option *ngFor="let cycle of availableCycles" [value]="cycle.cycleId">
-                            {{ cycle.modelName }} (SKU: {{ cycle.sku }}) -
-                            {{ cycle.price | currency }}
-                          </option>
-                        </select>
-
-                        <!-- Display selected cycle details -->
-                        <div class="cycle-details" *ngIf="item.get('cycleDetails')?.value?.modelName">
-                          <div class="detail-row">
-                            <span class="detail-label">Model:</span>
-                            <span class="detail-value">{{
-                              item.get("cycleDetails")?.value?.modelName
-                              }}</span>
-                          </div>
-                          <div class="detail-row">
-                            <span class="detail-label">Brand:</span>
-                            <span class="detail-value">{{
-                              item.get("cycleDetails")?.value?.brandName
-                              }}</span>
-                          </div>
-                          <div class="detail-row">
-                            <span class="detail-label">SKU:</span>
-                            <span class="detail-value">{{
-                              item.get("cycleDetails")?.value?.sku
-                              }}</span>
-                          </div>
-                        </div>
+                    <!-- Display selected cycle details -->
+                    <div class="cycle-details" *ngIf="item.get('cycleDetails')?.value?.modelName">
+                      <div class="detail-row">
+                        <span class="detail-label">Model:</span>
+                        <span class="detail-value">{{
+                          item.get("cycleDetails")?.value?.modelName
+                          }}</span>
                       </div>
-
-                      <div class="form-group">
-                        <label>Quantity:</label>
-                        <input type="number" formControlName="quantity" class="form-control" min="1"
-                          (change)="onQuantityChange(i)" [max]="item.get('maxQuantity')?.value" />
+                      <div class="detail-row">
+                        <span class="detail-label">Brand:</span>
+                        <span class="detail-value">{{
+                          item.get("cycleDetails")?.value?.brandName
+                          }}</span>
                       </div>
-
-                      <div class="form-group">
-                        <label>Unit Price:</label>
-                        <input type="number" formControlName="priceSnapshot" class="form-control" readonly />
-                      </div>
-
-                      <div class="form-group">
-                        <label>Total:</label>
-                        <input type="text" [value]="calculateItemTotal(i) | currency" class="form-control" readonly />
+                      <div class="detail-row">
+                        <span class="detail-label">SKU:</span>
+                        <span class="detail-value">{{
+                          item.get("cycleDetails")?.value?.sku
+                          }}</span>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              <!-- Order Summary -->
-              <div class="order-summary">
-                <h4>Order Summary</h4>
-                <div class="summary-row">
-                  <span>Subtotal:</span>
-                  <span>{{ calculateSubtotal() | currency }}</span>
-                </div>
-                <div class="summary-row">
-                  <span>Tax:</span>
-                  <span>{{ calculateTax() | currency }}</span>
-                </div>
-                <div class="summary-row discount">
-                  <label>Discount:</label>
-                  <input type="number" formControlName="discount" class="form-control" min="0"
-                    (change)="updateTotals()" />
-                </div>
-                <div class="summary-row total">
-                  <span>Total:</span>
-                  <span>{{ calculateTotal() | currency }}</span>
-                </div>
-              </div>
+                  <div class="form-group">
+                    <label>Quantity:</label>
+                    <input type="number" formControlName="quantity" class="form-control" min="1"
+                      (change)="onQuantityChange(i)" [max]="item.get('maxQuantity')?.value" />
+                  </div>
 
-              <!-- Notes -->
-              <div class="form-group">
-                <label>Notes:</label>
-                <textarea formControlName="notes" class="form-control" rows="3"></textarea>
-              </div>
+                  <div class="form-group">
+                    <label>Unit Price:</label>
+                    <input type="number" formControlName="priceSnapshot" class="form-control" readonly />
+                  </div>
 
-              <!-- Form Actions -->
-              <div class="modal-actions">
-                <button type="button" class="cancel-btn" (click)="closeModals()">
-                  Cancel
-                </button>
-                <button type="submit" class="submit-btn" [disabled]="
-                    orderForm.invalid || orderItemsFormArray.length === 0
-                  ">
-                  Proceed to Payment
-                </button>
+                  <div class="form-group">
+                    <label>Total:</label>
+                    <input type="text" [value]="calculateItemTotal(i) | currency" class="form-control" readonly />
+                  </div>
+                </div>
               </div>
-            </form>
+            </div>
           </div>
-        </div>
+
+          <!-- Order Summary -->
+          <div class="order-summary">
+            <h4>Order Summary</h4>
+            <div class="summary-row">
+              <span>Subtotal:</span>
+              <span>{{ calculateSubtotal() | currency }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Tax:</span>
+              <span>{{ calculateTax() | currency }}</span>
+            </div>
+            <div class="summary-row discount">
+              <label>Discount:</label>
+              <input type="number" formControlName="discount" class="form-control" min="0"
+                (change)="updateTotals()" />
+            </div>
+            <div class="summary-row total">
+              <span>Total:</span>
+              <span>{{ calculateTotal() | currency }}</span>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="form-group">
+            <label>Notes:</label>
+            <textarea formControlName="notes" class="form-control" rows="3"></textarea>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="modal-actions">
+            <button type="button" class="cancel-btn" (click)="closeModals()">
+              Cancel
+            </button>
+            <button type="submit" class="submit-btn" [disabled]="
+                orderForm.invalid || orderItemsFormArray.length === 0
+              ">
+              Proceed to Payment
+            </button>
+          </div>
+        </form>
       </div>
-      <!-- Order Details Modal -->
-      <app-order-details-modal 
-        [order]="selectedOrder" 
-        [isOpen]="showDetailsModal" 
-        (close)="closeModals()"
-        (statusUpdate)="updateOrderStatus($event)" 
-        (print)="printOrder($event)">
-      </app-order-details-modal>
     </div>
   </div>
+  <!-- Order Details Modal -->
+  <app-order-details-modal 
+    [order]="selectedOrder" 
+    [isOpen]="showDetailsModal" 
+    (close)="closeModals()"
+    (statusUpdate)="updateOrderStatus($event)" 
+    (print)="printOrder($event)">
+  </app-order-details-modal>
 </div>
