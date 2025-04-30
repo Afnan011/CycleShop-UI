@@ -196,15 +196,12 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit {
     this.isLoading = true;
     this.error = null;
 
-    // Different loading strategies based on user role
     if (this.isAdmin) {
       this.loadAdminDashboard();
     } else {
-      // For employees, ensure we have the userId before loading data
       if (this.userId) {
         this.loadEmployeeDashboard();
       } else {
-        // If userId is not available yet, load it and then load the dashboard
         this.dashboardService.getUserDetails(this.currentUsername).subscribe({
           next: (userDetails) => {
             if (userDetails && userDetails.id) {
