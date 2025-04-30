@@ -106,4 +106,30 @@ export class InventoryService {
   }): Observable<any> {
     return this.http.put(`${this.apiUrl}/Inventory/${id}`, inventory, { headers: this.getAuthHeaders() });
   }
+
+  createBrand(brandData: { name: string, description?: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/Brands`, brandData, { headers: this.getAuthHeaders() });
+  }
+
+  updateBrand(brandId: string, brandData: { name: string, description?: string }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/Brands/${brandId}`, brandData, { headers: this.getAuthHeaders() });
+  }
+
+  deleteBrand(brandId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/Brands/${brandId}`, { headers: this.getAuthHeaders() });
+  }
+
+  createCycleType(name: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/CycleTypes`, name, { headers: this.getAuthHeaders() });
+  }
+
+  updateCycleType(typeId: string, name: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/CycleTypes/${typeId}`, JSON.stringify(name), { 
+      headers: this.getAuthHeaders().set('Content-Type', 'application/json') 
+    });
+  }
+
+  deleteCycleType(typeId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/CycleTypes/${typeId}`, { headers: this.getAuthHeaders() });
+  }
 }

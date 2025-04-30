@@ -1,4 +1,273 @@
 <div class="settings-container">
-  <h2>System Settings</h2>
-  <p>Settings management works! Here you can configure system preferences and manage application settings.</p>
+  <div class="settings-header">
+    <h2>System Settings</h2>
+    <p>Configure system preferences, manage brands and cycle types</p>
+  </div>
+
+  <div class="settings-tabs">
+    <div class="tab" [class.active]="activeTab === 'general'" (click)="setActiveTab('general')">
+      <i class="fas fa-cog"></i> General
+    </div>
+    <div class="tab" [class.active]="activeTab === 'brands'" (click)="setActiveTab('brands')">
+      <i class="fas fa-tags"></i> Brands
+    </div>
+    <div class="tab" [class.active]="activeTab === 'types'" (click)="setActiveTab('types')">
+      <i class="fas fa-bicycle"></i> Cycle Types
+    </div>
+  </div>
+
+  <div class="settings-content">
+    <!-- General Settings Tab -->
+    <div class="tab-content" *ngIf="activeTab === 'general'">
+      <div class="general-settings">
+        <div class="settings-card">
+          <div class="card-header">
+            <h3><i class="fas fa-store"></i> Store Information</h3>
+          </div>
+          <div class="card-content">
+            <div class="info-item">
+              <span class="label">Store Name:</span>
+              <span class="value">CycleShop</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Version:</span>
+              <span class="value">1.0.0</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Last Update:</span>
+              <span class="value">April 30, 2025</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-header">
+            <h3><i class="fas fa-database"></i> Data Management</h3>
+          </div>
+          <div class="card-content">
+            <div class="action-buttons">
+              <button class="btn refresh-btn">
+                <i class="fas fa-sync"></i> Refresh Cache
+              </button>
+              <button class="btn export-btn">
+                <i class="fas fa-file-export"></i> Export Data
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Brands Tab -->
+    <div class="tab-content" *ngIf="activeTab === 'brands'">
+      <div class="brands-header">
+        <h3>Manage Brands</h3>
+        <button class="btn add-btn" (click)="openAddBrandModal()">
+          <i class="fas fa-plus"></i> Add New Brand
+        </button>
+      </div>
+
+      <div class="loading-spinner" *ngIf="loadingBrands">
+        <i class="fas fa-spinner fa-spin"></i> Loading brands...
+      </div>
+
+      <div class="empty-state" *ngIf="!loadingBrands && brands.length === 0">
+        <div class="empty-icon">
+          <i class="fas fa-box-open"></i>
+        </div>
+        <p>No brands found</p>
+        <button class="btn add-btn" (click)="openAddBrandModal()">
+          <i class="fas fa-plus"></i> Add Your First Brand
+        </button>
+      </div>
+
+      <div class="data-table" *ngIf="!loadingBrands && brands.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Brand Name</th>
+              <th>Description</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let brand of brands">
+              <td><strong>{{ brand.name }}</strong></td>
+              <td>{{ brand.description || 'No description' }}</td>
+              <td class="actions">
+                <button class="action-btn edit-btn" (click)="openEditBrandModal(brand)" title="Edit Brand">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn delete-btn" (click)="openDeleteBrandModal(brand)" title="Delete Brand">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Cycle Types Tab -->
+    <div class="tab-content" *ngIf="activeTab === 'types'">
+      <div class="types-header">
+        <h3>Manage Cycle Types</h3>
+        <button class="btn add-btn" (click)="openAddTypeModal()">
+          <i class="fas fa-plus"></i> Add New Type
+        </button>
+      </div>
+
+      <div class="loading-spinner" *ngIf="loadingTypes">
+        <i class="fas fa-spinner fa-spin"></i> Loading cycle types...
+      </div>
+
+      <div class="empty-state" *ngIf="!loadingTypes && cycleTypes.length === 0">
+        <div class="empty-icon">
+          <i class="fas fa-box-open"></i>
+        </div>
+        <p>No cycle types found</p>
+        <button class="btn add-btn" (click)="openAddTypeModal()">
+          <i class="fas fa-plus"></i> Add Your First Cycle Type
+        </button>
+      </div>
+
+      <div class="data-table" *ngIf="!loadingTypes && cycleTypes.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Type Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let type of cycleTypes">
+              <td><strong>{{ type.name }}</strong></td>
+              <td class="actions">
+                <button class="action-btn edit-btn" (click)="openEditTypeModal(type)" title="Edit Type">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn delete-btn" (click)="openDeleteTypeModal(type)" title="Delete Type">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Brand Modal -->
+  <app-modal *ngIf="showAddBrandModal" [isOpen]="showAddBrandModal" (close)="showAddBrandModal = false" title="Add New Brand">
+    <div class="modal-description">
+      <i class="fas fa-tags"></i>
+      <p>Add a new brand to your cycle shop. Brands are used to categorize cycles in inventory.</p>
+    </div>
+    <form [formGroup]="brandForm" (ngSubmit)="addBrand()">
+      <div class="form-group">
+        <label for="brandName">Brand Name*</label>
+        <input type="text" id="brandName" formControlName="name" class="form-control" placeholder="Enter brand name">
+        <div class="error-message" *ngIf="brandForm.get('name')?.invalid && brandForm.get('name')?.touched">
+          Brand name is required
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="brandDescription">Description</label>
+        <textarea id="brandDescription" formControlName="description" class="form-control" 
+          placeholder="Enter brand description (optional)"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn cancel-btn" (click)="showAddBrandModal = false">Cancel</button>
+        <button type="submit" class="btn submit-btn" [disabled]="brandForm.invalid">Add Brand</button>
+      </div>
+    </form>
+  </app-modal>
+
+  <!-- Edit Brand Modal -->
+  <app-modal *ngIf="showEditBrandModal" [isOpen]="showEditBrandModal" (close)="showEditBrandModal = false" title="Edit Brand">
+    <div class="modal-description">
+      <i class="fas fa-edit"></i>
+      <p>Update brand information</p>
+    </div>
+    <form [formGroup]="brandForm" (ngSubmit)="updateBrand()">
+      <div class="form-group">
+        <label for="brandName">Brand Name*</label>
+        <input type="text" id="brandName" formControlName="name" class="form-control" placeholder="Enter brand name">
+        <div class="error-message" *ngIf="brandForm.get('name')?.invalid && brandForm.get('name')?.touched">
+          Brand name is required
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="brandDescription">Description</label>
+        <textarea id="brandDescription" formControlName="description" class="form-control" 
+          placeholder="Enter brand description (optional)"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn cancel-btn" (click)="showEditBrandModal = false">Cancel</button>
+        <button type="submit" class="btn submit-btn" [disabled]="brandForm.invalid">Update Brand</button>
+      </div>
+    </form>
+  </app-modal>
+
+  <!-- Delete Brand Confirmation Modal -->
+  <app-confirm-modal
+    *ngIf="showDeleteBrandModal"
+    [isOpen]="showDeleteBrandModal"
+    title="Delete Brand"
+    message="Are you sure you want to delete this brand? This action cannot be undone and may affect existing cycles."
+    (onConfirm)="deleteBrand()"
+    (onClose)="showDeleteBrandModal = false">
+  </app-confirm-modal>
+
+  <!-- Add Cycle Type Modal -->
+  <app-modal *ngIf="showAddTypeModal" [isOpen]="showAddTypeModal" (close)="showAddTypeModal = false" title="Add New Cycle Type">
+    <div class="modal-description">
+      <i class="fas fa-bicycle"></i>
+      <p>Add a new cycle type to your shop. Types help categorize different kinds of bicycles.</p>
+    </div>
+    <form [formGroup]="typeForm" (ngSubmit)="addCycleType()">
+      <div class="form-group">
+        <label for="typeName">Type Name*</label>
+        <input type="text" id="typeName" formControlName="name" class="form-control" placeholder="Enter type name (e.g. Mountain Bike)">
+        <div class="error-message" *ngIf="typeForm.get('name')?.invalid && typeForm.get('name')?.touched">
+          Type name is required
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn cancel-btn" (click)="showAddTypeModal = false">Cancel</button>
+        <button type="submit" class="btn submit-btn" [disabled]="typeForm.invalid">Add Cycle Type</button>
+      </div>
+    </form>
+  </app-modal>
+
+  <!-- Edit Cycle Type Modal -->
+  <app-modal *ngIf="showEditTypeModal" [isOpen]="showEditTypeModal" (close)="showEditTypeModal = false" title="Edit Cycle Type">
+    <div class="modal-description">
+      <i class="fas fa-edit"></i>
+      <p>Update cycle type information</p>
+    </div>
+    <form [formGroup]="typeForm" (ngSubmit)="updateCycleType()">
+      <div class="form-group">
+        <label for="typeName">Type Name*</label>
+        <input type="text" id="typeName" formControlName="name" class="form-control" placeholder="Enter type name">
+        <div class="error-message" *ngIf="typeForm.get('name')?.invalid && typeForm.get('name')?.touched">
+          Type name is required
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn cancel-btn" (click)="showEditTypeModal = false">Cancel</button>
+        <button type="submit" class="btn submit-btn" [disabled]="typeForm.invalid">Update Type</button>
+      </div>
+    </form>
+  </app-modal>
+
+  <!-- Delete Cycle Type Confirmation Modal -->
+  <app-confirm-modal
+    *ngIf="showDeleteTypeModal"
+    [isOpen]="showDeleteTypeModal"
+    title="Delete Cycle Type"
+    message="Are you sure you want to delete this cycle type? This action cannot be undone and may affect existing cycles."
+    (onConfirm)="deleteCycleType()"
+    (onClose)="showDeleteTypeModal = false">
+  </app-confirm-modal>
 </div>
